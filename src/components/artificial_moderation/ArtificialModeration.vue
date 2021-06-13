@@ -378,7 +378,8 @@ export default {
       // string or list of strings.
       if (Array.isArray(body)) {
         // filter empty values
-        return body.filter((x) => x && x.lenght > 0);
+        // return body.filter((x) => x && x.lenght > 0);
+        return body;
       }
 
       return [body];
