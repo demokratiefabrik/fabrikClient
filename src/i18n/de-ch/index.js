@@ -297,14 +297,14 @@ export default {
   notifications: {
     PEERREVIEW_ASSIGNED: `Sie dürfen sich heute an {value} Gutachten zur Änderung/Ergänzung des Fragenkatalogs beteiligen.`,
     PEERREVIEW_INIT_INSERT: `Der von Ihnen erstellte Fragenvorschlag «{value}» wird nun von anderen Teilnehmenden begutachtet. Wir halten Sie hier auf dem Laufenden.`,
-    PEERREVIEW_INIT_UPDATE: `Ihr Änderungsvorschlag «{value}» wird nun von anderen Teilnehmenden begutachtet. Wir halten Sie hier auf dem Laufenden.`,
-    PEERREVIEW_REJECTED: `Der von Ihnen eingereichte Antrag «{value}» wurde abgelehnt.`,
-    PEERREVIEW_APPROVED: `Der von Ihnen erstellte Antrag «{value}» wurde angenommen.`,
+    PEERREVIEW_INIT_UPDATE: `Ihr Änderungsvorschlag zur Frage «{value}» wird nun von anderen Teilnehmenden begutachtet. Wir halten Sie hier auf dem Laufenden.`,
+    PEERREVIEW_REJECTED: `Der von Ihnen eingereichte Antrag (Frage: «{value}») wurde abgelehnt.`,
+    PEERREVIEW_APPROVED: `Der von Ihnen erstellte Antrag (Frage: «{value}») wurde angenommen.`,
     EDIT_CONTENT: `Der folgende, von Ihnen erstellte Kommentar wurde durch das Moderationsteam bearbeitet: «{value}»`,
     MOVE_CONTENT: `Der folgende, von Ihnen erstellte Kommentar wurde durch das Moderationsteam verschoben: «{value}»`,
     REPLY_TO_CONTENT: `Sie haben vom User {value} eine Antwort erhalten.`,
-    DELETE_CONTENT: `Ein Beitrag wurde vom Administrator gelöscht «{value}».`,
-    LOCK: `Der Zugang zur Könizer Demokratiefabrik wurde gesperrt: «{value}»`,
+    DELETE_CONTENT: `Ein Beitrag wurde vom Administrator mit folgender Begründung gelöscht: «{value}».`,
+    LOCK: `Der Zugang zur Könizer Demokratiefabrik wurde mit folgender Begründung gesperrt: «{value}»`,
     MESSAGE: `Sie haben eine Nachricht vom Moderationsteam erhalten: «{value}»`,
   }
 }

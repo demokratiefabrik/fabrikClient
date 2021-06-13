@@ -378,14 +378,16 @@ export default {
       // string or list of strings.
       if (Array.isArray(body)) {
         // filter empty values
-        // return body.filter((x) => x && x.lenght > 0);
-        return body;
+        return body.filter((x) => x && x.length > 0);
+        //console.log("mm", body2, body)
+        //return body2;
       }
 
       return [body];
     },
 
     noContent() {
+      // console.log(this.text, "ll")
       return this.text?.length === 0;
     },
 
