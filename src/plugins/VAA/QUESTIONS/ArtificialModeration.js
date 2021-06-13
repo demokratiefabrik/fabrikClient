@@ -29,7 +29,8 @@ const AMs = {
         condition: (ctx) => !ctx.VAAQuestionStageManualFocusTopic && !ctx.isRandomFocusStage && !ctx.focusedContent,
         body: (ctx) => [
           `Sie können sich jetzt ein beliebiges Thema aussuchen.`,
-          !ctx.get_uncompleted_user_peerreviews?.length ? `Bei den Themen sehen Sie jeweils, ob Sie noch Gutachten abgeben können` : ''
+          ``,
+          ctx.get_uncompleted_user_peerreviews?.length ? `Bei den Themen sehen Sie jeweils, ob Sie noch Gutachten abgeben können` : ''
         ]
       },
       {

@@ -371,14 +371,14 @@ export default {
         actorPartnerReference: this.actorPartnerReference,
       });
 
-      if (!body) {
-        return null;
-      }
+      // if (!body) {
+      //   return null;
+      // }
 
       // string or list of strings.
       if (Array.isArray(body)) {
         // filter empty values
-        return body.filter((x) => x && x.lenght);
+        return body.filter((x) => x && x.lenght > 0);
       }
 
       return [body];
