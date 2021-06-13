@@ -67,6 +67,10 @@
         im smartvote-Fragebogen am meisten Platz eingeräumt werden. Nämlich ungefähr {{topicHighestSaliencePercent}}%.
       </p>
     </div>
+        <div v-else>
+      <Skeleton h2="Zwischenstand:  smartvote-Themen"></Skeleton>
+    </div>
+
 
     <br>
 
@@ -229,14 +233,26 @@ export default {
 
   computed: {
     topicContentTree() {
+      const contenttreeID = this.topicContentTreeID
+      // const topicStage = Object.values(this.assembly_stages).find(
+      //   (stageTuple) => stageTuple.stage.type == "VAA_TOPICS"
+      // );
+      // console.assert(topicStage);
+      // console.assert(topicStage.stage.contenttree_id);
+      return this.get_contenttree({
+        contenttreeID: contenttreeID,
+      });
+    },
+    
+    topicContentTreeID() {
       const topicStage = Object.values(this.assembly_stages).find(
         (stageTuple) => stageTuple.stage.type == "VAA_TOPICS"
       );
       console.assert(topicStage);
-      console.assert(topicStage.stage.contenttree_id);
-      return this.get_contenttree({
-        contenttreeID: topicStage.stage.contenttree_id,
-      });
+      return (topicStage.stage.contenttree_id);
+      // return this.get_contenttree({
+      //   contenttreeID: topicStage.stage.contenttree_id,
+      // });
     },
 
     topics() {
@@ -361,6 +377,17 @@ export default {
         this.markUnAlert();
       }
     },
+
+    // LOAD TOPICS
+    topicContentTreeID(to, from) {
+      if (to) {
+        this.$store.dispatch('contentstore/syncContenttree', {
+          assemblyIdentifier: runtimeStore.assemblyIdentifier,
+          contenttreeID: to,
+          oauthUserID: this.oauth.userid
+        })
+      }
+    },
   },
 
   created() {
@@ -368,8 +395,16 @@ export default {
       this.markUnAlert();
     }
   },
+
   mounted() {
+
     // when stage has been loaded already
+    this.$store.dispatch('contentstore/syncContenttree', {
+      assemblyIdentifier: runtimeStore.assemblyIdentifier,
+      contenttreeID: this.topicContentTreeID,
+      oauthUserID: this.oauth.userid
+    })
+
     if (this.routed_stage?.stage.contenttree_id && this.oauth.userid) {
       this.$store.dispatch("peerreviewstore/syncPeerreviews", {
         assemblyIdentifier: runtimeStore.assemblyIdentifier,
