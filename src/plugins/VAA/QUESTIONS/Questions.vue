@@ -821,6 +821,12 @@ export default {
     initRoutedContent() {
       console.log("INIT ROUTED CONTENT");
       if (!this.nodeChildrenExceptUserPeerreviews?.length) {
+        // console.log("nodeChildrenExceptUserPeerreviews TRUE?", this.nodeChildrenExceptUserPeerreviews?.length)
+        if (this.$loaded(this.nodeChildrenExceptUserPeerreviews)){
+          // EMPTY CHAPTER...
+          this.milestone("SALIENCE", 4);
+          this.milestone("CHARTS", 4);
+        }
         return;
       }
 

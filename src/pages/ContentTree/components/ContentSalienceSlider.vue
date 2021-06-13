@@ -143,6 +143,10 @@ export default {
     initSet() {
       // console.log("SET NEW VALUE");
       // INIT Salience Monitor
+      if (!this.$loaded(this.progression_salience)){
+        // console.log("NULL RATING")
+        return null;
+      }
 
       const data = {
         contentID: this.content.content.id,

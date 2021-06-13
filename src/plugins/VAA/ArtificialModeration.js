@@ -22,7 +22,7 @@ const AMs = {
         buttons: [
           {
             action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
-            label: (ctx) => 'Ja, ich komme mit!'
+            label: (ctx) => 'Ich komme mit!'
           }
         ]
       },

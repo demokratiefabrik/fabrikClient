@@ -141,7 +141,7 @@ const ApiService = {
     var response = null
     response = await axios(data)
 
-    console.log('DEBUG1 ', response)
+    // console.log('DEBUG1 ', response)
 
     // TOKEN SHOULD BE ALRIGHT NOW:
     // DO the secont attempt
