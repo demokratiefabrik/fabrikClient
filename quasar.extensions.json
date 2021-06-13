@@ -1,0 +1,6 @@
+{
+  "dotenv-plus": {
+    "env_files": ".env",
+    "env_ci": ".env.ci"
+  }
+}

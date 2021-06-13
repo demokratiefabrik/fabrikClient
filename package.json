@@ -1,0 +1,53 @@
+{
+  "name": "demokratiefabrik",
+  "version": "0.5.1",
+  "description": "Demokratiefabrik - Vue-js Client",
+  "productName": "Demokratiefabrik",
+  "author": "Dominik Wyss (Année Politique Suisse)",
+  "private": false,
+  "scripts": {
+    "start-dev": "quasar dev",
+    "build": "quasar build",
+    "serve": "/usr/local/bin/quasar serve -p 80 --history ./dist/spa",
+    "build_docker_image": "docker build -f Dockerfile -t demokratiefabrik/fabrikclient . && docker push demokratiefabrik/fabrikclient",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@bity/oauth2-auth-code-pkce": "^2.12.0",
+    "@quasar/extras": "^1.9.14",
+    "@quasar/quasar-app-extension-dotenv": "^1.0.5",
+    "axios": "^0.21.0",
+    "chart.js": "^2.9.4",
+    "core-js": "^3.12.1",
+    "quasar": "^1.15.0",
+    "text-encoding": "^0.7.0",
+    "vue-chartjs": "^3.5.1",
+    "vue-dompurify-html": "^2.3.0",
+    "vue-i18n": "^8.0.0",
+    "vue-reactive-provide": "^0.3.0",
+    "vuex-persistedstate": "^4.0.0-beta.3",
+    "webcrypto-shim": "^0.1.6",
+    "whatwg-fetch": "^3.5.0"
+  },
+  "devDependencies": {
+    "@quasar/app": "^2.0.0",
+    "quasar-app-extension-dotenv-plus": "^2.0.0"
+  },
+  "browserslist": [
+    "ie >= 11",
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}

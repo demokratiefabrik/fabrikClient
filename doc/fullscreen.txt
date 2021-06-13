@@ -1,0 +1,23 @@
+    toggleFullscreen(e) {
+      const target = this.$refs.forumContainer;
+
+      this.$q.fullscreen
+        .toggle(target)
+        .then(() => {
+          // success!
+        })
+        .catch((err) => {
+          alert(err);
+          // uh, oh, error!!
+          // console.error(err)
+        });
+    },
+
+            <q-btn
+          color="secondary"
+          @click="toggleFullscreen"
+          :icon="$q.fullscreen.isActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          :label="$q.fullscreen.isActive ? 'Exit Fullscreen' : 'Go Fullscreen'"
+        />
+
+import { AppFullscreen } from "quasar";
