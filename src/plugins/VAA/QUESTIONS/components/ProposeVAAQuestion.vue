@@ -337,6 +337,9 @@ export default {
                   "Das Formular konnte nicht verarbeitet werden. Bitte informieren Sie die Veranstalter.",
               });
             }
+
+            this.closeDialog()
+            
           })
           .catch((error) => {
             console.warn(error);

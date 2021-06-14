@@ -227,7 +227,6 @@
             v-if="!milestonePEERREVIEW || !milestoneSALIENCE || !peerreviewCompleted"
             h2="Neue smartvote-Frage vorschlagen"
           />
-
           <div v-if="milestonePEERREVIEW && milestoneSALIENCE && peerreviewCompleted">
             <h2>
               <q-badge
@@ -718,10 +717,13 @@ export default {
       // dont ask, when one submitted one proposals...
       if (
         this.numberOfQuestionsInCurrentTopic > 5 ||
-        this.contributedAtleastOneVAAQuestion
+        this.contributedAtleastOneVAAQuestion ||
+        this.limitForAddingProposalsReached
       ) {
         return false;
       }
+
+
 
       return true;
     },
