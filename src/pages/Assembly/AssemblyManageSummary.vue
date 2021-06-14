@@ -78,7 +78,7 @@
 
         </ul>
       </div>
-      <div v-else>Wir halten Sie hier auf dem Laufenden, welche Fragen bei den Teilnehmden besonders gut ankommen.</div>
+      <div v-else>Wir halten Sie hier auf dem Laufenden, welche Fragen bei den Teilnehmenden besonders gut ankommen.</div>
 
 
     </div>
@@ -130,7 +130,7 @@
       <h2>Zwischenstand: Beteiligung</h2>
       <p>Wir laden insgesamt 9000 Könizerinnen und Könizer in die Demokratiefabrik ein. Wir sind gespannt, wieviele von Ihnen sich für die Demokratiefabrik interessieren. 
         
-        <span>Aktuell sind wir bei <b>{{assembly.agg_user_count }} Teilnehmende.</b></span>
+        <span>Aktuell sind wir bei <b>{{assembly.agg_user_count }} Teilnehmenden.</b></span>
         
         </p>
       <br><br>

@@ -96,7 +96,7 @@
 
         </ul>
       </div>
-      <div v-else>Wir halten Sie hier auf dem Laufenden, welche Fragen bei den Teilnehmden besonders gut ankommen.</div>
+      <div v-else>Wir halten Sie hier auf dem Laufenden, welche Fragen bei den Teilnehmenden besonders gut ankommen.</div>
 
 
     </div>
@@ -147,7 +147,7 @@
     <div>
       <h2>Zwischenstand: Beteiligung</h2>
       <p>Wir laden insgesamt 9000 Könizerinnen und Könizer in die Demokratiefabrik ein. Wir sind gespannt, wieviele von Ihnen sich für die Demokratiefabrik interessieren. 
-        <span v-if="assembly.agg_user_count && assembly.agg_user_count > 50">Aktuell sind wir bei {{assembly.agg_user_count }} Teilnehmende.</span>
+        <span v-if="assembly.agg_user_count && assembly.agg_user_count > 50">Aktuell sind wir bei {{assembly.agg_user_count }} Teilnehmenden.</span>
         <span v-if="!assembly.agg_user_count || assembly.agg_user_count <= 50">Wir halten Sie hier auf dem Laufenden.</span>
         
         </p>
