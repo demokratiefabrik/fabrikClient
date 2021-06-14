@@ -21,6 +21,12 @@
       </div>
     </div>
 
+    <h1>Assembly-Summary</h1>
+    <p>Hier sehen Sie einige Kennzahlen zur Assembly</p>
+    <router-link :to="toSummary">Übersicht</router-link>
+
+<br><br>
+
     <h1>Assembly-Inhalte</h1>
     <p>Hier können Sie die laufenden Diskussionen moderieren.</p>
     <!-- CITIZEN ASSEMBLIES -->
@@ -211,6 +217,20 @@ export default {
         });
         return this.get_contenttree({ contenttreeID: this.contenttreeID });
       }
+    },
+
+    toSummary() {
+      // TODO: this is a hack...
+      return {
+              name: 'assembly_manage_summary',
+              params: {
+                assemblyIdentifier: runtimeStore.assemblyIdentifier,
+                stageID: 8,
+                contenttreeID: 5,
+              },
+
+        }
+
     },
     ...mapGetters({
       assemblystore: "contentstore/assembly_sorted_stages",

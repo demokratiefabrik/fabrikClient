@@ -13,25 +13,7 @@
           :src="`layout/logodemokratiefabrik.png`"
           class="q-mb-xl"
         />
-        <h1> Vielen Dank für Ihre heutige Mitarbeit!</h1>
-
-        <ArtificialModeration
-          :AM="AMs.conclusionA"
-          alignment="left"
-          amGroup="Conclusion"
-          :role="1"
-          :ctx="this"
-        />
-
-        <ArtificialModeration
-          :AM="AMs.conclusionB"
-          alignment="right"
-          amGroup="Conclusion"
-          :role="2"
-          :ctx="this"
-        />
-
-        <!-- <p class="text-h4"> Es folgt ein kleiner Zwischenstand zur Demokratiefabrik! Wenn Sie möchten können Sie sich weiterhin auf der Plattform bewegen. Es gibt noch viel zu entdecken und mit anderen Könizerinenn und Könizer zu diskutieren. </p> -->
+        <h1> Summary</h1>
       </div>
     </div>
 
@@ -147,32 +129,11 @@
     <div>
       <h2>Zwischenstand: Beteiligung</h2>
       <p>Wir laden insgesamt 9000 Könizerinnen und Könizer in die Demokratiefabrik ein. Wir sind gespannt, wieviele von Ihnen sich für die Demokratiefabrik interessieren. 
-        <span v-if="assembly.agg_user_count && assembly.agg_user_count > 50">Aktuell sind wir bei {{assembly.agg_user_count }} Teilnehmende.</span>
-        <span v-if="!assembly.agg_user_count || assembly.agg_user_count <= 50">Wir halten Sie hier auf dem Laufenden.</span>
+        
+        <span>Aktuell sind wir bei <b>{{assembly.agg_user_count }} Teilnehmende.</b></span>
         
         </p>
       <br><br>
-
-    </div>
-    <!-- ... -->
-    <br>
-    <div class="row justify-between">
-      <div class="seperator">
-        <q-icon name="mdi-star-four-points-outline" />
-      </div>
-    </div>
-    <br>
-
-    <a name="OUTLOOK" />
-
-    <!-- Ausblick -->
-    <div>
-      <h2>Wie geht es nun weiter?</h2>
-      <p>Die Demokratiefabrik bleibt noch bis und mit 2. Juli 2021 geöffnet. Wir freuen uns, wenn Sie noch einmal vorbeischauen, um die Arbeiten zum Fragenkatalog erneut zu unterstützen!
-        Bei Ihrem nächsten Besuch finden Sie beim Glöckchen am oberen Rand Informationen dazu, wie andere Teilnehmende auf Ihre Anträge und Kommentare reagiert haben.
-
-        <!-- Vielen Dank für Ihren Besuch und bis zum nächsten Mal!  -->
-      </p>
 
     </div>
     <SideMenu :items="sideMenuItems" />

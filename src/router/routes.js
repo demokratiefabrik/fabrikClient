@@ -65,6 +65,10 @@ const routes = [
         component: () => import('pages/Assembly/AssemblyManageTree.vue'), meta: meta4AssemblyManagers
       },
       {
+        path: '/:assemblyIdentifier/manage/summary', name: 'assembly_manage_summary',
+        component: () => import('pages/Assembly/AssemblyManageSummary.vue'), meta: meta4AssemblyManagers
+      },
+      {
         path: '*',
         component: () => import('pages/Error404.vue')
       }
