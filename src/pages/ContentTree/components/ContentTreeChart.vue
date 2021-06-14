@@ -98,6 +98,7 @@ export default {
     },
     sortedChartEntries() {
       // deep copy
+      // console.log(this.nodes, "all population")
       const tmp_nodes = [...this.nodes];
 
       if (this.sortByPopulation && this.hasPopulationData) {
