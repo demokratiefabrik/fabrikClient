@@ -251,6 +251,11 @@ export default {
         this.$router.push({ name: 'home' });
       }
 
+      // send context data
+      const data = { extra: this.$q.platform.is };
+      data.screenW = screen.width
+      this.$root.monitorLog(constants.MONITOR_CONTEXT, data);
+
       // Clear data of last session...
       this.$root.clearSession()
     })
@@ -483,9 +488,7 @@ export default {
         if (fetchProfile) {
           this.$root.monitorLog(constants.MONITOR_ROUTE_CHANGE)
           console.log("FETCHED PROFILE!", constants.MONITOR_CONTEXT)
-          const data = { extra: this.$q.platform.is };
-          data.screenW = screen.width
-          this.$root.monitorLog(constants.MONITOR_CONTEXT, data);
+
         }
       }
     }
