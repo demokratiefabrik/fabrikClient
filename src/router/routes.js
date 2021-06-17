@@ -1,7 +1,7 @@
 // import UserContentDefault from 'src/pages/ContentTree/Default'
 import plugin_routes from './plugin_routes.js'
 const meta4AssemblyPages = { topmenu: 'assemblies_ongoing_list' }
-const meta4AssemblyDelegates = { assemblyAcl: 'delegate' }
+const meta4AssemblyDelegates = { assemblyAcl: ['delegate', 'observer']}
 const meta4AssemblyManagers = { assemblyAcl: 'manager' }
 
 const routes = [

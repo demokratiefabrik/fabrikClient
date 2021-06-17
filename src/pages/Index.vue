@@ -76,7 +76,10 @@ export default Vue.extend({
       get_public_profile: "publicprofilestore/get_public_profile",
       IsUserDelegateOfOngoingAssembly:
         "publicindexstore/IsUserDelegateOfOngoingAssembly",
+      IsUserObserverOfOngoingAssembly:
+        "publicindexstore/IsUserObserverOfOngoingAssembly",
       UsersDelegateAssemblies: "publicindexstore/UsersDelegateAssemblies",
+      UsersObserverAssemblies: "publicindexstore/UsersObserverAssemblies",
       UsersManagerAssemblies: "publicindexstore/UsersManagerAssemblies",
       IsThereAnAssemblyOngoing: "publicindexstore/IsThereAnAssemblyOngoing",
       ongoing_assemblies: "publicindexstore/ongoing_assemblies",

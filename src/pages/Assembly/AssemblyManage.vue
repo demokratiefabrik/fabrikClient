@@ -21,11 +21,10 @@
       </div>
     </div>
 
-    <h1>Assembly-Summary</h1>
-    <p>Hier sehen Sie einige Kennzahlen zur Assembly</p>
-    <router-link :to="toSummary">Übersicht</router-link>
+    <h1>Summary</h1>
+    <p>Diese Übersicht gibt es nun nicht mehr. Du kannst dich stattdessen als Beobachter einloggen. Siehe Dokument "Moderationshandbuch/Zugänge.docx"</p>
 
-<br><br>
+    <br><br>
 
     <h1>Assembly-Inhalte</h1>
     <p>Hier können Sie die laufenden Diskussionen moderieren.</p>

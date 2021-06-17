@@ -25,14 +25,25 @@ export default {
 
       // check permission
       if (to.meta.assemblyAcl) {
-        const role = `${to.meta.assemblyAcl}@${to.params.assemblyIdentifier}`
-        if (!to.params.assemblyIdentifier || !this.oauth.payload.roles.includes(role)) {
-          // Not allowed....
-          if (!to.params.assemblyIdentifier) {
-            console.error("WRONGLY CONFIUGRED ROUTE: assemblyACL option requires and Identifier in the route params")
-          }
+        if (!Array.isArray(to.meta.assemblyAcl)){
+          to.meta.assemblyAcl = [to.meta.assemblyAcl]
+        }
 
-          console.error("NOT AUTHORIZED....", to, this.oauth.payload.roles, this.oauth.payload.roles.includes(role), role)
+        // Not allowed....
+        if (!to.params.assemblyIdentifier) {
+          console.error("WRONGLY CONFIUGRED ROUTE: assemblyACL option requires and Identifier in the route params")
+          this.$router.push({ name: "home" });
+          throw new Error("Oops! You don't seem to have access to that page.");
+        }
+        
+        // find first permission that is allowed.
+        const allowed = to.meta.assemblyAcl.find(assemblyAcl => {
+          const role = `${assemblyAcl}@${to.params.assemblyIdentifier}`
+          // console.log("ROLE", role, this.oauth.payload.roles.includes(role), this.oauth.payload.roles, "llllllllllllllllllllllllllll")
+          return this.oauth.payload.roles.includes(role);
+        })
+        
+        if (!allowed) {
           this.$router.push({ name: "home" });
           throw new Error("Oops! You don't seem to have access to that page.");
         }

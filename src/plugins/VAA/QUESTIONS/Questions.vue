@@ -543,10 +543,16 @@ export default {
     },
 
     milestoneSALIENCE() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
       return this.stageMilestoneLabels.includes("SALIENCE");
     },
 
     milestonePROPOSE() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
       return (
         this.milestonePEERREVIEW &&
         this.stageMilestoneLabels.includes("PROPOSE")
@@ -554,6 +560,9 @@ export default {
     },
 
     milestonePEERREVIEW() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
       return (
         this.milestoneSALIENCE &&
         this.stageMilestoneLabels.includes("PEERREVIEW")
@@ -561,6 +570,10 @@ export default {
     },
 
     milestoneCHARTS() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
+
       return (
         this.milestonePROPOSE && this.stageMilestoneLabels.includes("CHARTS")
       );

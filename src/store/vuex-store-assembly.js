@@ -350,6 +350,13 @@ const getters = {
     if (getters.is_stage_completed(stage)) {
       return (false)
     }
+    
+    // for observers and other users...
+    if (!getters.IsDelegate) {
+      return false
+    }
+
+    // only for delegates....
     return getters.is_stage_alerted(stage) || getters.is_stage_new(stage)
   },
 

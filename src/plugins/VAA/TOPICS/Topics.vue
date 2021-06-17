@@ -217,10 +217,17 @@ export default {
     // },
 
     milestoneSALIENCE() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
       return this.stageMilestoneLabels.includes("SALIENCE");
     },
 
     milestoneCHARTS() {
+      if (!this.is_stage_alerted(this.routed_stage)){
+        return true;
+      }
+
       // console.log(this.stageMilestoneLabels.includes("CHARTS"));
       return this.stageMilestoneLabels.includes("CHARTS");
     },

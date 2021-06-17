@@ -49,6 +49,28 @@ const getters = {
     return (Object.values(accessibleAssemblies))
   },
 
+  
+  UsersObserverAssemblies: (state, getters, rootState, rootGetters) => {
+
+    // data not yet loaded
+    if (getters.ongoing_assemblies === null) {
+      return (null)
+    }
+
+    // Check if there is at least one ongoing assembly.
+    if (getters.ongoing_assemblies.length === 0) {
+      return (false)
+    }
+
+    // Check permissions:
+    const compare_func = rootGetters['publicprofilestore/translateOauthAcls']
+    let accessibleAssemblies = Object.filter(getters.ongoing_assemblies, x => {
+      const acls = compare_func(x.identifier)
+      return acls.includes('observe');
+    });
+    return (Object.values(accessibleAssemblies))
+  },
+
   UsersDelegateAssemblies: (state, getters, rootState, rootGetters) => {
 
     // data not yet loaded
@@ -76,6 +98,11 @@ const getters = {
     return (assemblies && Object.values(assemblies).length > 0)
   },
 
+  IsUserObserverOfOngoingAssembly: (state, getters) => {
+    // console.log("IsUserObserverOfOngoingAssembly", getters.UsersDelegateAssemblies)
+    const assemblies = getters.UsersObserverAssemblies
+    return (assemblies && Object.values(assemblies).length > 0)
+  },
 
   /* SHORTCUTS: mainly for artificial moderators */
   IsThereAnAssemblyInPublicState: (state, getters) => {

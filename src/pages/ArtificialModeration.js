@@ -111,9 +111,14 @@ const AMs = {
         label: (ctx) => 'Zur Könizer Demokratiefabrik, bitte!'
       },
       {
+        condition: (ctx) => ctx.oauth.authorized && ctx.IsUserObserverOfOngoingAssembly && !ctx.IsUserDelegateOfOngoingAssembly && !ctx.UsersManagerAssemblies?.length,
+        action: (ctx) => ctx.$root.gotoAssemblyHome(ctx.UsersObserverAssemblies[0]),
+        label: (ctx) => 'Eintreten als Beobachter'
+      },
+      {
         condition: (ctx) => ctx.oauth.authorized && ctx.UsersManagerAssemblies?.length > 0,
         action: (ctx) => ctx.$root.gotoAssemblyManage(ctx.UsersManagerAssemblies[0]),
-        label: (ctx) => 'Verwaltung der Könizer Demokratiefabrik'
+        label: (ctx) => 'Verwaltung'
 
       }
 
