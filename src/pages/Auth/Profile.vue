@@ -200,22 +200,22 @@ export default {
     isValidEmail: function () {
       const emailPattern =
         /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-      return emailPattern.test(this.profile.email);
+      return this.profile.email && emailPattern.test(this.profile.email.trim());
     },
 
     isValidPhone: function () {
       const phonePatternSwiss =
         /(\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?([1-9]{2}|77[1-9]{1})(\s)?[0-9]{3}(\s)?[0-9]{2}(\s)?[0-9]{2}\b$/;
-      return phonePatternSwiss.test(this.profile.email);
+      return this.profile.email && phonePatternSwiss.test(this.profile.email.trim());
     },
 
     completedEmailOrSMS() {
       if (this.isValidEmail) {
-        return this.profile.email;
+        return this.profile.email.trim();
       }
       // @${process.env.ENV_SMS_EMAIL_PROVIDER}
       if (this.isValidPhone) {
-        return `${this.profile.email}@${process.env.ENV_SMS_EMAIL_PROVIDER}`;
+        return `${this.profile.email.trim()}@${process.env.ENV_SMS_EMAIL_PROVIDER}`;
       }
     },
   },
