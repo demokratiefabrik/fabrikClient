@@ -205,7 +205,7 @@ export default {
 
     isValidPhone: function () {
       const phonePatternSwiss =
-        /(\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?([1-9]{2}|77[1-9]{1})(\s)?[0-9]{3}(\s)?[0-9]{2}(\s)?[0-9]{2}\b/;
+        /(\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?([1-9]{2}|77[1-9]{1})(\s)?[0-9]{3}(\s)?[0-9]{2}(\s)?[0-9]{2}\b$/;
       return phonePatternSwiss.test(this.profile.email);
     },
 
