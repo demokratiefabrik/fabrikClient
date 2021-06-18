@@ -74,7 +74,7 @@ export default {
     },
     linebreakLabels() {
       const labs = this.labels;
-      return labs.map((lab) => linebreaker(lab, 50, 4));
+      return labs.map((lab) => linebreaker(lab, 40, 4));
     },
 
     barThickness() {
