@@ -302,7 +302,7 @@
               </q-badge> Ihre Bewertung im Vergleich
             </h2>
             <p v-if="chartBarLabels.length">
-              Sie sehen hier nun Ihre Bewertungen der Fragen zum Thema "" im Vergleich zu derjenigen aller Teilnehmenden.
+              Sie sehen hier nun Ihre Bewertungen der Fragen zum Thema "{{node.content.title}}" im Vergleich zu denjenigen aller Teilnehmenden.
             </p>
             <p
               v-else
@@ -317,7 +317,7 @@
             <ContentTreeChart
               v-if="chartBarLabels.length"
               :chartType="chartType"
-              :nodes="nodeChildren"
+              :nodes="nodeChildrenNotRejected"
             />
 
             <br>
@@ -592,6 +592,19 @@ export default {
           this.contents_to_peerreview
         ).includes(`${x.content.id}`);
         return !rejected && (!pending || !assigned_to_the_user);
+      });
+      return questions;
+    },
+
+    nodeChildrenNotRejected() {
+      if (!this.nodeChildren || !this.$loaded(this.contents_to_peerreview)) {
+        return;
+      }
+
+      // show only thoese questions that have not a pending insert-peerreview, in which the user is involved
+      let questions = this.nodeChildren.filter((x) => {
+        const rejected = x.content.rejected;
+        return !rejected;
       });
       return questions;
     },

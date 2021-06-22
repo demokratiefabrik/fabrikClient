@@ -169,7 +169,7 @@ export default {
 
     next_steps: {
       label: 'Die nächsten Schritte',
-      text: `Konkret werden im Projekt zwei Prototypen digitaler Beteiligung getestet: 1) Wahlberechtigte stellen einen smartvote-Fragenkatalog zusammen und 2) Stimmberechtigte erstellen ein Argumentarium zu einer eidgenössischen Abstimmungsvorlage. Die Demokratiefabrik ist erstmals vom 14. Juni bis 2. Juli 2021 im Einsatz: 9'000 zufällig ausgewählte Wahlberechtigte der Gemeinde Köniz erhalten dann die Gelegenheit, den smartvote-Fragebogen für die Gemeindewahlen vom 26. September 2021 mitzugestalten.`
+      text: `Konkret werden im Projekt zwei Prototypen digitaler Beteiligung getestet: 1) Wahlberechtigte stellen einen smartvote-Fragenkatalog zusammen und 2) Stimmberechtigte erstellen ein Argumentarium zu einer eidgenössischen Abstimmungsvorlage. Die Demokratiefabrik ist erstmals vom 14. Juni bis am 4. Juli 2021 im Einsatz: 9'000 zufällig ausgewählte Wahlberechtigte der Gemeinde Köniz erhalten dann die Gelegenheit, den smartvote-Fragebogen für die Gemeindewahlen vom 26. September 2021 mitzugestalten.`
     },
 
     transparency: {

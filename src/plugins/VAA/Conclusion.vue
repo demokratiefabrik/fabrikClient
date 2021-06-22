@@ -91,7 +91,15 @@
             v-for="node in questionsHighestSalience"
             :key="node.content.id"
           >
-            {{node.content.title}} (Bewertung: {{Math.round(node.content.S.SA)}}/100)
+            <span v-if="!node.content.peerreviewed">Parteivorschlag</span>
+            <span v-if="node.content.peerreviewed">Vorschlag eines Teilnehmenden</span>
+
+             | Bewertung: {{Math.round(node.content.S.SA)}}/100
+             <br>
+                         <span class="text-h6">{{node.content.title}}</span>
+
+
+            <!-- {{node.content.peerreviewed}} -->
           </li>
 
         </ul>
@@ -168,7 +176,7 @@
     <!-- Ausblick -->
     <div>
       <h2>Wie geht es nun weiter?</h2>
-      <p>Die Demokratiefabrik bleibt noch bis und mit 2. Juli 2021 geöffnet. Wir freuen uns, wenn Sie noch einmal vorbeischauen, um die Arbeiten zum Fragenkatalog erneut zu unterstützen!
+      <p>Die Demokratiefabrik bleibt noch bis und mit 4. Juli 2021 geöffnet. Wir freuen uns, wenn Sie noch einmal vorbeischauen, um die Arbeiten zum Fragenkatalog erneut zu unterstützen!
         Bei Ihrem nächsten Besuch finden Sie beim Glöckchen am oberen Rand Informationen dazu, wie andere Teilnehmende auf Ihre Anträge und Kommentare reagiert haben.
 
         <!-- Vielen Dank für Ihren Besuch und bis zum nächsten Mal!  -->
@@ -320,7 +328,7 @@ export default {
 
     questionsHighestSalience() {
       const questions = [
-        ...this.questions.filter((x) => this.$loaded(x.content.S?.SA)),
+        ...this.questions.filter((x) => this.$loaded(x.content.S?.SA) && !x.content.rejected  && !x.content.pending_peerreview_for_insert),
       ];
       const sorted = questions.sort(function (first, second) {
         const firstS =
