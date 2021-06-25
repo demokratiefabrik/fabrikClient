@@ -67,12 +67,15 @@
         class="q-mb-md q-ml-md "
         v-if="newlyEnteredContent || !(CONTENTTREE.limitForAddingProposalsReached || CONTENTTREE.overallLimitForAddingProposalsReached)"
       >
-
         <q-form
           @submit="onSubmit"
           @reset="onReset"
           class="q-gutter-md"
         >
+                   Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
+      <br> Wir bitten Sie zudem Ihre Anträge rechtzeitig einzureichen. Die Genehmigung der Anträge durch andere Teilnehmende kann mehrere Tage dauern. 
+<br>
+<br>
           Bitte bestätigen Sie die folgenden Punkte:<br>
 <div class="q-pb-md">
           <q-toggle
@@ -129,8 +132,7 @@ Bitte teilen Sie den anderen Demokratiefabrik-Mitgliedern mit, warum Ihre Frage 
         ]"
           />
 
-          <p> Hinweis: Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
-          </p>
+
 </div>
           <div>
             <q-btn
