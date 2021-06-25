@@ -3,11 +3,18 @@
 
     <q-card-section
       class="q-mb-md q-ml-md text-notification"
-      v-if="CONTENTTREE.limitForAddingProposalsReached"
+      v-if="CONTENTTREE.limitForAddingProposalsReached && !CONTENTTREE.overallLimitForAddingProposalsReached"
     >
 
       Sie haben heute schon {{dailyContributionLimits.current}} Anträge eingereicht. Damit haben Sie die Tageslimite erreicht.
       Ab morgen früh können Sie wieder neue Anträge stellen.
+    </q-card-section>
+
+    <q-card-section
+      class="q-mb-md q-ml-md text-notification"
+      v-if="CONTENTTREE.overallLimitForAddingProposalsReached"
+    >
+        Sie haben das Maximum an möglichen Anträgen pro Teilnehmenden erreicht. Wir danken Ihnen für Ihr grosses Engagement in der Demokratiefabrik.
     </q-card-section>
 
     <q-form
@@ -15,7 +22,7 @@
       @submit="onSubmit"
       @reset="onReset"
       class="q-gutter-md"
-      v-if="!CONTENTTREE.limitForAddingProposalsReached && !node.content.pending_peerreview_for_update && !node.content.pending_peerreview_for_insert"
+      v-if="!CONTENTTREE.overallLimitForAddingProposalsReached && !CONTENTTREE.limitForAddingProposalsReached && !node.content.pending_peerreview_for_update && !node.content.pending_peerreview_for_insert"
     >
       Bitte bestätigen Sie zuerst folgende Aussagen:<br>
       <q-toggle
@@ -66,7 +73,8 @@
           val => val && val.length > 0 && val.length <= maxTextLength || `Die Beschreibung muss zwischen 0 und ${maxTextLength} Zeichen lang sein.`
         ]"
       />
-      <p> Hinweis: Sie können maximal {{dailyContributionLimits.daylimit}} Anträge pro Tag einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
+      <p> Hinweis: Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
+      <!-- <p> Hinweis: Sie können maximal {{dailyContributionLimits.daylimit}} Anträge pro Tag einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span> -->
       </p>
 
       <div>

@@ -73,6 +73,18 @@ export default {
       return this.assembly_sorted_stages[this.stage_nr_last_visited]
     },
 
+    overallLimitForAddingProposalsReached() {
+      let dailyContributionLimits = this.getDailyContributionLimits()
+      if (!this.$loaded(dailyContributionLimits)) {
+        return null
+      }
+      dailyContributionLimits = dailyContributionLimits.number_of_proposals
+      return (
+        dailyContributionLimits.overallCurrent >= dailyContributionLimits.overalllimit
+      );
+    },
+
+
     limitForAddingProposalsReached() {
       let dailyContributionLimits = this.getDailyContributionLimits()
       if (!this.$loaded(dailyContributionLimits)) {
@@ -195,6 +207,8 @@ export default {
       return ({
         number_of_proposals: {
           daylimit: configuration.MAX_DAILY_USER_PROPOSALS,
+          overalllimit: configuration.MAX_OVERALL_USER_PROPOSALS,
+          overallCurrent: progression.number_of_proposals === null ? 0 : progression.number_of_proposals,
           current: progression.number_of_proposals_today === null ? 0 : progression.number_of_proposals_today
         },
         number_of_comments: {

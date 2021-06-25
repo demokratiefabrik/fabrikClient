@@ -209,23 +209,28 @@ const AMs = {
       },
       {
         id: 2,
-        condition: (ctx) => ctx.CONTENTTREE.limitForAddingProposalsReached,
+        condition: (ctx) => ctx.CONTENTTREE.limitForAddingProposalsReached && !ctx.CONTENTTREE.overallLimitForAddingProposalsReached,
         body: (ctx) => `Heute können Sie leider keinen Vorschlag mehr einbringen. Morgen früh sieht das wieder ganz anders aus.`,
+      },
+      {
+        id: 2,
+        condition: (ctx) => ctx.CONTENTTREE.limitForAddingProposalsReached && ctx.CONTENTTREE.overallLimitForAddingProposalsReached,
+        body: (ctx) => `Sie haben das Maximum an möglichen Anträgen pro Teilnehmenden erreicht. Wir danken Ihnen für Ihr grosses Engagement in der Demokratiefabrik.`,
       }
     ],
     buttons: [
       {
-        condition: (ctx) => !ctx.CONTENTTREE.limitForAddingProposalsReached,
+        condition: (ctx) => !ctx.CONTENTTREE.limitForAddingProposalsReached && !ctx.CONTENTTREE.overallLimitForAddingProposalsReached,
         action: (ctx) => { ctx.showProposeForm = true },
         label: (ctx) => 'Ja, ich weiss da etwas.'
       },
       {
-        condition: (ctx) => !ctx.CONTENTTREE.limitForAddingProposalsReached,
+        condition: (ctx) => !ctx.CONTENTTREE.limitForAddingProposalsReached && !ctx.CONTENTTREE.overallLimitForAddingProposalsReached,
         action: (ctx) => { ctx.milestone("PROPOSE", 3); ctx.$root.scrollToAnchor('CHARTS', 300, 300) },
         label: (ctx) => 'Nein, gerade nicht.'
       },
       {
-        condition: (ctx) => ctx.CONTENTTREE.limitForAddingProposalsReached,
+        condition: (ctx) => ctx.CONTENTTREE.limitForAddingProposalsReached || ctx.CONTENTTREE.overallLimitForAddingProposalsReached,
         action: (ctx) => { ctx.milestone("PROPOSE", 3); ctx.$root.scrollToAnchor('CHARTS', 300, 300) },
         label: (ctx) => 'Weiter'
       }

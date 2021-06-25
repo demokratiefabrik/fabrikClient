@@ -45,15 +45,27 @@
       <br>
       <q-card-section
         class="q-mb-md q-ml-md text-notification"
-        v-if="CONTENTTREE.limitForAddingProposalsReached"
+        v-if="CONTENTTREE.limitForAddingProposalsReached && !CONTENTTREE.overallLimitForAddingProposalsReached"
       >
 
         Sie haben heute schon {{dailyContributionLimits.current}} Anträge eingereicht. Damit haben Sie die Tageslimite erreicht.
         Ab morgen früh können Sie wieder neue Anträge stellen.
       </q-card-section>
+
+
+      <q-card-section
+        class="q-mb-md q-ml-md text-notification"
+        v-if="CONTENTTREE.overallLimitForAddingProposalsReached"
+      >
+
+        Sie haben das Maximum an möglichen Anträgen pro Teilnehmenden erreicht. Wir danken Ihnen für Ihr grosses Engagement in der Demokratiefabrik.
+
+      </q-card-section>
+
+
       <q-card-section
         class="q-mb-md q-ml-md "
-        v-if="newlyEnteredContent || !CONTENTTREE.limitForAddingProposalsReached"
+        v-if="newlyEnteredContent || !(CONTENTTREE.limitForAddingProposalsReached || CONTENTTREE.overallLimitForAddingProposalsReached)"
       >
 
         <q-form
@@ -117,7 +129,7 @@ Bitte teilen Sie den anderen Demokratiefabrik-Mitgliedern mit, warum Ihre Frage 
         ]"
           />
 
-          <p> Hinweis: Sie können maximal {{dailyContributionLimits.daylimit}} Anträge pro Tag einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
+          <p> Hinweis: Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
           </p>
 </div>
           <div>
@@ -328,7 +340,10 @@ export default {
                   "Der Antrag wurde eingereicht und wird ab sofort von anderen Teilnehmenden begutachtet.",
               });
               this.newlyEnteredContent = response.data.content;
+              
               // this.showSalienceDialog = true;
+              this.onReset()
+
             } else {
               // Error Message
               this.$q.notify({

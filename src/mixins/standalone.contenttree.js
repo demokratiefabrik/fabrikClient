@@ -13,6 +13,7 @@ export default {
       name: 'CONTENTTREE',
       include: [
         'contenttree', 'salienceCompleted', 'rootElements', 'rootNode',
+        "overallLimitForAddingProposalsReached",
         "limitForAddingProposalsReached", "limitForAddingCommentsReached"],
     })
   ],

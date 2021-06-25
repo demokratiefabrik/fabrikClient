@@ -744,6 +744,7 @@ export default {
       if (
         this.numberOfQuestionsInCurrentTopic > 5 ||
         this.contributedAtleastOneVAAQuestion ||
+        this.overallLimitForAddingProposalsReached ||
         this.limitForAddingProposalsReached
       ) {
         return false;
