@@ -77,7 +77,7 @@
 <script>
 import ComponentContentTree from "src/pages/ContentTree/components/ContentTree";
 import constants from "src/utils/constants";
-import { mapGetters } from "vuex";
+// import { mapGetters } from "vuex";
 
 export default {
   name: "DefaultDiscussionBlock",
@@ -209,7 +209,10 @@ export default {
         }
 
         var entry = entries[id];
-        if (!entry) {
+        if (entry) {
+          // stringify the id. (contenttree requires a string id...)
+          entry.id = `${entry.id}`
+        }else{
           entries[id] = this.getEmptyNode(id);
           entry = entries[id];
         }

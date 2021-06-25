@@ -105,7 +105,7 @@ export default {
             if (this.accordion && isTopBranch) {
                 newlyExpanded = this.expand_node_accordion(node)
             } else {
-                console.log("EXPAND THIS", node, node?.nof_descendants);
+                // console.log("EXPAND THIS", node, node?.nof_descendants);
                 newlyExpanded = this.calculate_default_expanded_branches(node, 3);
                 this.expanded = this.expanded.concat(newlyExpanded);
                 this.updateExpanded()
