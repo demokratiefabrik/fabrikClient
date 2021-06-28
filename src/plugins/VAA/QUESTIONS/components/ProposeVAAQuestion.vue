@@ -72,9 +72,8 @@
           @reset="onReset"
           class="q-gutter-md"
         >
-                   Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
-      <br> Wir bitten Sie zudem, Ihre Anträge rechtzeitig einzureichen. Die Genehmigung der Anträge durch andere Teilnehmende kann mehrere Tage dauern. 
-<br>
+<p>                   Sie können heute maximal {{dailyContributionLimits.daylimit}} {{dailyContributionLimits.daylimit == 1 ? 'Antrag' : 'Anträge'}} einreichen. <span v-if="dailyContributionLimits.current">Sie haben bereits {{dailyContributionLimits.current}} eingereicht.</span>
+       Wir bitten Sie zudem, Ihre Anträge rechtzeitig einzureichen. Die Genehmigung der Anträge durch andere Teilnehmende kann mehrere Tage dauern. </p>
 <br>
           Bitte bestätigen Sie die folgenden Punkte:<br>
 <div class="q-pb-md">
