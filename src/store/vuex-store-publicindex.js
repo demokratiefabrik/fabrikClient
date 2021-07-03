@@ -120,7 +120,7 @@ const getters = {
   },
 
   IsThereNothingGoingOn: (state, getters) => {
-    if (getters.IsThereAnAssemblyInPublicState === null || getters.IsThereAnAssemblyInPublicState === null) {
+    if (getters.IsThereAnAssemblyInPublicState === false || getters.IsThereAnAssemblyInPublicState === false) {
       return (null)
     }
 
