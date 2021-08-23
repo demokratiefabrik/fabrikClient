@@ -101,8 +101,8 @@ const AMs = {
         id: 5,
         condition: (ctx) => ctx.IsThereNothingGoingOn,
         body: (ctx) => [
-          'Die Könizer Demokratiefabrik ist beendet. Dennoch finden Sie auf dieser Seite viele Informationen über die Demokratiefabrik.',
-        'Weiter unten finden Sie insbesondere den Ergebnisbericht zur Könizer Demokratiefabrik und eine Möglichkeit unseren Newsletter zu abonnieren.']
+          'Sie finden auf dieser Seite viele Informationen über die Demokratiefabrik.',
+          'Zum Beispiel finden Sie unter der Rubrik "News" den Ergebnisbericht zur Könizer Demokratiefabrik und eine Möglichkeit, unseren Newsletter zu abonnieren.']
       }
     ],
 

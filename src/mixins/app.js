@@ -162,7 +162,7 @@ export default {
       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
       runtimeMutations.setBrokenSession()
       console.log("SILENT LOGOUT,,,")
-      this.$root.logout(true);
+      this.$root.logout(null, {}, true);
 
       let msg_title = this.$i18n.t("auth.authentication_invalid_warning_title");
       let msg_body = this.$i18n.t("auth.authentication_invalid_warning_body");
@@ -347,8 +347,8 @@ export default {
         }
       },
 
-      this.$root.logout = async (eventString = null, extra = {}) => {
-        console.log("$root.logout call => fire monitor buffer with logout entry")
+      this.$root.logout = async (eventString = null, extra = {}, silent=false) => {
+        console.log("$root.logout call => fire monitor buffer with logout entry. SILENT:", silent), 
 
         await this.$store.dispatch('monitorFire', {
           eventString: constants.MONITOR_LOGOUT,
@@ -358,8 +358,8 @@ export default {
 
         runtimeMutations.setLogoutState()
 
-        console.log("await monitorFire ended => call oauth logout function.  ")
-        this.oauth.logout()
+        console.log("await monitorFire ended => call oauth logout function. SILENT:", silent)
+        this.oauth.logout(silent)
       }
 
 

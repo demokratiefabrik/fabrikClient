@@ -54,19 +54,13 @@
               In der Ausgabe des Regionaljournals Bern Fribourg Wallis des Schweizer Radio und Fernsehen (SRF) vom 17. August 2021 können Sie <a href="https://www.srf.ch/audio/regionaljournal-bern-freiburg-wallis/wahlen-koeniz-buerger-stellen-den-kandidierenden-fragen?id=12038889" target="_blank">ein Gespräch mit dem Könizer Gemeindeschreiber Pascal Arnold und der Projektleiterin der Demokratiefabrik zum Könizer smartvote-Fragebogen nachhören</a> (ab 08:35).
 
               <br><br>
-              Möchten Sie übrigens über die kommenden Etappen der Demokratiefabrik auf dem Laufenden bleiben? Dann melden Sie sich zum Newsletter an: 
-  <a href="https://41b4d1a2.sibforms.com/serve/MUIEAOqPps44Ywh4UHtxUCLCufSBHN9EsHAwfHB3OLFpmahyNcET11SuiB97sK1VBvtIVWIaz5-BpdjHzGGynB1DjYONx_4UE6qFuyR_mKjL1Vull29FU1_qCfHJJpjAMUx2PfCPmXhuiH_3RAL7olhf3SDJbRfT-Wgjro4rMzBRFOSFLkQwczHjl5OeOsSPEtfVB2doooUF3fi-" target="_blank">Newsletter-Anmeldung</a>
+              Möchten Sie übrigens über die kommenden Etappen der Demokratiefabrik auf dem Laufenden bleiben? Dann können Sie sich zum Newsletter anmelden: 
+             <a href="https://41b4d1a2.sibforms.com/serve/MUIEALtZ0tbJUdnbW6ml1EOJEi6-GVTwt8TQOQDOH_7-Uz2XSsrJTzb5FWqz7uR9jbRyWMUke45Y1ZUaT9Ckw4KzzG4aQ2FM-R6akCrwWKr9_KqSXGQg5B0gXZTn1PXhzYWb-bJsCpGN20EmFuXXmhlVKgqD4INCKAZpsTfyqK9dPa3FDyoox8Z2Ey6yrizGtLJZzVoL45NWTPpc" target="_blank">Newsletter-Anmeldung</a>
             </div>
         </q-timeline-entry>
 
-
-        <!-- <q-timeline-entry heading>
-          Aktuelle Einträge
-        </q-timeline-entry> -->
-
-        
         <q-timeline-entry
-          title="Die Könizer Demokratiefabrik hat Ihre Tore geschlossen"
+          title="Die Könizer Demokratiefabrik schliesst ihre Tore"
           subtitle="4. Juli 2021"
           icon="mdi-flag-checkered"
         >
@@ -76,7 +70,7 @@
 
         
         <q-timeline-entry
-          title="Die Könizer Demokratiefabrik öffnet ihre Türen"
+          title="Eröffnung der Könizer Demokratiefabrik"
           subtitle="14. Juni 2021"
           icon="mdi-door-open"
         >
