@@ -39,3 +39,7 @@ yarn-error.log*
 .env
 .env.production
 .env.development
+
+
+# index files
+/public/*fbdb.html.html

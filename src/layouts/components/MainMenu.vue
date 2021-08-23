@@ -176,13 +176,13 @@
       </q-list>
     </q-btn-dropdown>
 
-    <q-btn
+    <!-- <q-btn
       stretch
       flat
       label="Login"
       v-if="!oauth.authorized"
       @click="oauth.login({ name: 'home' })"
-    />
+    /> -->
 
     <!-- DISABLED: at the moment. only de_CH -->
     <!-- <LanguageSwitch /> -->

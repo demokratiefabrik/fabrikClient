@@ -137,7 +137,7 @@
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
             clickable
-            @click="$router.push(NotificationBannerRedirectRoute)"
+            @click="$router.pushR(NotificationBannerRedirectRoute)"
           >
             {{ $t('app.btn_next') }}
           </q-chip>
@@ -313,7 +313,7 @@ export default {
       this.NotificationBannerVisible = false;
     },
     gotoHome() {
-      this.$router.push({ name: "home" });
+      this.$router.pushR({ name: "home" });
     },
   },
 

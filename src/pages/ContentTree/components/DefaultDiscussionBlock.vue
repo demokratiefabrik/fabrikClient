@@ -266,6 +266,8 @@ export default {
         }
       }
 
+
+      console.log(JSON.stringify(structure))
       return structure;
     },
   },

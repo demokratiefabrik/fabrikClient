@@ -164,14 +164,14 @@ export default {
           return true
         },
 
-        async logout() {
-          console.log("$$$ LOGOUT IN PLUGIN")
+        async logout(silent=false) {
+          console.log("$$$ LOGOUT IN PLUGIN", silent)
           Vue.prototype.pkce.reset();
           console.assert(!Vue.prototype.pkce.isAuthorized())
           console.log(Vue.prototype.pkce.state)
           Vue.prototype.pkce.setState({});
           // Second trial....
-          console.log(Vue.prototype.pkce.state)
+          // console.log(Vue.prototype.pkce.state)
           this.jwt = null
           // oAuthEventBus.$emit('TokenChanges', null)
           // oAuthEventBus.$emit('AfterTokenChanged', null)
@@ -185,7 +185,9 @@ export default {
             this.jwt = null
             // oAuthEventBus.$emit('TokenChanges', null)
             oAuthEventBus.$emit('AfterTokenChanged', null)
-            oAuthEventBus.$emit('AfterLogout')
+            if (!silent) {
+              oAuthEventBus.$emit('AfterLogout')
+            }
           }, 10)
         },
 

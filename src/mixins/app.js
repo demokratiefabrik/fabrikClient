@@ -83,7 +83,8 @@ export default {
       let msg_body = this.$i18n.t("app.error.authorization_error_body");
       let icon = "mdi-key-outline";
       let type = "error";
-      let buttons = ['reload', 'hide'];
+      let buttons = ['home'];
+      // let buttons = ['reload', 'hide'];
       this.$refs?.maincontent?.showNotificationBanner(
         type,
         msg_title,
@@ -156,14 +157,19 @@ export default {
       this.showAuthorizationError(data)
     });
     LayoutEventBus.$on("showAuthorizationInvalidToken", (data) => {
+
+
       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
       runtimeMutations.setBrokenSession()
+      console.log("SILENT LOGOUT,,,")
+      this.$root.logout(true);
+
       let msg_title = this.$i18n.t("auth.authentication_invalid_warning_title");
       let msg_body = this.$i18n.t("auth.authentication_invalid_warning_body");
       let icon = "mdi-key-outline";
       let type = "error";
       let settimer = data?.settimer ? data.settimer : false;
-      let buttons = ['auth'];
+      let buttons = ['auth', 'home'];
 
       this.$refs?.maincontent?.showNotificationBanner(
         type,

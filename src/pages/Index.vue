@@ -62,7 +62,7 @@ import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "PageIndex",
   components: {
-    ArtificialModeration,
+    ArtificialModeration
   },
   data() {
     return {
