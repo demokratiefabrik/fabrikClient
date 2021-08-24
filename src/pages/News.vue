@@ -13,10 +13,6 @@
     <div class="q-px-lg q-pb-md">
       <q-timeline color="secondary">
 
-        <!-- <q-timeline-entry heading>
-          Aktuelle Einträge
-        </q-timeline-entry> -->
-
         
         <q-timeline-entry
           title="Ergebnisbericht der Könizer Demokratiefabrik"
@@ -27,8 +23,9 @@
 
         <div>
             <a
-              href=""
-              style="float:left"
+              href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+              style="float:left; padding-right: 15px; margin-bottom:1em;"
+              target="_blank"
               alt="Ergebnisbericht der Könizer Demokratiefabrik"
             >
                <q-icon
@@ -36,21 +33,31 @@
                 class="text-grey-9"
                 size="4em"
               />  
+              
+              <br>Ergebnisbericht <br>vom 24.08.2021<br>(PDF)
               </a>
+
+
             <div style="block">
               Das Demokratiefabrik-Team der Universität Bern hat die Könizer Demokratiefabrik bereits etwas genauer angeschaut 
-              und einen Ergebnisbericht dazu erstellt. Dieser kann hier bald <!--ab sofortt--> heruntergeladen werden. 
+              und einen Ergebnisbericht dazu erstellt. 
               Der Bericht gibt Auskunft über die Idee und den Aufbau der Demokratiefabrik, sowie darüber, wie der smartvote-Fragebogen 
               zu Stande kam und welche Personengruppen bei der Erarbeitung mitgeholfen haben. Zuletzt fasst der Ergebnisbericht 
               die ersten Erkenntnisse aus der Evaluation der Demokratiefabrik zusammen.</div>
-          <!-- 
-            <br><br><a href="/impressum">Ergebnisbericht vom 24.08.2021 (PDF)</a>
-          -->
+          
+    
+            
+            <!-- <a 
+               href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+              style="float:left"
+              target="_blank"
+              alt="Ergebnisbericht der Könizer Demokratiefabrik"
+>Ergebnisbericht vom 24.08.2021 (PDF)</a> -->
+
 
         </div>
-        <br>
-            <div style="clear:both;">
-              Auch regionale Medien berichteten über das Projekt: In der August-Ausgabe von Köniz Innerorts, die diese Woche erscheint, finden Sie ebenfalls eine kurze Zusammenfassung des Ergebnisberichts. 
+            <div style="padding-top:5px; clear:both;">
+              Regionale Medien berichteten über das Projekt: In der August-Ausgabe von Köniz Innerorts, die diese Woche erscheint, finden Sie ebenfalls eine kurze Zusammenfassung des Ergebnisberichts. 
               In der Ausgabe des Regionaljournals Bern Fribourg Wallis des Schweizer Radio und Fernsehen (SRF) vom 17. August 2021 können Sie <a href="https://www.srf.ch/audio/regionaljournal-bern-freiburg-wallis/wahlen-koeniz-buerger-stellen-den-kandidierenden-fragen?id=12038889" target="_blank">ein Gespräch mit dem Könizer Gemeindeschreiber Pascal Arnold und der Projektleiterin der Demokratiefabrik zum Könizer smartvote-Fragebogen nachhören</a> (ab 08:35).
 
               <br><br>

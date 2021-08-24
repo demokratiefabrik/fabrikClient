@@ -25,8 +25,8 @@
         <div class="col-6 footerbox">
           <div>
             <a
-              href=""
-              alt="Ergebnisbericht Könizer Demokratiefabrik"
+              target="_blank"
+              alt="Ergebnisbericht der Könizer Demokratiefabrik"
             >
                <q-icon
           name="mdi-file-chart-outline"
@@ -37,16 +37,17 @@
           </div>
 <br>
 
-          <!-- <div>
-            <b>Ergebnisbericht</b><br>
-            Der Ergebnisbericht der Könizer Demokratiefabrik vom Juni/Juli 2021 ist online. Sie können ihn hier herunterladen. <br>
-            <br><a href="/impressum">Ergebnisbericht vom 24.08.2021 (PDF)</a>
-          </div> -->
-
           <div>
             <b>Ergebnisbericht</b><br>
-            Der Ergebnisbericht der Könizer Demokratiefabrik vom Juni/Juli 2021 ist bald online. Sie können ihn bald hier herunterladen. <br>
+            Der Ergebnisbericht der Könizer Demokratiefabrik 2021 ist online. Sie können ihn hier herunterladen. <br><br>
+            <a 
+               href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+              style="float:left"
+              target="_blank"
+              alt="Ergebnisbericht der Könizer Demokratiefabrik"
+>Ergebnisbericht vom 24.08.2021 (PDF)</a>
           </div>
+
 
         </div>
 
