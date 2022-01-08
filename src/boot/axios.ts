@@ -5,6 +5,12 @@ declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $axios: AxiosInstance;
   }
+
+  interface ComponentCustomProperties {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    emitter: typeof emitter
+  }
 }
 
 // Be careful when using SSR for cross-request state pollution

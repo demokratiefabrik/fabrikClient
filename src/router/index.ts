@@ -1,4 +1,13 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable no-var */
 import { route } from 'quasar/wrappers';
+// import { LayoutEventBus } from 'src/utils/eventbus';
 import {
   createMemoryHistory,
   createRouter,
@@ -20,7 +29,9 @@ import routes from './routes';
 export default route<StateInterface>(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
+    : process.env.VUE_ROUTER_MODE === 'history'
+    ? createWebHistory
+    : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -34,5 +45,95 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
     ),
   });
 
+  Router.beforeEach((to, from, next) => {
+    if (to.params?.assemblyIdentifier) {
+      // console.log(process.env.ENV_UNDER_CONSTRUCTION, "kkkkkkk")
+      // @ts-ignore
+      if (parseInt(process.env.ENV_UNDER_CONSTRUCTION) == 1) {
+        // ALL ASSEMBLY PAGES ARE UNDER CONSTRUCTION
+        return next('/pause');
+      }
+    }
+
+    return next();
+  });
+
+  Router.afterEach((to) => {
+    if (to.params?.assemblyIdentifier) {
+      // @ts-ignore
+      runtimeMutations.setAssemblyIdentifier(to.params.assemblyIdentifier);
+
+      if (to.params?.stageID !== null && to.params?.stageID !== undefined) {
+        // TODO: redirect to asembly home, when stage is invalid
+
+        // console.log("router after each : new stage", to.params.stageID, to)
+        // @ts-ignore
+        runtimeMutations.setStageID(to.params.stageID);
+        // TODO: disabled during vue3 migration
+        // this.emitter.emit('showLoading');
+      }
+    }
+
+    // reset brokenSession Error
+    // @ts-ignore
+    runtimeMutations.setBrokenSession(false);
+
+    // console.log(to, from, store, Vue)
+    // store.dispatch('assemblystore/monitor_route_changes', { to, from })
+  });
+
+  /* Get Object of current route/page (including name and params) */
+  // @ts-ignore
+  Router.currentRouteObject = function () {
+    // @ts-ignore
+    return { name: this.currentRoute.name, params: this.currentRoute.params };
+  };
+
+  /* Reload Page, when redirecting to the same page */
+  // @ts-ignore
+  Router.pushR = function (route) {
+    const target = this.resolve(route).href;
+
+    // @ts-ignore
+    const current = this.resolve(this.currentRouteObject()).href;
+    if (target === current) {
+      // Reload
+      // console.log("EVENT BUS!!!")
+      // TODO: disabled during vue3 migration
+      // this.emitter.emit('reload');
+    } else {
+      // Push
+      this.push(route);
+    }
+  };
+
+  /* Dont do anything when redirecting to the same page */
+  // @ts-ignore
+  Router.pushI = function (route) {
+    const target = this.resolve(route).href;
+    // @ts-ignore
+    const current = this.resolve(this.currentRouteObject()).href;
+    if (target !== current) {
+      this.push(route);
+    }
+    console.log('TODO: promise error in router/index?');
+    console.log('ignore push route (same site).. ');
+  };
+
+  /* Scroll To Anchor */
+  // @ts-ignore
+  Router.anchor = (anchor) => {
+    // scroll to element
+    const el = document.querySelector(`a[name=${anchor}]`);
+    console.log(el, 'el');
+    el && el.scrollIntoView();
+
+    // account for fixed header
+    const headerHeight = 200;
+    var scrolledY = window.scrollY;
+    if (scrolledY) {
+      window.scroll(0, scrolledY - headerHeight);
+    }
+  };
   return Router;
 });
