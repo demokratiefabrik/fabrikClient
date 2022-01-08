@@ -7,8 +7,8 @@ export default ({ app }) => {
   // Create I18n instance
   const i18n = createI18n({
     // locale: 'en-US',
-    // locale: process.env.ENV_I18N_LOCALE, // set locale
-    // fallbackLocale: process.env.ENV_I18N_FALLBACK_LOCALE, // set fallback locale
+    locale: process.env.ENV_I18N_LOCALE, // set locale
+    fallbackLocale: process.env.ENV_I18N_FALLBACK_LOCALE, // set fallback locale
     messages,
   });
 

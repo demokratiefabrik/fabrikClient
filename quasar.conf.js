@@ -54,13 +54,15 @@ module.exports = configure(function (ctx) {
     build: {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
-      env: {
-        API: ctx.dev ? 'https://dev.' : 'https://prod.',
-      },
+      // env: {
+      //   API: ctx.dev ? 'https://dev.' : 'https://prod.',
+      // },
+
+      env: require('dotenv').config().parsed,
 
       // transpile: false,
       // publicPath: '/',
-      libraryTarget: 'commonjs2',
+      // libraryTarget: 'commonjs2',
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).

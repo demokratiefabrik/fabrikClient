@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row">
+  <q-page class="row"><br><br><br>
     <PySwarmPlot></PySwarmPlot>
   </q-page>
 </template>
@@ -21,7 +21,7 @@ export default defineComponent({
 
   components: { PySwarmPlot },
   setup() {
-    return {};
+    return {ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
   },
 });
 </script>
