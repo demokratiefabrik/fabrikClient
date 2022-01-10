@@ -118,7 +118,7 @@
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
             clickable
-            @click="$root.logout()"
+            @click="authComposable.logout()"
           >
             {{ $t('auth.logout') }}
           </q-chip>
@@ -167,12 +167,19 @@ import { defineComponent } from 'vue';
 import MainMenu from './components/MainMenu';
 import Footer from './components/Footer';
 import { mapGetters } from 'vuex';
+import useAuthComposable from 'src/composables/auth.composable';
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
     Footer,
     MainMenu,
+  },
+
+
+  setup() {
+    const authComposable = useAuthComposable();
+    return { authComposable };
   },
 
   data() {
@@ -251,7 +258,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const destination_route = this.$router.currentRouteObject();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.oauth.login(destination_route);
+      this.authComposable.login(destination_route);
     },
 
     showNotificationBanner(

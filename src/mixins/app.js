@@ -11,20 +11,20 @@ import { mapGetters, mapActions } from 'vuex'
 import { useOAuthEmitter } from 'src/plugins/VueOAuth2PKCE/oauthEmitter'
 import constants from 'src/utils/constants'
 import useAppComposable from 'src/composables/app.composable'
+import useAuthComposable from 'src/composables/auth.composable'
 import { scroll } from 'quasar';
 const { setScrollPosition } = scroll;
-// const { setBrand } = colors
 import { dom } from 'quasar'
 const { offset } = dom
-
 
 
 export default {
 
   setup() {
     const appComposable = useAppComposable()
+    const authComposable = useAuthComposable()
     oauthEmitter = useOAuthEmitter()
-    return {oauthEmitter, appComposable}
+    return {oauthEmitter, appComposable, authComposable}
   },
 
   data() {
@@ -177,9 +177,9 @@ export default {
 
 
       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
-      appComposable.setBrokenSession()
+      authComposable.setBrokenSession()
       console.log('SILENT LOGOUT,,,')
-      this.$root.logout(null, {}, true);
+      this.authComposable.logout(null, {}, true);
 
       let msg_title = this.$t('auth.authentication_invalid_warning_title');
       let msg_body = this.$t('auth.authentication_invalid_warning_body');
@@ -364,20 +364,20 @@ export default {
         }
       },
 
-      this.$root.logout = async (eventString = null, extra = {}, silent=false) => {
-        console.log('$root.logout call => fire monitor buffer with logout entry. SILENT:', silent), 
+      // this.authComposable.logout = async (eventString = null, extra = {}, silent=false) => {
+      //   console.log('authComposable.logout call => fire monitor buffer with logout entry. SILENT:', silent), 
 
-        await this.$store.dispatch('monitorFire', {
-          eventString: constants.MONITOR_LOGOUT,
-          data: {},
-          onlyWhenTokenValid: true
-        })
+      //   await this.$store.dispatch('monitorFire', {
+      //     eventString: constants.MONITOR_LOGOUT,
+      //     data: {},
+      //     onlyWhenTokenValid: true
+      //   })
 
-        appComposable.setLogoutState()
+      //   appComposable.setLogoutState()
 
-        console.log('await monitorFire ended => call oauth logout function. SILENT:', silent)
-        this.oauth.logout(silent)
-      }
+      //   console.log('await monitorFire ended => call oauth logout function. SILENT:', silent)
+      //   this.oauth.logout(silent)
+      // }
 
 
     this.$root.monitorLog = async (eventString = null, data = {}) => {

@@ -1,4 +1,7 @@
 import useXHR from 'src/utils/xhr';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+
+const {refresh_token_if_required} = usePKCEComposable()
 
 interface IResponseUsers {
   data: {
@@ -10,8 +13,9 @@ interface IResponseSVG {
   data: string;
 }
 
+const xhr = useXHR();
+
 export default function useCIRApi() {
-  const xhr = useXHR();
 
   // CIR
   // *********************************
@@ -19,9 +23,9 @@ export default function useCIRApi() {
    * Get CIR plot svg..
    */
   const polarbee = async (url: string): Promise<IResponseSVG> => {
-    // Renew token (if required)
-    // await Vue.prototype.oauth.refresh_token_if_required()
-    // const url = `${process.env.ENV_OAUTH_BASE_URL}/user`
+
+    await refresh_token_if_required()
+
     const data = {
       method: 'get',
       url: url
@@ -31,15 +35,13 @@ export default function useCIRApi() {
 
   //  export const SaveEvent: GeneralActionCreator<UserEvent> = (payload) => {
   const polarbeeUsers = async (): Promise<IResponseUsers> => {
-    // Renew token (if required)
-    // await Vue.prototype.oauth.refresh_token_if_required()
+    
+    await refresh_token_if_required()
+
     const url = '/users';
     const data = {
       method: 'get',
-      url: url,
-      // headers: {
-      //   'content-type': 'application/json',
-      // },
+      url: url
     };
 
     return xhr.customRequest(data);

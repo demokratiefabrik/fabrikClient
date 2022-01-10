@@ -33,6 +33,7 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
       'main',
+      'events',
       // 'axios',
       'i18n',
     ],

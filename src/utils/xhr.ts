@@ -7,16 +7,14 @@
 //  */
 import axios from 'axios';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-import useAppComposable from 'src/composables/app.composable';
 import useEmitter from './emitter';
-
-const emitter = useEmitter();
-const appComposable = useAppComposable();
-
+import useAuthComposable from 'src/composables/auth.composable';
 
 axios.defaults.timeout = 2000;
 axios.defaults.baseURL = process.env.ENV_APISERVER_URL;
 
+const emitter = useEmitter();
+const authComposable = useAuthComposable();
 const HTTP_HEADER = 'Authorization';
 const RequestOrigin = 'ApiService';
 const ERROR_CODES_TO_RETRY = [400, 500, 502, 503, 501];
@@ -34,127 +32,123 @@ const Allow400Status = (config: Record<string, undefined>) => {
     : false;
 };
 
+// Axios Interceptor: Authorization Error Handling
+// ---------------------------
 
-
-
-  // Axios Interceptor: Authorization Error Handling
-  // ---------------------------
-  
-  /**
-   * Refresh Token: if Api request returns 401
-   * This is done by axios intercept method, which everytime checks response.status of each API call.
-   */
-   const mountAxiosInterceptor = (onRejected: (error: unknown) => Promise<boolean | Record<string, unknown>>) => {
-    const onFullfilled = (response) => {
-      return response;
-    };
-    axios.interceptors.response.use(onFullfilled, (error: unknown) =>
-      onRejected(error)
-    );
+/**
+ * Refresh Token: if Api request returns 401
+ * This is done by axios intercept method, which everytime checks response.status of each API call.
+ */
+const mountAxiosInterceptor = (
+  onRejected: (error: unknown) => Promise<boolean | Record<string, unknown>>
+) => {
+  const onFullfilled = (response) => {
+    return response;
   };
+  axios.interceptors.response.use(onFullfilled, (error: unknown) =>
+    onRejected(error)
+  );
+};
 
+const axiosErrorHandling = async function (
+  error
+): Promise<boolean | Record<string, unknown>> {
+  // enfoce that ApiService Wrapper is used, (and not pure Axios)
 
-  const axiosErrorHandling = async function (error): Promise<boolean | Record<string, unknown>> {
-    // enfoce that ApiService Wrapper is used, (and not pure Axios)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const PREVIOUS_HTTP_ERROR_CODE = error?.config?.PREVIOUS_HTTP_ERROR_CODE;
+  const NEW_STATUS = error.response?.status
+    ? parseInt(error.response?.status)
+    : null;
+  console.log(
+    'XHR ERROR: PREVIOUS:',
+    PREVIOUS_HTTP_ERROR_CODE,
+    'NEW:',
+    NEW_STATUS
+  );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const PREVIOUS_HTTP_ERROR_CODE = error?.config?.PREVIOUS_HTTP_ERROR_CODE;
-    const NEW_STATUS = error.response?.status
-      ? parseInt(error.response?.status)
-      : null;
-    console.log(
-      'XHR ERROR: PREVIOUS:',
-      PREVIOUS_HTTP_ERROR_CODE,
-      'NEW:',
-      NEW_STATUS
-    );
+  // No remote connection established
+  // Invalid URL or Server not reachable...
+  if (!NEW_STATUS && !error?.response) {
+    console.log('Network error: empty response set', error);
 
-    // No remote connection established
-    // Invalid URL or Server not reachable...
-    if (!NEW_STATUS && !error?.response) {
-      console.log('Network error: empty response set', error);
+    // check if two in a row...
+    if (PREVIOUS_HTTP_ERROR_CODE != 'NETWORK') {
+      // no, this is the first one..
+      return { HTTP_ERROR_CODE: 'NETWORK' };
+    }
+    emitter.emit('showNetworkError');
+    return Promise.reject(error);
 
-      // check if two in a row...
-      if (PREVIOUS_HTTP_ERROR_CODE != 'NETWORK') {
-        // no, this is the first one..
-        return { HTTP_ERROR_CODE: 'NETWORK' };
-      }
-      emitter.emit('showNetworkError');
-      return Promise.reject(error);
-
-      // Server Error
-    } else if (NEW_STATUS && ERROR_CODES_TO_RETRY.includes(NEW_STATUS)) {
-      console.log('error code retrieved', NEW_STATUS);
-      // HTTP errors (parse errors, etc..)
-      if (Allow400Status(error.config)) {
-        // dont raise 400 errors, if this is desired explicitly
-        console.log(`AXIOS: Pass Error ${PREVIOUS_HTTP_ERROR_CODE}`);
-        return true;
-      }
-
-      // check if two in a row...
-      if (NEW_STATUS != PREVIOUS_HTTP_ERROR_CODE) {
-        // no, this is the first one..
-        console.log('ERROR CODES: first trial finished');
-        return { HTTP_ERROR_CODE: NEW_STATUS };
-      }
-      emitter.emit('showServiceError');
-      return Promise.reject(error);
-
-      // 405 Authorization errors : probably not enough privileges...
-    } else if (error.response.status == 405) {
-      // 405 errors (parse errors)
-      console.log('AXIOS: Pass Error 405');
-      emitter.emit('showAuthorizationError');
-      return Promise.reject(error);
-
-      // 429 Too Many Requests...
-    } else if (error.response.status == 429) {
-      console.log('AXIOS: Pass Error 429');
-      emitter.emit('showTooManyRequestsError');
-      return Promise.reject(error);
-
-      // 403 Permission errors : probaly token expired...
-    } else if (error.response.status == 403) {
-      console.log('403 Error');
-
-      if (ReloginOnStatus403(error.config)) {
-        console.log('AXIOS: ReloginOnStatus403');
-        error.response.status = 449;
-
-        // TODO: global pkce Variable
-        // if (Vue.prototype.pkce.isAuthorized()) {
-        //     await Vue.prototype.refresh_token()
-        //     if (Vue.prototype.pkce.state && Vue.prototype.pkce.state.accessToken) {
-        //     error.config.retoken = true
-        //     return (error.config)
-        //     }
-        // }
-
-        // Token Refresh, seems not be possible / desired :-(
-        console.log('Not Authenticated');
-        emitter.emit('showAuthenticationWarning');
-        return Promise.reject(error);
-      }
+    // Server Error
+  } else if (NEW_STATUS && ERROR_CODES_TO_RETRY.includes(NEW_STATUS)) {
+    console.log('error code retrieved', NEW_STATUS);
+    // HTTP errors (parse errors, etc..)
+    if (Allow400Status(error.config)) {
+      // dont raise 400 errors, if this is desired explicitly
+      console.log(`AXIOS: Pass Error ${PREVIOUS_HTTP_ERROR_CODE}`);
+      return true;
     }
 
-    // All other errors:
-    console.log('Unknown API Request Error');
-    // console.log(`status: ${error.response.status}`)
+    // check if two in a row...
+    if (NEW_STATUS != PREVIOUS_HTTP_ERROR_CODE) {
+      // no, this is the first one..
+      console.log('ERROR CODES: first trial finished');
+      return { HTTP_ERROR_CODE: NEW_STATUS };
+    }
     emitter.emit('showServiceError');
     return Promise.reject(error);
-  };
 
-  mountAxiosInterceptor(axiosErrorHandling);
+    // 405 Authorization errors : probably not enough privileges...
+  } else if (error.response.status == 405) {
+    // 405 errors (parse errors)
+    console.log('AXIOS: Pass Error 405');
+    emitter.emit('showAuthorizationError');
+    return Promise.reject(error);
 
+    // 429 Too Many Requests...
+  } else if (error.response.status == 429) {
+    console.log('AXIOS: Pass Error 429');
+    emitter.emit('showTooManyRequestsError');
+    return Promise.reject(error);
 
+    // 403 Permission errors : probaly token expired...
+  } else if (error.response.status == 403) {
+    console.log('403 Error');
+
+    if (ReloginOnStatus403(error.config)) {
+      console.log('AXIOS: ReloginOnStatus403');
+      error.response.status = 449;
+
+      // TODO: global pkce Variable
+      // if (Vue.prototype.pkce.isAuthorized()) {
+      //     await Vue.prototype.refresh_token()
+      //     if (Vue.prototype.pkce.state && Vue.prototype.pkce.state.accessToken) {
+      //     error.config.retoken = true
+      //     return (error.config)
+      //     }
+      // }
+
+      // Token Refresh, seems not be possible / desired :-(
+      console.log('Not Authenticated');
+      emitter.emit('showAuthenticationWarning');
+      return Promise.reject(error);
+    }
+  }
+
+  // All other errors:
+  console.log('Unknown API Request Error');
+  // console.log(`status: ${error.response.status}`)
+  emitter.emit('showServiceError');
+  return Promise.reject(error);
+};
+
+mountAxiosInterceptor(axiosErrorHandling);
 
 export default function useXHR() {
-
   // console.log('SETUP Composable AXIOS API ');
 
-  const oauthEmitter = useOAuthEmitter()
-
+  const oauthEmitter = useOAuthEmitter();
 
   //--- Authorization Header ---
   // ---------------------------
@@ -163,7 +157,7 @@ export default function useXHR() {
   const hasHeader = () => {
     return !!getHeader();
   };
-  
+
   /**
    * Sets the transmitted JWT token as current default authentication header
    */
@@ -183,7 +177,6 @@ export default function useXHR() {
     console.log('Remove axios header');
   };
 
-
   /**
    * Returns currently set default authentication header (without prefix)
    */
@@ -198,7 +191,6 @@ export default function useXHR() {
     }
     return null;
   };
-
 
   //--- Request Types ---
   // --------------------
@@ -262,9 +254,9 @@ export default function useXHR() {
     //   this.removeHeader()
     // }
 
-    if (appComposable.brokenSession.value) {
+    if (authComposable.brokenSession.value) {
       console.log(
-        '**** appComposable.brokenSession is set to TRUE: no ajax call is executed... ******'
+        '**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******'
       );
       return null;
     }
@@ -311,7 +303,6 @@ export default function useXHR() {
     return response;
   };
 
-
   // Subscribe to token changes...
   oauthEmitter.on('TokenChanges', (jwt) => {
     if (jwt && typeof jwt === 'string') {
@@ -330,4 +321,4 @@ export default function useXHR() {
     put,
     customRequest,
   };
-};
+}

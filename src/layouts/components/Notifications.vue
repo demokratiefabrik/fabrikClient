@@ -7,7 +7,7 @@
       icon="mdi-bell-outline"
       @click="expandMenu"
       flat
-      v-if="false && oauth.authorized"
+      v-if="false && authorized"
     >
     <!-- // TODO disabled by DW for migration to vue3 -->
       <q-menu
@@ -127,14 +127,16 @@
 import constants from 'src/utils/constants';
 import { mapGetters } from 'vuex';
 import useAppComposable from 'src/composables/app.composable';
+import useAuthComposable from 'src/composables/auth.composable';
 
 
 export default {
   name: 'Notifications',
 
-  setup(){
-    const appComposable = useAppComposable()
-    return {appComposable}
+  setup() {
+    const appComposable = useAppComposable();
+    const {authorized, userid} = useAuthComposable();
+    return { appComposable, authorized, userid };
   },
   data() {
     return {
@@ -223,7 +225,7 @@ export default {
       preloadAssemblies.forEach((assemblyIdentifier) => {
         this.$store.dispatch('assemblystore/syncAssembly', {
           assemblyIdentifier: assemblyIdentifier,
-          oauthUserID: this.oauth.userid,
+          oauthUserID: this.userid,
         });
       });
 
@@ -231,7 +233,7 @@ export default {
         this.$store.dispatch('contentstore/syncContenttree', {
           assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
-          oauthUserID: this.oauth.userid,
+          oauthUserID: this.userid,
         });
       });
 
@@ -239,7 +241,7 @@ export default {
         this.$store.dispatch('peerreviewstore/syncPeerreviews', {
           assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
-          oauthUserID: this.oauth.userid,
+          oauthUserID: this.userid,
         });
       });
     },

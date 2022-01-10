@@ -1,5 +1,8 @@
 <template>
-  <q-page class="row"><br><br><br>
+  <q-page class="row">
+    HALLO {{pkce.authorized}}
+    <br><br><br>
+    <input @click="pkce.login()" type="button" value="login"/>
     <PySwarmPlot></PySwarmPlot>
   </q-page>
 </template>
@@ -7,18 +10,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PySwarmPlot from 'src/plugins/CIR/components/PySwarmPlot.vue';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+
 
 export default defineComponent({
   name: 'PageIndex',
-
-  // setup() {
-  //   return {}
-  // },
   
   setup() {
-    // const emitter = useEmitter();
-
-    return {ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
+    const pkce = usePKCEComposable();
+    return {pkce, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
   },
   components: { PySwarmPlot },
 

@@ -92,7 +92,7 @@
     <!-- <q-btn-dropdown
       stretch
       flat
-      v-if="oauth.authorized"
+      v-if="authorized"
     >
       <template v-slot:label>
         <UserAvatar
@@ -115,7 +115,7 @@
           clickable
           :class="'profile'==currentRoute ? 'dropdownSelected' : ''"
           @click="gotoProfile()"
-          v-if="oauth.authorized"
+          v-if="authorized"
           v-close-popup
         >
           <q-item-section>
@@ -126,7 +126,7 @@
 
         <q-item
           clickable
-          v-if="oauth.authorized && UsersDelegateAssemblies"
+          v-if="authorized && UsersDelegateAssemblies"
           :class="'profile'==currentRoute ? 'dropdownSelected' : ''"
           @click="$root.gotoAssemblyHome(UsersDelegateAssemblies[0])"
           v-close-popup
@@ -138,12 +138,12 @@
         </q-item>
 
         <q-item
-          @click="$root.logout()"
+          @click="logout()"
           clickable
           class=""
           v-close-popup
         >
-          <q-item-section v-if="oauth.authorized">
+          <q-item-section v-if="authorized">
             <q-item-label>{{$t('auth.logout')}}</q-item-label>
             <q-item-label caption>Demokratiefabrik verlassen.</q-item-label>
           </q-item-section>
@@ -157,6 +157,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useAppComposable from 'src/composables/app.composable';
+import useAuthComposable from 'src/composables/auth.composable';
 import { mapGetters, mapActions } from 'vuex';
 // import UserAvatar from 'src/components/UserAvatar';
 // import api from 'src/utils/api';
@@ -172,8 +173,10 @@ export default defineComponent({
 
   setup() {
     const appComposable = useAppComposable();
-    return { appComposable };
+    const {logout, authorized} = useAuthComposable();
+    return { appComposable, logout, authorized };
   },
+
   mounted() {
     // TODO: why here?
     this.appComposable.setHeaderOffset(150);
@@ -238,7 +241,7 @@ export default defineComponent({
     //     api.apireset(full);
     //     this.$store.dispatch("monitorReset");
     //     setTimeout(() => {
-    //       this.oauth.logout();
+    //       this.logout();
     //     }, 10);
     //   }
     // },

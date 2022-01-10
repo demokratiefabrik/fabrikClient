@@ -11,6 +11,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@bity/oauth2-auth-code-pkce": "^2.13.0",
     "@nivo/bar": "^0.75.0",
     "@nivo/core": "^0.75.0",
     "@nivo/swarmplot": "^0.75.0",
@@ -20,11 +21,14 @@
     "dotenv": "^10.0.0",
     "mitt": "^3.0.0",
     "quasar": "^2.0.0",
+    "text-encoding": "^0.7.0",
     "tiny-emitter": "^2.1.0",
     "vue-dompurify-html": "^3.0.0-beta.2",
     "vue-i18n": "^9.2.0-beta.26",
     "vuex": "^4.0.2",
-    "vuex-persistedstate": "^4.1.0"
+    "vuex-persistedstate": "^4.1.0",
+    "webcrypto-shim": "^0.1.7",
+    "whatwg-fetch": "^3.6.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

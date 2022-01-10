@@ -25,7 +25,7 @@
 
 // import('./polyfills')
 const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce')
-import { useAuthEmitter } from './oauthEmitter'
+// import { useAuthEmitter } from './oauthEmitter'
 import { mapActions } from 'vuex';
 import { emitter } from 'src/utils/emitter'
 

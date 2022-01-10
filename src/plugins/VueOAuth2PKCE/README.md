@@ -58,7 +58,7 @@ Vue.prototype.pkce.reset();
 
 ```
 // Check and Renew token
-await Vue.prototype.oauth.refresh_token_if_required()
+await refresh_token_if_required()
 ```
 
 Note: this ensures that not multiple renew-processes run simultaniously
