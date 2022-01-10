@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-var */
 import { route } from 'quasar/wrappers';
-// import { LayoutEventBus } from 'src/utils/eventbus';
 import {
   createMemoryHistory,
   createRouter,
@@ -17,6 +9,9 @@ import {
 import { StateInterface } from '../store';
 import routes from './routes';
 
+import useAppComposable from 'src/composables/app.composable';
+import useEmitter from 'src/utils/emitter';
+const appComposable = useAppComposable();
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -25,6 +20,11 @@ import routes from './routes';
  * async/await or return a Promise which resolves
  * with the Router instance.
  */
+
+
+
+const emitter = useEmitter();
+
 
 export default route<StateInterface>(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -61,22 +61,21 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
   Router.afterEach((to) => {
     if (to.params?.assemblyIdentifier) {
       // @ts-ignore
-      runtimeMutations.setAssemblyIdentifier(to.params.assemblyIdentifier);
+      appComposable.setAssemblyIdentifier(to.params.assemblyIdentifier);
 
       if (to.params?.stageID !== null && to.params?.stageID !== undefined) {
         // TODO: redirect to asembly home, when stage is invalid
 
         // console.log("router after each : new stage", to.params.stageID, to)
         // @ts-ignore
-        runtimeMutations.setStageID(to.params.stageID);
-        // TODO: disabled during vue3 migration
-        // this.emitter.emit('showLoading');
+        appComposable.setStageID(to.params.stageID);
+        emitter.emit('showLoading');
       }
     }
 
     // reset brokenSession Error
     // @ts-ignore
-    runtimeMutations.setBrokenSession(false);
+    appComposable.setBrokenSession(false);
 
     // console.log(to, from, store, Vue)
     // store.dispatch('assemblystore/monitor_route_changes', { to, from })
@@ -98,9 +97,7 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
     const current = this.resolve(this.currentRouteObject()).href;
     if (target === current) {
       // Reload
-      // console.log("EVENT BUS!!!")
-      // TODO: disabled during vue3 migration
-      // this.emitter.emit('reload');
+      emitter.emit('reload');
     } else {
       // Push
       this.push(route);
@@ -121,8 +118,8 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
   };
 
   /* Scroll To Anchor */
-  // @ts-ignore
-  Router.anchor = (anchor) => {
+    // @ts-ignore
+    Router.anchor = (anchor) => {
     // scroll to element
     const el = document.querySelector(`a[name=${anchor}]`);
     console.log(el, 'el');
@@ -130,7 +127,7 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
 
     // account for fixed header
     const headerHeight = 200;
-    var scrolledY = window.scrollY;
+    const scrolledY = window.scrollY;
     if (scrolledY) {
       window.scroll(0, scrolledY - headerHeight);
     }

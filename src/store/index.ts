@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { store } from 'quasar/wrappers'
 import { InjectionKey } from 'vue'
 import {
@@ -5,6 +6,10 @@ import {
   Store as VuexStore,
   useStore as vuexUseStore,
 } from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
+import { assemblystore } from './vuex-store-assembly'
+import { publicprofilestore } from './vuex-store-profile'
+import { publicindexstore } from './vuex-store-publicindex'
 
 // import example from './module-example'
 // import { ExampleStateInterface } from './module-example/state';
@@ -39,8 +44,20 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
       // example
+      publicprofilestore,
+      assemblystore,
+      publicindexstore
+      // contentstore,
+      // peerreviewstore,
+  
     },
-
+    plugins: [createPersistedState()],
+    // TODO: uncomment
+    // state: {
+    //   monitor_buffer: [],
+    //   monitor_date: Date.now(),
+    // },
+  
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only
     strict: !!process.env.DEBUGGING

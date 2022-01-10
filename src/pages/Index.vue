@@ -5,12 +5,22 @@
 </template>
 
 <script lang="ts">
-// import { api } from 'src/boot/axios';
 import { defineComponent } from 'vue';
-import PySwarmPlot from '../components/PySwarmPlot.vue';
+import PySwarmPlot from 'src/plugins/CIR/components/PySwarmPlot.vue';
 
 export default defineComponent({
   name: 'PageIndex',
+
+  // setup() {
+  //   return {}
+  // },
+  
+  setup() {
+    // const emitter = useEmitter();
+
+    return {ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
+  },
+  components: { PySwarmPlot },
 
   data() {
     return {
@@ -19,10 +29,6 @@ export default defineComponent({
     };
   },
 
-  components: { PySwarmPlot },
-  setup() {
-    return {ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
-  },
 });
 </script>
 

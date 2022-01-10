@@ -10,8 +10,9 @@
 
 import ApiService from 'src/utils/xhr'
 import { date } from 'quasar'
-import Vue from 'vue'
-import { runtimeStore } from 'src/store/runtime.store';
+// import Vue from 'vue'
+import useAppComposable from 'src/composables/app.composable';
+const appComposable = useAppComposable()
 
 export default {
 
@@ -121,8 +122,8 @@ export default {
 
   async monitorActivities(buffer, onlyWhenTokenValid) {
 
-    if (runtimeStore.brokenSession) {
-      console.log('**** runtimeStore.brokenSession is set to TRUE: no ajax call is executed... ******')
+    if (appComposable.brokenSession.value) {
+      console.log('**** appComposable.brokenSession is set to TRUE: no ajax call is executed... ******')
       return (false)
     }
 
@@ -190,7 +191,7 @@ export default {
     // Renew token (if required)
     await Vue.prototype.oauth.refresh_token_if_required()
 
-    // const assemblyIdentifier = runtimeStore.assemblyIdentifier
+    // const assemblyIdentifier = appComposable.assemblyIdentifier
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/stage`;
     // console.log("stage: ", stage, assemblyIdentifier)
     if (stage.id) {
@@ -286,7 +287,7 @@ export default {
 
 
   oauthSessionActive() {
-    return !!ApiService.getHeader() && !runtimeStore.logoutState;
+    return !!ApiService.getHeader() && !appComposable.logoutState.value;
   },
 
   async retrievePeerreviews(assemblyIdentifier, contenttreeID) {

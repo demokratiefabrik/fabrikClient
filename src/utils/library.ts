@@ -1,0 +1,69 @@
+/** DEMOKRATIFABRIK standalone Method Libraryies */
+
+export default function useLibraryComposable() {
+
+  /* Add Object filter: helper...
+  * <var>.filter only works for lists but not for objects...
+  * Returns length of a object/list, while handling null as 0. 
+    TODO: same as object?.length rigth?
+  */
+  const filter = (obj, predicate) =>
+    Object.keys(obj)
+      .filter((key) => predicate(obj[key]))
+      .reduce((res, key) => ((res[key] = obj[key]), res), {});
+
+  const nLength = (object1) => {
+    if (object1 === null) {
+      return 0;
+    }
+    return object1.length;
+  };
+
+  const loaded = (object1) => {
+    return object1 !== null && object1 !== undefined;
+  };
+
+  // randomly choose an entry from array...
+  const sample = (array) => {
+    return array[Math.floor(Math.random() * array.length)];
+  };
+
+  const pushSorted = (children, toAdd) => {
+    if (!toAdd.content.order_position) {
+      children.push(toAdd);
+      return children;
+    }
+    function getIndex(children, toAdd) {
+      const idx = children.findIndex(
+        (x) => x.content.order_position > toAdd.content.order_position
+      );
+      return idx === -1 ? children.length : idx;
+    }
+
+    const ix = getIndex(children, toAdd);
+    children.splice(ix, 0, toAdd);
+    return children;
+  };
+
+  const getOffsetTop = (element: HTMLElement) => {
+    // TODO: why not element
+    let offsetTop = 0;
+    // let el = element
+    while (element) {
+      offsetTop += element.offsetTop;
+      if (element.offsetParent) {
+        element = element.offsetParent as HTMLElement;
+      }
+    }
+    return offsetTop;
+  };
+
+  return {
+    getOffsetTop,
+    pushSorted,
+    sample,
+    loaded,
+    nLength,
+    filter,
+  };
+}

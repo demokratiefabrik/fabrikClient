@@ -93,15 +93,17 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 interface ExtWindowObject extends Window {
   dmclick(l: HTMLElement, id: number): void;
   dmover(l: HTMLElement, id: number): void;
   dmout(l: HTMLElement, id: number): void;
 }
 declare var window: ExtWindowObject;
-
-import { api } from 'src/boot/axios';
+// 
+// import { api } from 'src/boot/axios';
 import { defineComponent } from 'vue';
+import useCIRApi from '../composables/api'
 
 interface IUser {
   U: string
@@ -109,6 +111,12 @@ interface IUser {
 
 export default defineComponent({
   name: 'PySwarmPlot',
+
+
+  setup(){
+    const api = useCIRApi()
+    return {api}
+  },
 
   data() {
     return {
@@ -135,6 +143,7 @@ export default defineComponent({
 
 
   mounted() {
+
     const dotClick = (el: HTMLElement, id: number) => {
       this.selectedId = id;
       this.selectedEl = el;
@@ -190,14 +199,13 @@ export default defineComponent({
 
     plot: function () {
       this.loading = true;
-      void api
-        .get(
-          `/cirplot?distribution=${this.distribution}&marker-color-map=${this.markerColorMap}&number=${this.number}&marker-size-factor=${this.markerSizeFactor}`
-        )
-        .then((response) => {
-          this.cirplot = response.data as string;
-          this.loading = false;
-        });
+      
+      // TODO: transmit get object and not the final url...
+      const url = `/cirplot?distribution=${this.distribution}&marker-color-map=${this.markerColorMap}&number=${this.number}&marker-size-factor=${this.markerSizeFactor}`
+      this.api.polarbee(url).then(response => {
+        this.loading = false;
+        this.cirplot = response.data
+      })
     },
 
     loadUser: function(userId: number): IUser | null {
@@ -211,16 +219,27 @@ export default defineComponent({
 
     getUsers: function () {
       this.loading = true;
-      interface IResponseUsers {
-        data: {
-          users: {string, IUser}
-        }
-      }
-      void api
-        .get('/users')
-        .then((response: IResponseUsers) => {
-            this.users = response.data.users;
-        });
+      this.api.polarbeeUsers().then(response => {
+        console.log('lll')
+        this.users = response.data.users
+      })
+      
+
+    // void api
+    //   .get('/users')
+    //   .then((response: IResponseUsers) => {
+    //       return response.data.users;
+    //   });
+
+
+
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // void api
+      //   .get('/users')
+      //   .then((response: IResponseUsers) => {
+      //       this.users = response.data.users;
+      //   });
     },
   },
 });

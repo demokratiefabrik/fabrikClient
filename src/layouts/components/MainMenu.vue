@@ -13,11 +13,7 @@
 }
 </style>
 <template>
-  <q-toolbar
-    align="center"
-    style="align:center; text-align:center;"
-  >
-
+  <q-toolbar align="center" style="align: center; text-align: center">
     <!-- Left-Align: Small PAges -->
     <!-- <q-toolbar-title
       v-if="$q.screen.lt.md && assemblyName"
@@ -33,14 +29,16 @@
     <!-- v-if="$q.screen.gt.xs "  -->
     <!-- Center: Large Pages -->
     <!-- v-if="$q.screen.gt.sm && assemblyName" -->
+
+    <!-- TODO uncomment-->
+    <!-- @click="$root.gotoAssemblyHome(assembly)" -->
     <q-toolbar-title
       shrink
       v-if="$q.screen.gt.sm && assemblyName"
-      @click="$root.gotoAssemblyHome(assembly)"
       class="cursor-pointer"
-      style=" font-weight:400"
+      style="font-weight: 400"
     >
-      {{assemblyName}}
+      {{ assemblyName }}
     </q-toolbar-title>
     <q-space />
     <!-- Extended TOP Menu: (large page or none-assembly page)  -->
@@ -49,15 +47,17 @@
     <Notifications></Notifications>
 
     <span v-if="!is_assembly_page && $q.screen.gt.xs">
-    <q-item
-      v-for="item in menu"
-      clickable
-      :label=item.text
-      :class="item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'"
-      @click="$router.pushR(item.to)"
-      :key="item.text"
-    >{{item.text}}
-    </q-item>
+      <q-item
+        v-for="item in menu"
+        clickable
+        :label="item.text"
+        :class="
+          item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'
+        "
+        @click="$router.pushR(item.to)"
+        :key="item.text"
+        >{{ item.text }}
+      </q-item>
     </span>
 
     <!-- MENU: for assembly views  -->
@@ -66,38 +66,39 @@
       flat
       icon="mdi-menu"
       label=""
-      v-if="is_assembly_page || $q.screen.lt.sm "
+      v-if="is_assembly_page || $q.screen.lt.sm"
     >
       <q-menu>
         <q-list style="min-width: 100px">
           <q-item
             v-for="item in menu"
             clickable
-            :key=item.text
-            :class="item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'"
+            :key="item.text"
+            :class="
+              item.to.name == currentRoute
+                ? 'topmenuSelected'
+                : 'topmenuDefault'
+            "
             @click="$router.pushR(item.to)"
             v-close-popup
           >
-            <q-item-section>{{item.text}}</q-item-section>
+            <q-item-section>{{ item.text }}</q-item-section>
           </q-item>
-
         </q-list>
       </q-menu>
     </q-btn>
 
     <!-- ACCOUNT DROPDOWN -->
-    <q-btn-dropdown
+    <!-- <q-btn-dropdown
       stretch
       flat
       v-if="oauth.authorized"
     >
       <template v-slot:label>
-        <!-- <div class="row items-center"> -->
         <UserAvatar
           :profile="public_profile"
           menu="true"
         ></UserAvatar>
-        <!-- </div> -->
       </template>
 
       <q-list class="z-max">
@@ -148,69 +149,36 @@
           </q-item-section>
         </q-item>
 
-        <!-- <q-item
-          @click="apireset()"
-          clickable
-          v-if="is_in_testing_phase"
-          class=""
-          v-close-popup
-        >
-          <q-item-section v-if="oauth.authorized">
-            <q-item-label>_day reset</q-item-label>
-            <q-item-label caption>TESTING</q-item-label>
-          </q-item-section>
-        </q-item> -->
-
-        <!-- <q-item
-          @click="apireset(true)"
-          clickable
-          v-if="is_in_testing_phase"
-          class=""
-          v-close-popup
-        >
-          <q-item-section v-if="oauth.authorized">
-            <q-item-label>_full reset</q-item-label>
-            <q-item-label caption>TESTING</q-item-label>
-          </q-item-section>
-        </q-item> -->
-
       </q-list>
-    </q-btn-dropdown>
-
-    <!-- <q-btn
-      stretch
-      flat
-      label="Login"
-      v-if="!oauth.authorized"
-      @click="oauth.login({ name: 'home' })"
-    /> -->
-
-    <!-- DISABLED: at the moment. only de_CH -->
-    <!-- <LanguageSwitch /> -->
+    </q-btn-dropdown> -->
   </q-toolbar>
-
 </template>
 
-<script>
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable vue/return-in-computed-property */
-
-import UserAvatar from 'src/components/UserAvatar';
+<script lang="ts">
+import { defineComponent } from 'vue';
+import useAppComposable from 'src/composables/app.composable';
 import { mapGetters, mapActions } from 'vuex';
+// import UserAvatar from 'src/components/UserAvatar';
 // import api from 'src/utils/api';
 import Notifications from './Notifications.vue';
 
-export default {
+export default defineComponent({
   name: 'MainMenu',
   // props: ['assemblyName'],
   components: {
-    UserAvatar,
-    Notifications,
+    // UserAvatar,
+    Notifications
   },
+
+  setup() {
+    const appComposable = useAppComposable();
+    return { appComposable };
+  },
+  mounted() {
+    // TODO: why here?
+    this.appComposable.setHeaderOffset(150);
+  },
+
   data() {
     return {
       menu: [
@@ -246,7 +214,7 @@ export default {
     },
 
     username_derivation: function () {
-      return this.$root.username_derivation(this.public_profile);
+      return this.appComposable.username_derivation(this.public_profile);
     },
 
     ...mapGetters({
@@ -275,8 +243,5 @@ export default {
     //   }
     // },
   },
-  mounted() {
-    this.$root.headerOffset = 150;
-  },
-};
+});
 </script>

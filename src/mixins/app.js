@@ -5,31 +5,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable @typescript-eslint/restrict-template-expressions */
-// /* eslint-disable @typescript-eslint/require-await */
-// /* eslint-disable @typescript-eslint/no-unsafe-return */
-// /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// /* eslint-disable @typescript-eslint/no-unsafe-call */
-// /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import useEmitter from '@/composables/useEmitter'
+// import emitter from 'src/utils/emitter'
 import { mapGetters, mapActions } from 'vuex'
 // import { LayoutEventBus } from 'src/utils/eventbus'
-import { oAuthEventBus } from 'src/plugins/VueOAuth2PKCE/eventbus'
+import { useOAuthEmitter } from 'src/plugins/VueOAuth2PKCE/oauthEmitter'
 import constants from 'src/utils/constants'
-import { runtimeStore, runtimeMutations } from 'src/store/runtime.store'
+import useAppComposable from 'src/composables/app.composable'
 import { scroll } from 'quasar';
 const { setScrollPosition } = scroll;
 // const { setBrand } = colors
 import { dom } from 'quasar'
 const { offset } = dom
 
+
+
 export default {
 
   setup() {
-    const emitter = useEmitter()
-    return {emitter}
+    const appComposable = useAppComposable()
+    oauthEmitter = useOAuthEmitter()
+    return {oauthEmitter, appComposable}
   },
+
   data() {
     return {
       appInitialized: false,
@@ -83,7 +80,7 @@ export default {
     },
 
     appExitState: function () {
-      return runtimeStore.appExitState
+      return this.appComposable.appExitState.value
     },
 
     ...mapGetters({
@@ -99,8 +96,8 @@ export default {
 
     showAuthorizationError(data) {
       // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, data)
-      let msg_title = this.$i18n.t('app.error.authorization_error_title');
-      let msg_body = this.$i18n.t('app.error.authorization_error_body');
+      let msg_title = this.$t('app.error.authorization_error_title');
+      let msg_body = this.$t('app.error.authorization_error_body');
       let icon = 'mdi-key-outline';
       let type = 'error';
       let buttons = ['home'];
@@ -120,7 +117,7 @@ export default {
       console.log('Shutdown Demokratiefabrik')
       // Might invalidate the token.
       // this.$root.monitorFire(constants.MONITOR_EXIT)
-      runtimeMutations.exitApp()
+      appComposable.exitApp()
     },
 
     ...mapActions({
@@ -140,8 +137,8 @@ export default {
       this.$root.reload();
     });
     this.emitter.on('showServiceError', (data) => {
-      let msg_title = this.$i18n.t('app.error.service_error_title');
-      let msg_body = this.$i18n.t('app.error.service_error_body');
+      let msg_title = this.$t('app.error.service_error_title');
+      let msg_body = this.$t('app.error.service_error_body');
       let icon = 'mdi-alarm-light-outline';
       let settimer = data?.settimer ? data.settimer : false;
       let buttons = data?.nobuttons ? ['hide'] : ['reload'];
@@ -159,8 +156,8 @@ export default {
       this.$root.monitorLog(constants.MONITOR_ERROR_NETWORK, data)
     })
     this.emitter.on('showNetworkError', (data) => {
-      let msg_title = this.$i18n.t('app.error.network_error_title');
-      let msg_body = this.$i18n.t('app.error.network_error_body');
+      let msg_title = this.$t('app.error.network_error_title');
+      let msg_body = this.$t('app.error.network_error_body');
       let icon = 'mdi-alarm-light-outline';
       let type = 'error';
       let buttons = ['reload', 'hide'];
@@ -180,12 +177,12 @@ export default {
 
 
       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
-      runtimeMutations.setBrokenSession()
+      appComposable.setBrokenSession()
       console.log('SILENT LOGOUT,,,')
       this.$root.logout(null, {}, true);
 
-      let msg_title = this.$i18n.t('auth.authentication_invalid_warning_title');
-      let msg_body = this.$i18n.t('auth.authentication_invalid_warning_body');
+      let msg_title = this.$t('auth.authentication_invalid_warning_title');
+      let msg_body = this.$t('auth.authentication_invalid_warning_body');
       let icon = 'mdi-key-outline';
       let type = 'error';
       let settimer = data?.settimer ? data.settimer : false;
@@ -202,8 +199,8 @@ export default {
     })
     this.emitter.on('showTooManyRequestsError', (data) => {
       this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
-      let msg_title = this.$i18n.t('app.error.toomanyrequests_error_title');
-      let msg_body = this.$i18n.t('app.error.toomanyrequests_error_body');
+      let msg_title = this.$t('app.error.toomanyrequests_error_title');
+      let msg_body = this.$t('app.error.toomanyrequests_error_body');
       let icon = 'mdi-car-multiple';
       let type = 'error';
       this.$refs?.maincontent?.showNotificationBanner(
@@ -217,8 +214,8 @@ export default {
       this.$root.monitorLog(constants.MONITOR_WARNING_AUTHENTICATION, data)
       let type = 'warning';
       let icon = 'mdi-emoticon-cool-outline';
-      let msg_title = this.$i18n.t('auth.authentication_warning_title');
-      let msg_body = this.$i18n.t('auth.authentication_warning_body');
+      let msg_title = this.$t('auth.authentication_warning_title');
+      let msg_body = this.$t('auth.authentication_warning_body');
       this.$refs?.maincontent?.showNotificationBanner(
         type,
         msg_title,
@@ -232,8 +229,8 @@ export default {
       this.$root.monitorLog(constants.MONITOR_ERROR_AUTHENTICATION, data)
       let type = 'error';
       let icon = 'mdi-alarm-light-outline';
-      let msg_title = this.$i18n.t('auth.authentication_error_title');
-      let msg_body = this.$i18n.t('auth.authentication_error_body');
+      let msg_title = this.$t('auth.authentication_error_title');
+      let msg_body = this.$t('auth.authentication_error_body');
       this.$refs?.maincontent?.showNotificationBanner(
         type,
         msg_title,
@@ -256,7 +253,7 @@ export default {
 
 
     // oAuth2PKCE Hooks
-    oAuthEventBus.$on('AfterTokenChanged', data => {
+    this.oauthEmitter.on('AfterTokenChanged', data => {
       // NOTIFY EVERYONE, THAT TOKEN HAS CHANGED NOW!
       if (data) {
         this.storeOauthAcls({ oauthAcls: this.oauth?.payload?.roles })
@@ -266,16 +263,16 @@ export default {
       }
     })
 
-    oAuthEventBus.$on('AfterLogout', () => {
+    this.outhEmitter.on('AfterLogout', () => {
       console.log('CLEAR DATA AND REDIRECT TO LOGUT PAGE')
       this.$root.clearUserData()
       this.$router.push({ name: 'logout' })
     })
 
-    oAuthEventBus.$on('AfterLogin', () => {
+    this.outhEmitter.on('AfterLogin', () => {
 
       // reset monitor routine (and push first action)
-      runtimeMutations.setLogoutState(false)
+      appComposable.setLogoutState(false)
       this.$store.dispatch('monitorSetup',)
       this.$root.monitorLog(constants.MONITOR_LOGIN)
 
@@ -346,7 +343,7 @@ export default {
       const ele = dom?.item(0);
       const scrollFnc = () => {
         this.fixedSelectedItem = anchor;
-        const elOffset = this.$getOffsetTop(ele) - this.$root.headerOffset;
+        const elOffset = this.$getOffsetTop(ele) - this.appComposable.headerOffset;
         setScrollPosition(window, elOffset, duration);
         setTimeout(() => (this.fixedSelectedItem = null), duration);
       }
@@ -376,40 +373,12 @@ export default {
           onlyWhenTokenValid: true
         })
 
-        runtimeMutations.setLogoutState()
+        appComposable.setLogoutState()
 
         console.log('await monitorFire ended => call oauth logout function. SILENT:', silent)
         this.oauth.logout(silent)
       }
 
-
-    this.$root.username = (profile) => {
-      return profile ? profile.U : 'Anonymous';
-    }
-
-    this.$root.username_derivation = (profile, shortversion, thirdPerson = true) => {
-      if (!profile) {
-        return '';
-      }
-      const altitude = profile.ALT;
-      const fullname = profile.FN;
-      const canton = profile.CA;
-
-      if (thirdPerson) {
-        return this.$i18n.t(`auth.name_derivation_3rd_party${shortversion ? '_short' : ''}`, {
-          fullname: fullname,
-          canton: canton,
-          altitude: altitude,
-        });
-      } else {
-        return this.$i18n.t('auth.name_derivation', {
-          fullname: fullname,
-          canton: canton,
-          altitude: altitude,
-        });
-      }
-
-    }
 
     this.$root.monitorLog = async (eventString = null, data = {}) => {
       if (!this.oauth.authorized) {
@@ -421,8 +390,8 @@ export default {
         data.extra = { 'name': route.name }
       }
       data = { name: route.name, ...route.params, ...data }
-      if (runtimeStore.assemblyIdentifier && !data.assemblyIdentifier) {
-        data.assemblyIdentifier = runtimeStore.assemblyIdentifier
+      if (this.appComposable.assemblyIdentifier.value && !data.assemblyIdentifier) {
+        data.assemblyIdentifier = this.appComposable.assemblyIdentifier.value
       }
       this.$store.dispatch('monitorLog', {
         eventString,
@@ -436,8 +405,8 @@ export default {
       }
       const route = this.$router.currentRouteObject()
       const data = { name: route.name, ...route.params, ...extra }
-      if (runtimeStore.assemblyIdentifier && !data.assemblyIdentifier) {
-        data.assemblyIdentifier = runtimeStore.assemblyIdentifier
+      if (this.appComposable.assemblyIdentifier.value && !data.assemblyIdentifier) {
+        data.assemblyIdentifier = this.appComposable.assemblyIdentifier.value
       }
 
       await this.$store.dispatch('monitorFire', {
@@ -451,8 +420,8 @@ export default {
      * Clear all the data, that we want to reset for every participation session
      */
     this.$root.clearSession = () => {
-      runtimeMutations.setStageID(null)
-      runtimeMutations.setAssemblyIdentifier(null)
+      appComposable.setStageID(null)
+      appComposable.setAssemblyIdentifier(null)
     }
 
     /**
@@ -495,10 +464,10 @@ export default {
     let intervall = parseInt(process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS);
     if (!intervall) { intervall = 60 }
     this.$root.$monitorTimer = setInterval(() => {
-      if (runtimeStore.assemblyIdentifier && this.oauth.userid) {
+      if (this.appComposable.assemblyIdentifier.value && this.oauth.userid) {
         this.$store.dispatch('assemblystore/syncAssembly', {
           oauthUserID: this.oauth.userid,
-          assemblyIdentifier: runtimeStore.assemblyIdentifier
+          assemblyIdentifier: this.appComposable.assemblyIdentifier.value
         })
       }
       this.$root.monitorFire()

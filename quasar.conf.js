@@ -31,7 +31,11 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['main', 'axios', 'i18n'],
+    boot: [
+      'main',
+      // 'axios',
+      'i18n',
+    ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
@@ -81,7 +85,21 @@ module.exports = configure(function (ctx) {
       // https://quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
       chainWebpack(/* chain */) {
-        //
+        // DW: Added for i18n support (https://quasar.dev/options/app-internationalization)
+        // chain.module
+        //   .rule('i18n-resource')
+        //   .test(/\.(json5?|ya?ml)$/)
+        //   .include.add(path.resolve(__dirname, './src/i18n'))
+        //   .end()
+        //   .type('javascript/auto')
+        //   .use('i18n-resource')
+        //   .loader('@intlify/vue-i18n-loader');
+        // chain.module
+        //   .rule('i18n')
+        //   .resourceQuery(/blockType=i18n/)
+        //   .type('javascript/auto')
+        //   .use('i18n')
+        //   .loader('@intlify/vue-i18n-loader');
       },
     },
 
@@ -90,8 +108,8 @@ module.exports = configure(function (ctx) {
       server: {
         type: 'http',
       },
-      port: 8080,
-      open: true, // opens browser window automatically
+      port: 80,
+      open: false, // opens browser window automatically
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework

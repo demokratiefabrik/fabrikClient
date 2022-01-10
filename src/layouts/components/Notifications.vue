@@ -7,8 +7,9 @@
       icon="mdi-bell-outline"
       @click="expandMenu"
       flat
-      v-if="oauth.authorized"
+      v-if="false && oauth.authorized"
     >
+    <!-- // TODO disabled by DW for migration to vue3 -->
       <q-menu
         anchor="bottom left"
         self="top left"
@@ -123,19 +124,18 @@
 </template>
 
 <script>
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable vue/return-in-computed-property */
-
 import constants from 'src/utils/constants';
 import { mapGetters } from 'vuex';
-import { runtimeStore } from 'src/store/runtime.store';
+import useAppComposable from 'src/composables/app.composable';
+
 
 export default {
   name: 'Notifications',
+
+  setup(){
+    const appComposable = useAppComposable()
+    return {appComposable}
+  },
   data() {
     return {
       numberOfNotifications: 10,
@@ -154,14 +154,15 @@ export default {
     },
 
     // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
+    // eslint-disable-next-line vue/return-in-computed-property
     PeerreviewViewLoader() {
-      if (this.selectedPeerreviewID) {
-        return () =>
-          import('src/plugins/VAA/components/PeerReviewDetailLoader.vue');
-      } else if (this.selectedContentID) {
-        return () =>
-          import('src/plugins/VAA/components/SalienceDetailLoader.vue');
-      }
+      // if (this.selectedPeerreviewID) {
+      //   return () =>
+      //     import('src/plugins/VAA/components/PeerReviewDetailLoader.vue');
+      // } else if (this.selectedContentID) {
+      //   return () =>
+      //     import('src/plugins/VAA/components/SalienceDetailLoader.vue');
+      // }
     },
 
     notificationsList() {
@@ -228,7 +229,7 @@ export default {
 
       preloadContenttrees.forEach((contenttreeID) => {
         this.$store.dispatch('contentstore/syncContenttree', {
-          assemblyIdentifier: runtimeStore.assemblyIdentifier,
+          assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.oauth.userid,
         });
@@ -236,7 +237,7 @@ export default {
 
       preloadPeerreviews.forEach((contenttreeID) => {
         this.$store.dispatch('peerreviewstore/syncPeerreviews', {
-          assemblyIdentifier: runtimeStore.assemblyIdentifier,
+          assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.oauth.userid,
         });
