@@ -171,10 +171,10 @@ export default defineComponent({
     Notifications
   },
 
-  setup() {
-    const appComposable = useAppComposable();
-    const {logout, authorized} = useAuthComposable();
-    return { appComposable, logout, authorized };
+  async setup() {
+    const appComposable = await useAppComposable();
+    const {logout, authorized, getUsernameDerivation} = await useAuthComposable();
+    return { appComposable, logout, authorized, getUsernameDerivation };
   },
 
   mounted() {
@@ -217,22 +217,22 @@ export default defineComponent({
     },
 
     username_derivation: function () {
-      return this.appComposable.username_derivation(this.public_profile);
+      return this.getUsernameDerivation(this.public_profile);
     },
 
     ...mapGetters({
-      public_profile: 'publicprofilestore/get_public_profile',
+      public_profile: 'profilestore/get_public_profile',
       UsersDelegateAssemblies: 'publicindexstore/UsersDelegateAssemblies',
-      is_in_testing_phase: 'publicprofilestore/is_in_testing_phase',
+      is_in_testing_phase: 'profilestore/is_in_testing_phase',
       assemblyName: 'assemblystore/assemblyName',
       assembly: 'assemblystore/assembly',
     }),
   },
   methods: {
     ...mapActions({
-      gotoProfile: 'publicprofilestore/gotoProfile',
-      // username: "publicprofilestore/username",
-      // username_derivate: "publicprofilestore/username_derivate",
+      gotoProfile: 'profilestore/gotoProfile',
+      // username: "profilestore/username",
+      // username_derivate: "profilestore/username_derivate",
     }),
 
     // apireset(full) {

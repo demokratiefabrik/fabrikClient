@@ -157,29 +157,34 @@
 
       <!--TODO v-if="$parent.appInitialized" -->
       <br /><br />
-      <Footer />
+      <!-- <Footer /> -->
     </q-page-container>
   </q-layout>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
-import MainMenu from './components/MainMenu';
-import Footer from './components/Footer';
-import { mapGetters } from 'vuex';
+import MainMenu from './components/MainMenu.vue';
+// import Footer from './components/Footer';
+import { mapGetters} from 'vuex';
 import useAuthComposable from 'src/composables/auth.composable';
+import { useStore } from 'vuex'
+import useEmitter from 'src/utils/emitter';
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
-    Footer,
+    // Footer,
     MainMenu,
   },
 
 
-  setup() {
-    const authComposable = useAuthComposable();
-    return { authComposable };
+  async setup() {
+
+    const emitter = useEmitter()
+    const $store = useStore()
+    const authComposable = await useAuthComposable();
+    return { emitter, $store, authComposable };
   },
 
   data() {
@@ -191,10 +196,10 @@ export default defineComponent({
       NotificationBannerVisible: false,
       NotificationBannerType: 'info',
       NotificationBannerTitle: '',
-      NotificationBannerRedirectRoute: {},
+      NotificationBannerRedirectRoute: {} as Record<string, unknown>,
       NotificationBannerBody: '',
       NotificationBannerIcon: '',
-      NotificationBannerButtons: [],
+      NotificationBannerButtons: [] as any[],
     };
   },
 
@@ -244,8 +249,8 @@ export default defineComponent({
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     ...mapGetters({
-      profileColor: 'publicprofilestore/profileColor',
-      lightProfileColor: 'publicprofilestore/lightProfileColor',
+      profileColor: 'profilestore/profileColor',
+      lightProfileColor: 'profilestore/lightProfileColor',
       assemblyName: 'assemblystore/assemblyName',
       assemblyType: 'assemblystore/assemblyType',
       IsManager: 'assemblystore/IsManager',
@@ -276,8 +281,9 @@ export default defineComponent({
       this.NotificationBannerType = type;
       this.NotificationBannerIcon = icon;
       this.NotificationBannerButtons = buttons;
-      this.NotificationBannerRedirectRoute = redirectRoute;
-      if (!this.NotificationBannerRedirectRoute) {
+      if (redirectRoute) {
+        this.NotificationBannerRedirectRoute = redirectRoute;
+      }else{
         this.NotificationBannerRedirectRoute = { name: 'home' };
       }
 
@@ -293,19 +299,19 @@ export default defineComponent({
       window.scrollTo(0, 0);
     },
 
-    // pageReload() {
+    pageReload() {
     //   // delete some of the local storage to ensure validity of data...
     //   /* resets the counter to zero */
     //   // Only marginal user data is lost.
     //   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    //   this.$store.dispatch('monitorReset');
+      this.$store.dispatch('monitorReset');
     //   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    //   this.$store.dispatch('assemblystore/deleteAssemblyStore');
+      this.$store.dispatch('assemblystore/deleteAssemblyStore');
     //   // this.$store.dispatch("contentstore/deleteContentStore");
     //   // this.$store.dispatch("peerreviewstore/deletePeerreviewStore");
-    //   // this.$store.dispatch("publicprofilestore/deletePublicProfile", {
-    //   window.location.reload();
-    // },
+    //   // this.$store.dispatch("profilestore/deletePublicProfile", {
+      window.location.reload();
+    },
 
     // LOADING GIF
     showLoadingGif() {
@@ -344,8 +350,9 @@ export default defineComponent({
     // enable or disable AssemblyMenu
     // TODO: DW:
     // this.showAssemblyMenu = false;
+    const current = this.$router.currentRoute as any
     this.showAssemblyMenu = this.assemblyType &&
-      !this.$router.currentRoute.meta?.hideAssemblyMenu &&
+      !current?.meta?.hideAssemblyMenu &&
       !this.IsManager;
   }
 });

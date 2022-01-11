@@ -1,62 +1,64 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { ref, readonly, getCurrentInstance } from 'vue'
-import Constants from 'src/utils/constants'
+import { ref, readonly, getCurrentInstance } from 'vue';
+import Constants from 'src/utils/constants';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import { useStore } from 'vuex';
+// import {useStore} from 'vuex';
+//   // const store = useStore()
+//   // await store.dispatch('appstore/monitorFire', {
 
 const pkce = usePKCEComposable();
-
 const brokenSession = ref<boolean>(false);
 const logoutState = ref<boolean>(false);
 
 // export default {
 export default async function useAuthComposable() {
-  // setup() {
-
-  const internalInstance = getCurrentInstance(); 
-  const i18n = internalInstance?.appContext.config.globalProperties.$i18n;
-  const store = internalInstance?.appContext.config.globalProperties.store;
-
-  await store.dispatch('monitorFire', {
-    eventString: Constants.MONITOR_LOGOUT,
-    data: {},
-    onlyWhenTokenValid: true,
-  });
+  console.log('DEBUG: AUTH COMPOSABLE - START');
 
   // Session / PROFILE METHODS
   const setBrokenSession = (state: boolean) => (brokenSession.value = state);
   const setLogoutState = (state: boolean) => (logoutState.value = state);
-  const username = (profile) => profile ? profile.U : 'Anonymous';;
+  const username = (profile) => (profile ? profile.U : 'Anonymous');
 
-  const logout = async (eventString: string | null = null, extra = {}, silent=false) => {
-
-      console.log(
-        extra,
-        eventString,
-        '$root.logout call => fire monitor buffer with logout entry. SILENT:',
-        silent
-      ),
-        await store.dispatch('monitorFire', {
-          eventString: Constants.MONITOR_LOGOUT,
-          data: {},
-          onlyWhenTokenValid: true,
-        });
-
-      setLogoutState(false);
-
-      console.log(
-        'await monitorFire ended => call oauth logout function. SILENT:',
-        silent
-      );
-      
-      pkce.logout(silent);
-  }
-
-  const username_derivation = (profile, shortversion = false, thirdPerson = true) => {
-    if (!profile) {return '';}
+  const logout = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    eventString: string | null = null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    extra = {},
+    silent = false
+  ) => {
     
+    console.log(
+      'await monitorFire ended => call oauth logout function. SILENT:',
+      silent
+    );
+
+    setLogoutState(false);
+
+    const store = useStore();
+    await store.dispatch('appstore/monitorFire', {
+      eventString: Constants.MONITOR_LOGOUT,
+      data: {},
+      onlyWhenTokenValid: true,
+    });
+
+    pkce.logout(silent);
+  };
+
+  const getUsernameDerivation = (
+    profile,
+    shortversion = false,
+    thirdPerson = true
+  ) => {
+    if (!profile) {
+      return '';
+    }
+
     const altitude = profile.ALT;
     const fullname = profile.FN;
     const canton = profile.CA;
+    const internalInstance = getCurrentInstance();
+    const i18n = internalInstance?.appContext.config.globalProperties.$i18n;
 
     if (thirdPerson) {
       return i18n.t(
@@ -76,21 +78,20 @@ export default async function useAuthComposable() {
     }
   };
 
-
-  // const items = computed(() => store.state.items);
+  console.log('auth c. end')
   return {
     brokenSession: readonly(brokenSession),
     logoutState: readonly(logoutState),
+    authorized: readonly(pkce.authorized),
+    jwt: readonly(pkce.jwt),
+    payload: readonly(pkce.payload),
+    userid: readonly(pkce.userid),
     setBrokenSession,
     setLogoutState,
-    username_derivation,
+    getUsernameDerivation,
     username,
     logout,
+    login: pkce.login,
     refresh_token_if_required: pkce.refresh_token_if_required,
-    authorized: pkce.authorized,
-    jwt: pkce.jwt,
-    payload: pkce.payload,
-    userid: pkce.userid
   };
-  // },
 }

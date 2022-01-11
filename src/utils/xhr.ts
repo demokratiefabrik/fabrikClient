@@ -1,10 +1,4 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 //  * Provides methods for XHR-calls using Axios.
-//  */
 import axios from 'axios';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import useEmitter from './emitter';
@@ -14,10 +8,12 @@ axios.defaults.timeout = 2000;
 axios.defaults.baseURL = process.env.ENV_APISERVER_URL;
 
 const emitter = useEmitter();
-const authComposable = useAuthComposable();
 const HTTP_HEADER = 'Authorization';
 const RequestOrigin = 'ApiService';
 const ERROR_CODES_TO_RETRY = [400, 500, 502, 503, 501];
+
+// populate at first load
+let authComposable: any = null;
 
 const ReloginOnStatus403 = (config: Record<string, undefined>) => {
   return Object.prototype.hasOwnProperty.call(config, 'ReloginOnStatus403') &&
@@ -145,10 +141,14 @@ const axiosErrorHandling = async function (
 
 mountAxiosInterceptor(axiosErrorHandling);
 
-export default function useXHR() {
+export default async function useXHR() {
   // console.log('SETUP Composable AXIOS API ');
 
   const oauthEmitter = useOAuthEmitter();
+
+  if (!authComposable) {
+    authComposable = await useAuthComposable();
+  }
 
   //--- Authorization Header ---
   // ---------------------------

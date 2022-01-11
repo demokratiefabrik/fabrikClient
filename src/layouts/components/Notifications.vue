@@ -123,20 +123,23 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import constants from 'src/utils/constants';
-import { mapGetters } from 'vuex';
+import { mapGetters, useStore } from 'vuex';
 import useAppComposable from 'src/composables/app.composable';
 import useAuthComposable from 'src/composables/auth.composable';
+import filters from 'src/utils/filters';
+import { defineComponent } from 'vue';
 
-
-export default {
+export default defineComponent({
   name: 'Notifications',
 
-  setup() {
+  async setup() {
     const appComposable = useAppComposable();
-    const {authorized, userid} = useAuthComposable();
-    return { appComposable, authorized, userid };
+    const {authorized, userid} = await useAuthComposable();
+    const {formatTimeLeft} = filters
+    const $store = useStore()
+    return { $store, appComposable, authorized, userid, formatTimeLeft };
   },
   data() {
     return {
@@ -155,6 +158,7 @@ export default {
       return [];
     },
 
+    // TODO: Fix this...
     // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
     // eslint-disable-next-line vue/return-in-computed-property
     PeerreviewViewLoader() {
@@ -168,13 +172,9 @@ export default {
     },
 
     notificationsList() {
-      const notificationsList = [...Object.values(this.notifications)];
+      const notificationsList: any[] = [...Object.values(this.notifications)];
       notificationsList.sort((a, b) => b.id - a.id);
       return notificationsList.slice(0, 10);
-    },
-
-    oneUnread() {
-      return this.unreads.length > 0;
     },
 
     unreads() {
@@ -182,10 +182,14 @@ export default {
       return this.notificationsList.filter((x) => x.is_read !== true);
     },
 
+    oneUnread() {
+      return this.unreads.length > 0;
+    },
+
     ...mapGetters({
       // get_peerreview: "peerreviewstore/get_peerreview",
       // get_content: "contentstore/get_content",
-      notifications: 'publicprofilestore/notifications',
+      notifications: 'profilestore/notifications',
     }),
   },
   methods: {
@@ -197,10 +201,10 @@ export default {
       this.showDetailView = false;
 
       // preload data:
-      const preloadContenttrees = [];
-      const preloadAssemblies = [];
-      const preloadPeerreviews = [];
-      this.notificationsList.forEach((notification) => {
+      const preloadContenttrees: any[] = [];
+      const preloadAssemblies: any[] = [];
+      const preloadPeerreviews: any[] = [];
+      this.notificationsList.forEach(notification => {
         if (
           !!notification.peerreview_id &&
           !!notification.contenttree_id &&
@@ -279,5 +283,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

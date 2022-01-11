@@ -1,7 +1,6 @@
 import useXHR from 'src/utils/xhr';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 
-const {refresh_token_if_required} = usePKCEComposable()
 
 interface IResponseUsers {
   data: {
@@ -13,9 +12,10 @@ interface IResponseSVG {
   data: string;
 }
 
-const xhr = useXHR();
 
-export default function useCIRApi() {
+export default async function useCIRApi() {
+
+  const xhr = await useXHR();
 
   // CIR
   // *********************************
@@ -24,6 +24,7 @@ export default function useCIRApi() {
    */
   const polarbee = async (url: string): Promise<IResponseSVG> => {
 
+    const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     const data = {
@@ -36,6 +37,7 @@ export default function useCIRApi() {
   //  export const SaveEvent: GeneralActionCreator<UserEvent> = (payload) => {
   const polarbeeUsers = async (): Promise<IResponseUsers> => {
     
+    const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     const url = '/users';

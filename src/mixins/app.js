@@ -20,9 +20,9 @@ const { offset } = dom
 
 export default {
 
-  setup() {
+  async setup() {
     const appComposable = useAppComposable()
-    const authComposable = useAuthComposable()
+    const authComposable = await useAuthComposable()
     oauthEmitter = useOAuthEmitter()
     return {oauthEmitter, appComposable, authComposable}
   },
@@ -87,7 +87,7 @@ export default {
       ongoing_assemblies: 'publicindexstore/ongoing_assemblies',
       isUserAssemblyManager: 'publicindexstore/storeOisUserAssemblyManagerauthAcls',
       // lightProfileColor: "publicindexstore/lightProfileColor",
-      // profileColor: "publicprofilestore/profileColor",
+      // profileColor: "profilestore/profileColor",
     })
 
   },
@@ -121,8 +121,8 @@ export default {
     },
 
     ...mapActions({
-      touchRandomSeed: 'publicprofilestore/touchRandomSeed',
-      storeOauthAcls: 'publicprofilestore/storeOauthAcls',
+      touchRandomSeed: 'profilestore/touchRandomSeed',
+      storeOauthAcls: 'profilestore/storeOauthAcls',
       clearUserData: 'clearUserData',
     })
   },
@@ -243,7 +243,7 @@ export default {
       // SYNC USER PROFILE
       // console.log("on PublicProfileLoaded")
       // is email already set: if not => redirect to userprofile...
-      this.$store.dispatch('publicprofilestore/setUsernameDerivate', {
+      this.$store.dispatch('profilestore/setUsernameDerivate', {
         usernameDerivate: this.usernameDerivate()
       })
     })
@@ -484,7 +484,7 @@ export default {
 
       if (this.oauth.userid) {
         console.log('...profile')
-        const fetchProfile = await this.$store.dispatch('publicprofilestore/syncProfile', {
+        const fetchProfile = await this.$store.dispatch('profilestore/syncProfile', {
           oauthUserID: this.oauth.userid,
           oauthUserEmail: this.oauth.payload?.userEmail
         })

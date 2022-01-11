@@ -1,21 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /**
- * https://stackoverflow.com/questions/49639605/how-to-separate-axios-requests-from-a-vuex-store
  * Do not catch errors in here...
  */
-
 import ApiService from 'src/utils/xhr'
 import { date } from 'quasar'
-// import Vue from 'vue'
-import useAppComposable from 'src/composables/app.composable';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useAuthComposable from 'src/composables/auth.composable';
 
-const appComposable = useAppComposable()
-const {refresh_token_if_required, brokenSession} = useAuthComposable()
+const {refresh_token_if_required} = usePKCEComposable()
 
 export default {
 
@@ -73,6 +64,7 @@ export default {
 
     // Renew token (if required)
     // refresh_token method is done earlier, while launching app.
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     /* Notify Resource Server about certain user activities in the client app. */
@@ -89,6 +81,7 @@ export default {
 
     // Renew token (if required)
     // refresh_token method is done earlier, while launching app.
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     /* Notify Resource Server about certain user activities in the client app. */
@@ -108,6 +101,7 @@ export default {
   async sendUserMessage(assemblyIdentifier, userID, message) {
     console.log('API: sendUserMessage')
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/notifyuser`
     return ApiService.post(url, { user_id: userID, message })
@@ -117,13 +111,13 @@ export default {
    */
   async lockUserWithMessage(assemblyIdentifier, userID, message) {
     console.log('API: sendUserMessage')
-    // Renew token (if required)
     await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/lockuser`
     return ApiService.post(url, { user_id: userID, message })
   },
 
   async monitorActivities(buffer, onlyWhenTokenValid) {
+    const {refresh_token_if_required, brokenSession, authorized} = useAuthComposable()
 
     if (brokenSession.value) {
       console.log('**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******')
@@ -132,7 +126,7 @@ export default {
 
     // Only precheck token (if this is not an APP Exit Event)
     if (onlyWhenTokenValid) {
-      if (!Vue.prototype.pkce.isAuthorized()) {
+      if (!authorized()) {
         return (false);
       }
       if (await expiredJWT()) {
@@ -155,11 +149,9 @@ export default {
   async retrievePublicIndex() {
 
 
-    // // Renew token (if required)
-    // await refresh_token_if_required()
-
-    // let url = `${process.env.ENV_APISERVER_URL}/assemblies`
-    // return await ApiService.get(url)
+    // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
+    await refresh_token_if_required()
 
     console.log('API retrievePublicIndex')
     let url = `${process.env.ENV_APISERVER_URL}/assemblies`
@@ -182,6 +174,7 @@ export default {
     console.log('API retrieveAssembly')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
@@ -192,13 +185,11 @@ export default {
   async addOrUpdateStage(assemblyIdentifier, stage) {
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    // const assemblyIdentifier = appComposable.assemblyIdentifier
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/stage`;
-    // console.log("stage: ", stage, assemblyIdentifier)
     if (stage.id) {
-      // MODIFY
       url += `/${stage.id}`;
     }
     return ApiService.post(url, { stage })
@@ -207,6 +198,7 @@ export default {
   async updateAssembly(assemblyIdentifier, assembly) {
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/assembly/form/${assembly.id}`;
@@ -219,6 +211,7 @@ export default {
     console.log('API retrieveContenttree')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/contenttree`
@@ -230,6 +223,7 @@ export default {
     console.log('API retrieveContenttree')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/update`
@@ -241,6 +235,7 @@ export default {
     console.log('API saveContent')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     // compose url
@@ -260,6 +255,7 @@ export default {
     console.log('API saveContent', contenttreeID)
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     // compose url
@@ -271,8 +267,6 @@ export default {
       url += `/contenttree/${contenttreeID}/propose`;
     }
 
-    // Renew token (if required)
-    // await refresh_token_if_required()
     return await ApiService.post(url, { content: data })
   },
 
@@ -281,6 +275,7 @@ export default {
     console.log('API contentDetail', contentID)
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     // compose url
@@ -288,16 +283,12 @@ export default {
     return await ApiService.get(url)
   },
 
-
-  oauthSessionActive() {
-    return !!ApiService.getHeader() && !appComposable.logoutState.value;
-  },
-
   async retrievePeerreviews(assemblyIdentifier, contenttreeID) {
 
     console.log('API retrievePeerreviews')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviews`
@@ -310,6 +301,7 @@ export default {
     console.log('API updatePeerreviews')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviewupdate`
@@ -322,6 +314,7 @@ export default {
     console.log('API updateNotifications')
 
     // Renew token (if required)
+    // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/notifications`

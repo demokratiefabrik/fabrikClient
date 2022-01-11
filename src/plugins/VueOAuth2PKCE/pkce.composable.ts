@@ -160,7 +160,7 @@ export default function usePKCEComposable() {
 
   // TODO:
   // ...mapActions({
-  //   storeOauthAcls: 'publicprofilestore/storeOauthAcls'
+  //   storeOauthAcls: 'profilestore/storeOauthAcls'
   // }),
 
   const expiredJWT = function () {
@@ -269,7 +269,6 @@ export default function usePKCEComposable() {
     refresh_token_if_required,
     login,
     logout,
-    initialize,
-    // expiredJWT
+    initialize
   };
 }
