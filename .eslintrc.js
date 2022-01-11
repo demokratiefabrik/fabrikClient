@@ -33,6 +33,7 @@ module.exports = {
     // ESLint typescript rules
     'plugin:@typescript-eslint/recommended',
     // consider disabling this class of rules if linting takes too long
+    // DISABLED DW
     // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
 
     // Uncomment any of the lines below to choose desired strictness,
@@ -73,9 +74,16 @@ module.exports = {
     chrome: 'readonly'
   },
 
+  // ADDED BY DW (exlude all assets)
+  ignorePatterns: ["src/assets/*"],
+
   // add your custom rules here
   rules: {
     'prefer-promise-reject-errors': 'off',
+
+    // ADDED BY DW (allow any type)
+    "@typescript-eslint/no-explicit-any": "off",
+
 
     // TypeScript
     quotes: ['warn', 'single', { avoidEscape: true }],

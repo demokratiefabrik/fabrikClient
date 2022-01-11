@@ -12,7 +12,10 @@ import ApiService from 'src/utils/xhr'
 import { date } from 'quasar'
 // import Vue from 'vue'
 import useAppComposable from 'src/composables/app.composable';
+import useAuthComposable from 'src/composables/auth.composable';
+
 const appComposable = useAppComposable()
+const {refresh_token_if_required, brokenSession} = useAuthComposable()
 
 export default {
 
@@ -43,7 +46,7 @@ export default {
     console.log('API authProfile')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     /* Update Auth Profile => Emailadress/ Username etc... */
     profile.client_id = process.env.ENV_OAUTH_CLIENT_ID
@@ -70,7 +73,7 @@ export default {
 
     // Renew token (if required)
     // refresh_token method is done earlier, while launching app.
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     /* Notify Resource Server about certain user activities in the client app. */
     let url = `${process.env.ENV_APISERVER_URL}/profile`
@@ -86,7 +89,7 @@ export default {
 
     // Renew token (if required)
     // refresh_token method is done earlier, while launching app.
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     /* Notify Resource Server about certain user activities in the client app. */
     let url = ''
@@ -105,7 +108,7 @@ export default {
   async sendUserMessage(assemblyIdentifier, userID, message) {
     console.log('API: sendUserMessage')
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/notifyuser`
     return ApiService.post(url, { user_id: userID, message })
   },
@@ -115,15 +118,15 @@ export default {
   async lockUserWithMessage(assemblyIdentifier, userID, message) {
     console.log('API: sendUserMessage')
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/lockuser`
     return ApiService.post(url, { user_id: userID, message })
   },
 
   async monitorActivities(buffer, onlyWhenTokenValid) {
 
-    if (appComposable.brokenSession.value) {
-      console.log('**** appComposable.brokenSession is set to TRUE: no ajax call is executed... ******')
+    if (brokenSession.value) {
+      console.log('**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******')
       return (false)
     }
 
@@ -132,13 +135,13 @@ export default {
       if (!Vue.prototype.pkce.isAuthorized()) {
         return (false);
       }
-      if (await Vue.prototype.oauth.expiredJWT()) {
+      if (await expiredJWT()) {
         return (false)
       }
     }
 
 
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     // console.log("/api")
     /* Notify Resource Server about certain user activities in the client app. */
@@ -153,7 +156,7 @@ export default {
 
 
     // // Renew token (if required)
-    // await Vue.prototype.oauth.refresh_token_if_required()
+    // await refresh_token_if_required()
 
     // let url = `${process.env.ENV_APISERVER_URL}/assemblies`
     // return await ApiService.get(url)
@@ -179,7 +182,7 @@ export default {
     console.log('API retrieveAssembly')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
     return await ApiService.get(url)
@@ -189,7 +192,7 @@ export default {
   async addOrUpdateStage(assemblyIdentifier, stage) {
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     // const assemblyIdentifier = appComposable.assemblyIdentifier
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/stage`;
@@ -204,7 +207,7 @@ export default {
   async updateAssembly(assemblyIdentifier, assembly) {
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/assembly/form/${assembly.id}`;
     console.assert(assembly.id);
@@ -216,7 +219,7 @@ export default {
     console.log('API retrieveContenttree')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/contenttree`
     return await ApiService.get(url)
@@ -227,7 +230,7 @@ export default {
     console.log('API retrieveContenttree')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/update`
     return await ApiService.post(url, { content: { update_date } })
@@ -238,7 +241,7 @@ export default {
     console.log('API saveContent')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     // compose url
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
@@ -257,7 +260,7 @@ export default {
     console.log('API saveContent', contenttreeID)
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     // compose url
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
@@ -269,7 +272,7 @@ export default {
     }
 
     // Renew token (if required)
-    // await Vue.prototype.oauth.refresh_token_if_required()
+    // await refresh_token_if_required()
     return await ApiService.post(url, { content: data })
   },
 
@@ -278,7 +281,7 @@ export default {
     console.log('API contentDetail', contentID)
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     // compose url
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/content/${contentID}/detail`
@@ -295,7 +298,7 @@ export default {
     console.log('API retrievePeerreviews')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviews`
     return await ApiService.get(url)
@@ -307,7 +310,7 @@ export default {
     console.log('API updatePeerreviews')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviewupdate`
     return await ApiService.post(url, { content: { update_date } })
@@ -319,7 +322,7 @@ export default {
     console.log('API updateNotifications')
 
     // Renew token (if required)
-    await Vue.prototype.oauth.refresh_token_if_required()
+    await refresh_token_if_required()
 
     let url = `${process.env.ENV_APISERVER_URL}/notifications`
     return await ApiService.post(url, { update_date })

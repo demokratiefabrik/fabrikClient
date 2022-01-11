@@ -11,7 +11,10 @@ import routes from './routes';
 
 import useAppComposable from 'src/composables/app.composable';
 import useEmitter from 'src/utils/emitter';
+import useAuthComposable from 'src/composables/auth.composable';
 const appComposable = useAppComposable();
+const authComposable = useAuthComposable();
+
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -21,10 +24,7 @@ const appComposable = useAppComposable();
  * with the Router instance.
  */
 
-
-
 const emitter = useEmitter();
-
 
 export default route<StateInterface>(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -75,7 +75,7 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
 
     // reset brokenSession Error
     // @ts-ignore
-    appComposable.setBrokenSession(false);
+    authComposable.setBrokenSession(false);
 
     // console.log(to, from, store, Vue)
     // store.dispatch('assemblystore/monitor_route_changes', { to, from })
@@ -118,8 +118,8 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
   };
 
   /* Scroll To Anchor */
-    // @ts-ignore
-    Router.anchor = (anchor) => {
+  // @ts-ignore
+  Router.anchor = (anchor) => {
     // scroll to element
     const el = document.querySelector(`a[name=${anchor}]`);
     console.log(el, 'el');

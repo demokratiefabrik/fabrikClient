@@ -52,14 +52,14 @@ export default {
 
   am: {
     actor: {
-      '1': 'Felix',
-      '2': 'Sophie'
+      1: 'Felix',
+      2: 'Sophie'
     },
 
     /* Male: 0; female: 1 */
     gender: {
-      1: () => '0',
-      2: () => '1'
+      1: () => 0,
+      2: () => 1
     },
 
     // Use pluralization for gender... 

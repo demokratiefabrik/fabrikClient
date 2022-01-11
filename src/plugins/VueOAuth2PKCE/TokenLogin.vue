@@ -3,12 +3,9 @@
 </template>
 
 <script lang='ts'>
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 export default {
-  name: 'EmptyPage',
+  name: 'TokenLogin',
   // mounted() {
   //   // Add token to extraAuthorizationParams config param of PKCE Plugin (It is transmitted to the oAuth Server...)
   //   const transmittedTToken = this.$router.currentRoute.params?.ttoken;

@@ -1,6 +1,6 @@
-# fabrikClient (fabrikclient)
+# Demokratiefabrik (fabrikclient3.1)
 
-Demokratiefabrik Client
+Demokratiefabrik Webclient
 
 ## Install the dependencies
 ```bash
