@@ -89,7 +89,7 @@ export const assemblyAcls = (state, getters, rootState, rootGetters) => {
     return null;
   }
   const translateAclMethod =
-    rootGetters['publicprofilestore/translateOauthAcls'];
+    rootGetters['profilestore/translateOauthAcls'];
   return translateAclMethod(assemblyIdentifier.value);
 };
 

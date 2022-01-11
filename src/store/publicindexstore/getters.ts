@@ -38,7 +38,7 @@ export const UsersManagerAssemblies = (
   }
 
   // Check permissions:
-  const compare_func = rootGetters['publicprofilestore/translateOauthAcls'];
+  const compare_func = rootGetters['profilestore/translateOauthAcls'];
   const accessibleAssemblies = filter(state.publicIndex.assemblies, (x) => {
     const acls = compare_func(x.identifier);
     return acls.includes('manage');
@@ -63,7 +63,7 @@ export const UsersObserverAssemblies = (
   }
 
   // Check permissions:
-  const compare_func = rootGetters['publicprofilestore/translateOauthAcls'];
+  const compare_func = rootGetters['profilestore/translateOauthAcls'];
   const accessibleAssemblies = filter(getters.ongoing_assemblies, (x) => {
     const acls = compare_func(x.identifier);
     return acls.includes('observe');
@@ -88,7 +88,7 @@ export const UsersDelegateAssemblies = (
   }
 
   // Check permissions:
-  const compare_func = rootGetters['publicprofilestore/translateOauthAcls'];
+  const compare_func = rootGetters['profilestore/translateOauthAcls'];
   const accessibleAssemblies = filter(getters.ongoing_assemblies, (x) => {
     const acls = compare_func(x.identifier);
     return acls.includes('delegate');
@@ -139,7 +139,7 @@ export const IsThereNothingGoingOn = (_state, getters) => {
 export const isUserAssemblyManager =
   (_state, _getters, _rootState, rootGetters) => (assemblyIdentifier) => {
     // Check permissions:
-    const aclFunc = rootGetters['publicprofilestore/translateOauthAcls'];
+    const aclFunc = rootGetters['profilestore/translateOauthAcls'];
     const acls = aclFunc(assemblyIdentifier);
     return acls.includes('manage');
   };

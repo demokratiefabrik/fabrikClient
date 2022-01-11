@@ -419,9 +419,9 @@ export default {
     },
 
     ...mapGetters({
-      randomLocalStorageSeed: 'publicprofilestore/randomLocalStorageSeed',
+      randomLocalStorageSeed: 'profilestore/randomLocalStorageSeed',
       // TODO use runtime store for am cache...
-      getAMCache: 'publicprofilestore/getAMCache',
+      getAMCache: 'profilestore/getAMCache',
     }),
   },
 
@@ -464,7 +464,7 @@ export default {
     },
 
     ...mapActions({
-      setAMCache: 'publicprofilestore/setAMCache',
+      setAMCache: 'profilestore/setAMCache',
     }),
   },
 

@@ -35,7 +35,7 @@ const filters = {
   },
 
   // Calculate & Format Time Left
-  formatTimeLeft(value, baseTime) {
+  formatTimeLeft(value, baseTime: null | number =null) {
     if (!baseTime) {
       baseTime = Date.now()
     }

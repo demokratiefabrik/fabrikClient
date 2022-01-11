@@ -7,7 +7,7 @@ const emitter = useEmitter()
 export const clearUserData = ({ dispatch, commit }) => {
   /* resets the counter to zero */
   dispatch('monitorExit');
-  dispatch('publicprofilestore/deletePublicProfile', { commit });
+  dispatch('profilestore/deletePublicProfile', { commit });
   dispatch('contentstore/deleteContentStore', { commit });
   console.log('delete peerreviews...');
   dispatch('peerreviewstore/deletePeerreviewStore', { commit });
@@ -153,7 +153,7 @@ export const updateStore = ({ dispatch, commit }, { data }) => {
 
     if ('notifications' in data) {
       console.log('RETRIEVED NOTIFICATIONS', data.peerreviews);
-      commit('publicprofilestore/update_notifications', {
+      commit('profilestore/update_notifications', {
         notifications: data.notifications,
       });
     }
