@@ -9,12 +9,18 @@ const brokenSession = ref<boolean>(false);
 const logoutState = ref<boolean>(false);
 
 // export default {
-export default function useAuthComposable() {
+export default async function useAuthComposable() {
   // setup() {
 
   const internalInstance = getCurrentInstance(); 
   const i18n = internalInstance?.appContext.config.globalProperties.$i18n;
   const store = internalInstance?.appContext.config.globalProperties.store;
+
+  await store.dispatch('monitorFire', {
+    eventString: Constants.MONITOR_LOGOUT,
+    data: {},
+    onlyWhenTokenValid: true,
+  });
 
   // Session / PROFILE METHODS
   const setBrokenSession = (state: boolean) => (brokenSession.value = state);
@@ -69,6 +75,7 @@ export default function useAuthComposable() {
       });
     }
   };
+
 
   // const items = computed(() => store.state.items);
   return {

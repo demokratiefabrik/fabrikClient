@@ -18,10 +18,8 @@
 })(window);
 
 const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
-// import { mapActions } from 'vuex';
 import { ref, computed } from 'vue';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-// import Constants from 'src/utils/constants'
 
 // Global Properties and Computeds
 const oauthEmitter = useOAuthEmitter();
@@ -133,7 +131,6 @@ export default function usePKCEComposable() {
           return resolve(true);
         }
 
-        // console.log("ISNT IT FALSE?", !val)
         iter++;
         if (iter >= maxSeconds * 10) {
           console.log('(infinity loop)');
@@ -213,7 +210,7 @@ export default function usePKCEComposable() {
     // wait few seconds...before deleting everything...
     setTimeout(() => {
       // Run it twice: dont know why this is required... but sometimes...
-      console.log(pkce.value.state, 'oauth.logout performed => emit events');
+      // console.log(pkce.value.state, 'oauth.logout performed => emit events');
       pkce.value.reset();
       pkce.value.setState({});
       jwt.value = null;
