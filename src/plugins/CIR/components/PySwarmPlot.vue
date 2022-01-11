@@ -93,17 +93,15 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 interface ExtWindowObject extends Window {
   dmclick(l: HTMLElement, id: number): void;
   dmover(l: HTMLElement, id: number): void;
   dmout(l: HTMLElement, id: number): void;
 }
 declare var window: ExtWindowObject;
-// 
-// import { api } from 'src/boot/axios';
+
 import { defineComponent } from 'vue';
-import useCIRApi from '../composables/api'
+import useCIRApi from '../utils/api';
 
 interface IUser {
   U: string
@@ -113,9 +111,9 @@ export default defineComponent({
   name: 'PySwarmPlot',
 
 
-  setup(){
-    const api = useCIRApi()
-    return {api}
+  async setup(){
+    const cirapi = await useCIRApi()
+    return {api: cirapi}
   },
 
   data() {

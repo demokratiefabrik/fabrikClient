@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { route } from 'quasar/wrappers';
+import useAppComposable from 'src/composables/app.composable';
 import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-import { StateInterface } from '../store';
+// import { StateInterface } from '../store';
 import routes from './routes';
 
-import useAppComposable from 'src/composables/app.composable';
 import useEmitter from 'src/utils/emitter';
-import useAuthComposable from 'src/composables/auth.composable';
-const appComposable = useAppComposable();
-const authComposable = useAuthComposable();
+// import useAuthComposable from 'src/composables/auth.composable';
+// const authComposable = await useAuthComposable();
 
 /*
  * If not building with SSR mode, you can
@@ -26,7 +25,7 @@ const authComposable = useAuthComposable();
 
 const emitter = useEmitter();
 
-export default route<StateInterface>(function (/* { store, ssrContext } */) {
+export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === 'history'
@@ -60,8 +59,9 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
 
   Router.afterEach((to) => {
     if (to.params?.assemblyIdentifier) {
-      // @ts-ignore
-      appComposable.setAssemblyIdentifier(to.params.assemblyIdentifier);
+      console.log('TODO: is vuex loaded?????')
+      const appComposable = useAppComposable();
+      appComposable.setAssemblyIdentifier(to?.params?.assemblyIdentifier as string | null);
 
       if (to.params?.stageID !== null && to.params?.stageID !== undefined) {
         // TODO: redirect to asembly home, when stage is invalid
@@ -75,7 +75,7 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
 
     // reset brokenSession Error
     // @ts-ignore
-    authComposable.setBrokenSession(false);
+    // authComposable.setBrokenSession(false);
 
     // console.log(to, from, store, Vue)
     // store.dispatch('assemblystore/monitor_route_changes', { to, from })

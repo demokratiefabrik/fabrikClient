@@ -230,7 +230,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // import constants from "src/utils/constants";
 import NewsletterForm from 'src/components/NewsletterForm.vue';
 

@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-array-constructor */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { date } from 'quasar'
 const { getDateDiff, formatDate } = date
 
-// Vue.use(VueI18n)
-
 const filters = {
-
 
   // Date Filters:
   /////////////////////////////////
@@ -60,7 +55,7 @@ const filters = {
     let hours = Math.abs(getDateDiff(value, baseTime, 'hours'))
     let days = Math.abs(getDateDiff(value, baseTime, 'days'))
     const months = Math.abs(getDateDiff(value, baseTime, 'months'))
-    const result = new Array()
+    const result: any[] = []
     let prefix = 'in'
     if (seconds < 0) {
       prefix = 'vor'
@@ -88,8 +83,6 @@ const filters = {
       minutes -= (60 * minutes)
       // seconds = 0
     }
-    // console.log(result)
-    // console.log(hours)
     if (minutes > 15) {
       result.push(`${roundToFive(minutes)} Minuten`)
       minutes = 0

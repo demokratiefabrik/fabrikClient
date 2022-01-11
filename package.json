@@ -23,6 +23,7 @@
     "vue-i18n": "^9.0.0",
     "vuex": "^4.0.1",
     "vuex-persistedstate": "^4.1.0",
+    "vuex-smart-module": "^1.0.0",
     "webcrypto-shim": "^0.1.7",
     "whatwg-fetch": "^3.6.2"
   },

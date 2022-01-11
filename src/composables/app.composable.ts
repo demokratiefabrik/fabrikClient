@@ -6,8 +6,13 @@ const assemblyIdentifier = ref<string | null>(null);
 const appExitState = ref<boolean>(false);
 const headerOffset = ref<number>(150);
 
+
+
 // export default {
 export default function useAppComposable() {
+
+
+  console.log('DEBUG: APP COMPOSABLE - START');
 
   const exitApp = () => (appExitState.value = true);
   const setStageID = (id: number | null) => (stageID.value = id);
@@ -16,6 +21,8 @@ export default function useAppComposable() {
 
   // Layout
   const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
+
+  console.log('DEBUG: APP COMPOSABLE - END');
 
   return {
     stageID: readonly(stageID),

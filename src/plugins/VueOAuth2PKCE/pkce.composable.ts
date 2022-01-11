@@ -269,7 +269,6 @@ export default function usePKCEComposable() {
     refresh_token_if_required,
     login,
     logout,
-    initialize,
-    // expiredJWT
+    initialize
   };
 }

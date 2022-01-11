@@ -20,9 +20,9 @@ const { offset } = dom
 
 export default {
 
-  setup() {
+  async setup() {
     const appComposable = useAppComposable()
-    const authComposable = useAuthComposable()
+    const authComposable = await useAuthComposable()
     oauthEmitter = useOAuthEmitter()
     return {oauthEmitter, appComposable, authComposable}
   },

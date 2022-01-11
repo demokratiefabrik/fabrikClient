@@ -1,71 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { store } from 'quasar/wrappers'
-import { InjectionKey } from 'vue'
-import {
-  createStore,
-  Store as VuexStore,
-  useStore as vuexUseStore,
-} from 'vuex'
-import createPersistedState from 'vuex-persistedstate'
-import { assemblystore } from './vuex-store-assembly'
-import { publicprofilestore } from './vuex-store-profile'
-import { publicindexstore } from './vuex-store-publicindex'
+import {createStore} from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
+import appstore from './appstore'
+import contenttreestore from './contenttreestore';
+import assemblystore from './assemblystore';
+import publicindexstore from './publicindexstore';
+import profilestore from './profilestore';
 
-// import example from './module-example'
-// import { ExampleStateInterface } from './module-example/state';
-
-/*
- * If not building with SSR mode, you can
- * directly export the Store instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Store instance.
- */
-
-export interface StateInterface {
-  // Define your own store structure, using submodules if needed
-  // example: ExampleStateInterface;
-  // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
-  example: unknown
-}
-
-// provide typings for `this.$store`
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $store: VuexStore<StateInterface>
-  }
-}
-
-// provide typings for `useStore` helper
-export const storeKey: InjectionKey<VuexStore<StateInterface>> = Symbol('vuex-key')
-
-export default store(function (/* { ssrContext } */) {
-  const Store = createStore<StateInterface>({
+export default function (/* { ssrContext } */) {
+  const Store = createStore({
     modules: {
-      // example
-      publicprofilestore,
+      appstore,
+      profilestore,
       assemblystore,
+      contenttreestore,
       publicindexstore
-      // contentstore,
-      // peerreviewstore,
-  
     },
     plugins: [createPersistedState()],
-    // TODO: uncomment
-    // state: {
-    //   monitor_buffer: [],
-    //   monitor_date: Date.now(),
-    // },
-  
+
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only
-    strict: !!process.env.DEBUGGING
-  })
+    strict: !!process.env.DEBUGGING,
+  });
 
   return Store;
-})
-
-export function useStore() {
-  return vuexUseStore(storeKey)
-}
+};

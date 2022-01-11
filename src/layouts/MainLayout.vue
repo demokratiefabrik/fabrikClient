@@ -157,28 +157,32 @@
 
       <!--TODO v-if="$parent.appInitialized" -->
       <br /><br />
-      <Footer />
+      <!-- <Footer /> -->
     </q-page-container>
   </q-layout>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
-import MainMenu from './components/MainMenu';
-import Footer from './components/Footer';
-import { mapGetters } from 'vuex';
+import MainMenu from './components/MainMenu.vue';
+// import Footer from './components/Footer';
+import { mapGetters} from 'vuex';
 import useAuthComposable from 'src/composables/auth.composable';
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
-    Footer,
+    // Footer,
     MainMenu,
   },
 
 
-  setup() {
-    const authComposable = useAuthComposable();
+  async setup() {
+
+    const store = useStore();
+    console.log(store, 'lll');
+    const authComposable = await useAuthComposable();
     return { authComposable };
   },
 

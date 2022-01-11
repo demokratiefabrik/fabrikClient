@@ -172,7 +172,7 @@ export default defineComponent({
   },
 
   async setup() {
-    const appComposable = useAppComposable();
+    const appComposable = await useAppComposable();
     const {logout, authorized, getUsernameDerivation} = await useAuthComposable();
     return { appComposable, logout, authorized, getUsernameDerivation };
   },

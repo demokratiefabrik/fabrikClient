@@ -123,7 +123,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import constants from 'src/utils/constants';
 import { mapGetters } from 'vuex';
 import useAppComposable from 'src/composables/app.composable';
@@ -133,9 +133,9 @@ import useAuthComposable from 'src/composables/auth.composable';
 export default {
   name: 'Notifications',
 
-  setup() {
+  async setup() {
     const appComposable = useAppComposable();
-    const {authorized, userid} = useAuthComposable();
+    const {authorized, userid} = await useAuthComposable();
     return { appComposable, authorized, userid };
   },
   data() {
