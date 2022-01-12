@@ -1,8 +1,9 @@
 //  * Provides methods for XHR-calls using Axios.
 import axios from 'axios';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useEmitter from './emitter';
-import useAuthComposable from 'src/composables/auth.composable';
+
 
 axios.defaults.timeout = 2000;
 axios.defaults.baseURL = process.env.ENV_APISERVER_URL;
@@ -11,9 +12,10 @@ const emitter = useEmitter();
 const HTTP_HEADER = 'Authorization';
 const RequestOrigin = 'ApiService';
 const ERROR_CODES_TO_RETRY = [400, 500, 502, 503, 501];
+const {getBrokenSession} = usePKCEComposable()
 
 // populate at first load
-let authComposable: any = null;
+// let authComposable: any = null;
 
 const ReloginOnStatus403 = (config: Record<string, undefined>) => {
   return Object.prototype.hasOwnProperty.call(config, 'ReloginOnStatus403') &&
@@ -141,14 +143,14 @@ const axiosErrorHandling = async function (
 
 mountAxiosInterceptor(axiosErrorHandling);
 
-export default async function useXHR() {
+export default function useXHR() {
   // console.log('SETUP Composable AXIOS API ');
 
   const oauthEmitter = useOAuthEmitter();
 
-  if (!authComposable) {
-    authComposable = await useAuthComposable();
-  }
+  // if (!authComposable) {
+  //   authComposable = await useAuthComposable();
+  // }
 
   //--- Authorization Header ---
   // ---------------------------
@@ -195,21 +197,21 @@ export default async function useXHR() {
   //--- Request Types ---
   // --------------------
 
-  const get = async (resource: Record<string, undefined>) => {
+  const get = async (url: string) => {
     const options = {
       method: 'GET',
-      url: resource,
+      url,
     };
     return await customRequest(options);
   };
 
   const post = async (
-    resource: Record<string, undefined>,
-    data: Record<string, undefined>
+    url: string,
+    data: Record<string, unknown>
   ) => {
     const fulldata = {
       method: 'POST',
-      url: resource,
+      url,
       data: data,
     };
 
@@ -217,12 +219,12 @@ export default async function useXHR() {
   };
 
   const put = async (
-    resource: Record<string, undefined>,
-    data: Record<string, undefined>
+    url: string,
+    data: Record<string, unknown>
   ) => {
     const fulldata = {
       method: 'PUT',
-      url: resource,
+      url,
       data: data,
     };
 
@@ -230,13 +232,13 @@ export default async function useXHR() {
   };
 
   const del = async (
-    resource: Record<string, undefined>,
-    data: Record<string, undefined>
+    url: string,
+    data: Record<string, unknown>
   ) => {
     // async function delete(resource, data) {
     const fulldata = {
       method: 'DELETE',
-      url: resource,
+      url,
       data: data,
     };
 
@@ -254,7 +256,7 @@ export default async function useXHR() {
     //   this.removeHeader()
     // }
 
-    if (authComposable.brokenSession.value) {
+    if (getBrokenSession()) {
       console.log(
         '**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******'
       );
@@ -319,6 +321,6 @@ export default async function useXHR() {
     get,
     del,
     put,
-    customRequest,
+    customRequest
   };
 }

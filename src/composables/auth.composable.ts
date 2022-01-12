@@ -8,7 +8,6 @@ import { useStore } from 'vuex';
 //   // await store.dispatch('appstore/monitorFire', {
 
 const pkce = usePKCEComposable();
-const brokenSession = ref<boolean>(false);
 const logoutState = ref<boolean>(false);
 
 // export default {
@@ -16,7 +15,6 @@ export default async function useAuthComposable() {
   console.log('DEBUG: AUTH COMPOSABLE - START');
 
   // Session / PROFILE METHODS
-  const setBrokenSession = (state: boolean) => (brokenSession.value = state);
   const setLogoutState = (state: boolean) => (logoutState.value = state);
   const username = (profile) => (profile ? profile.U : 'Anonymous');
 
@@ -80,13 +78,11 @@ export default async function useAuthComposable() {
 
   console.log('auth c. end')
   return {
-    brokenSession: readonly(brokenSession),
     logoutState: readonly(logoutState),
     authorized: readonly(pkce.authorized),
     jwt: readonly(pkce.jwt),
     payload: readonly(pkce.payload),
     userid: readonly(pkce.userid),
-    setBrokenSession,
     setLogoutState,
     getUsernameDerivation,
     username,

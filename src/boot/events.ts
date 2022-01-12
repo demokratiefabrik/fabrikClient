@@ -16,11 +16,11 @@ export default boot(async ({ app }) => {
   // RECEIVE MESSAGES FROM FROMBACKEND
   // TODO: write type for data
   emitter.on('receiveBackendFeedback', async (data: any) => {
-    if (!data.ok) {
-      return null;
-    }
     console.log('RESPONSE MONITORED');
-    // const appCompensable = useAppComposable();
+
+    // Shortcuts
+    const $q = useQuasar()   
+    if (!data.ok) {return null;}
     const { logoutState, authorized } = await useAuthComposable();
     if (logoutState) {
       console.log(
@@ -29,19 +29,18 @@ export default boot(async ({ app }) => {
       return;
     }
 
-    // // Some of the events could not be stored into the DB
-    const $q = useQuasar()   
+    // Errors
     if (data.response.errors?.length) {
       data.response.errors.forEach((error) => {
         console.error(error.message, error.event);
       });
-      // A monitor action resolved in an error.
       const message = 'Die Datenübermittlung ist beeinträchtigt.';
       $q.notify({ type: 'nFabrikWarning', message });
     }
 
+    // Warnings
     if (data.response.warnings?.length) {
-      const displayedWarning = ['nonsense'];
+      const displayedWarning: string[] = [];
       data.response.warnings.forEach((warning) => {
         // show only one warning at the time...
         const warnignLabel = warning.event?.eventString;
@@ -65,6 +64,5 @@ export default boot(async ({ app }) => {
       // see if there are new notifications...
       store.dispatch('profilestore/checkToUpdateNotifications')
     }
-
   });
 });

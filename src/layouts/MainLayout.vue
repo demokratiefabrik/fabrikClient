@@ -157,7 +157,7 @@
 
       <!--TODO v-if="$parent.appInitialized" -->
       <br /><br />
-      <!-- <Footer /> -->
+      <Footer />
     </q-page-container>
   </q-layout>
 </template>
@@ -165,16 +165,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import MainMenu from './components/MainMenu.vue';
-// import Footer from './components/Footer';
+import Footer from './components/Footer.vue';
 import { mapGetters} from 'vuex';
 import useAuthComposable from 'src/composables/auth.composable';
 import { useStore } from 'vuex'
 import useEmitter from 'src/utils/emitter';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
-    // Footer,
+    Footer,
     MainMenu,
   },
 
@@ -184,7 +185,9 @@ export default defineComponent({
     const emitter = useEmitter()
     const $store = useStore()
     const authComposable = await useAuthComposable();
-    return { emitter, $store, authComposable };
+    const {login} = usePKCEComposable();
+    
+    return { emitter, $store, authComposable, login };
   },
 
   data() {
@@ -247,7 +250,6 @@ export default defineComponent({
       );
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     ...mapGetters({
       profileColor: 'profilestore/profileColor',
       lightProfileColor: 'profilestore/lightProfileColor',
@@ -263,7 +265,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const destination_route = this.$router.currentRouteObject();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.authComposable.login(destination_route);
+      this.login(destination_route);
     },
 
     showNotificationBanner(
@@ -281,11 +283,7 @@ export default defineComponent({
       this.NotificationBannerType = type;
       this.NotificationBannerIcon = icon;
       this.NotificationBannerButtons = buttons;
-      if (redirectRoute) {
-        this.NotificationBannerRedirectRoute = redirectRoute;
-      }else{
-        this.NotificationBannerRedirectRoute = { name: 'home' };
-      }
+      this.NotificationBannerRedirectRoute = redirectRoute ? redirectRoute : { name: 'home' }
 
       // TODO: uncomment
       // this.hideLoadingGif();

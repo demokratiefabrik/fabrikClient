@@ -1,12 +1,14 @@
 /**
  * Do not catch errors in here...
  */
-import ApiService from 'src/utils/xhr'
+// import xhr from 'src/utils/xhr'
 import { date } from 'quasar'
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useAuthComposable from 'src/composables/auth.composable';
+import useXHR from 'src/utils/xhr';
 
-const {refresh_token_if_required} = usePKCEComposable()
+const {refresh_token_if_required, expiredJWT, getBrokenSession} = usePKCEComposable()
+const xhr = useXHR()
 
 export default {
 
@@ -14,7 +16,8 @@ export default {
   expiredCacheDate(timeDownloaded) {
     if (!timeDownloaded) { return (false) }
     timeDownloaded = new Date(timeDownloaded)
-    const expiringDate = date.addToDate(timeDownloaded, { minutes: parseInt(process.env.ENV_APISERVER_CACHE_EXPIRATION_MINUTES) })
+    const minutes = parseInt(process.env.ENV_APISERVER_CACHE_EXPIRATION_MINUTES as string)
+    const expiringDate = date.addToDate(timeDownloaded, { minutes })
     return (new Date(Date.now()) > expiringDate)
   },
 
@@ -22,7 +25,8 @@ export default {
   expiredUpdateDate(timeDownloaded) {
     if (!timeDownloaded) { return (false) }
     timeDownloaded = new Date(timeDownloaded)
-    const pingDate = date.addToDate(timeDownloaded, { minutes: parseInt(process.env.ENV_APISERVER_PING_FOR_MODIFIED_CONTENT_MINUTES) })
+    const minutes = parseInt(process.env.ENV_APISERVER_PING_FOR_MODIFIED_CONTENT_MINUTES as string)
+    const pingDate = date.addToDate(timeDownloaded, { minutes })
     return (new Date(Date.now()) > pingDate)
   },
 
@@ -32,7 +36,7 @@ export default {
   /**
    * Get or Update Userprofile data..
    */
-  async authProfile(profile) {
+  async authProfile(profile): Promise<any> {
 
     console.log('API authProfile')
 
@@ -41,16 +45,16 @@ export default {
 
     /* Update Auth Profile => Emailadress/ Username etc... */
     profile.client_id = process.env.ENV_OAUTH_CLIENT_ID
-    let url = `${process.env.ENV_OAUTH_BASE_URL}/accounts/emailupdate`
+    const url = `${process.env.ENV_OAUTH_BASE_URL}/accounts/emailupdate`
     const data = {
       method: 'post',
-      url: url,
+      url,
       data: profile,
       headers: {
         'content-type': 'application/json'
       }
     }
-    return (ApiService.customRequest(data))
+    return xhr.customRequest(data)
   },
 
   // API
@@ -68,9 +72,9 @@ export default {
     await refresh_token_if_required()
 
     /* Notify Resource Server about certain user activities in the client app. */
-    let url = `${process.env.ENV_APISERVER_URL}/profile`
+    const url = `${process.env.ENV_APISERVER_URL}/profile`
     // console.log('get public profile (API-Server)')
-    return await ApiService.get(url)
+    return xhr.get(url)
   },
   /**
    * Testing: Reset user data 
@@ -92,7 +96,7 @@ export default {
       url = `${process.env.ENV_APISERVER_URL}/user/dayreset`
     }
     // console.log('get public profile (API-Server)')
-    return ApiService.get(url)
+    return xhr.get(url)
   },
 
   /**
@@ -104,7 +108,7 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/notifyuser`
-    return ApiService.post(url, { user_id: userID, message })
+    return xhr.post(url, { user_id: userID, message })
   },
   /**
    * MODERATION: Lock user from the assembly 
@@ -113,37 +117,34 @@ export default {
     console.log('API: sendUserMessage')
     await refresh_token_if_required()
     const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/lockuser`
-    return ApiService.post(url, { user_id: userID, message })
+    return xhr.post(url, { user_id: userID, message })
   },
 
+  
+  /* Notify Resource Server about certain user activities in the client app. */
   async monitorActivities(buffer, onlyWhenTokenValid) {
-    const {refresh_token_if_required, brokenSession, authorized} = useAuthComposable()
+    const {refresh_token_if_required, authorized} = await useAuthComposable()
 
-    if (brokenSession.value) {
+    if (getBrokenSession()) {
       console.log('**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******')
       return (false)
     }
 
     // Only precheck token (if this is not an APP Exit Event)
     if (onlyWhenTokenValid) {
-      if (!authorized()) {
+      if (!authorized) {
         return (false);
       }
-      if (await expiredJWT()) {
+      if (expiredJWT()) {
         return (false)
       }
     }
 
-
     await refresh_token_if_required()
 
-    // console.log("/api")
-    /* Notify Resource Server about certain user activities in the client app. */
-    let url = `${process.env.ENV_APISERVER_URL}/monitor`
-    // console.log('monitor activies in API')
-    const response = await ApiService.post(url, { buffer })
+    const url = `${process.env.ENV_APISERVER_URL}/monitor`
+    const response =  await xhr.post(url, { buffer })
     return response.data
-
   },
 
   async retrievePublicIndex() {
@@ -154,15 +155,15 @@ export default {
     await refresh_token_if_required()
 
     console.log('API retrievePublicIndex')
-    let url = `${process.env.ENV_APISERVER_URL}/assemblies`
+    const url = `${process.env.ENV_APISERVER_URL}/assemblies`
 
-    let data = {
+    const data = {
       method: 'GET',
       url: url,
       WithoutAuthHeader: true
     }
 
-    return await ApiService.customRequest(data)
+    return xhr.customRequest(data)
   },
 
   // api.retrieveNotifications
@@ -177,8 +178,8 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
-    return await ApiService.get(url)
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}`
+    return xhr.get(url)
   },
 
 
@@ -192,7 +193,7 @@ export default {
     if (stage.id) {
       url += `/${stage.id}`;
     }
-    return ApiService.post(url, { stage })
+    return xhr.post(url, { stage })
   },
 
   async updateAssembly(assemblyIdentifier, assembly) {
@@ -201,9 +202,9 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/assembly/form/${assembly.id}`;
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/assembly/form/${assembly.id}`;
     console.assert(assembly.id);
-    return ApiService.post(url, { assembly })
+    return xhr.post(url, { assembly })
   },
 
   async retrieveContenttree(assemblyIdentifier, contenttreeID) {
@@ -214,8 +215,8 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/contenttree`
-    return await ApiService.get(url)
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/contenttree`
+    return xhr.get(url)
   },
 
   async updateContenttree(assemblyIdentifier, contenttreeID, update_date) {
@@ -226,8 +227,8 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/update`
-    return await ApiService.post(url, { content: { update_date } })
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/update`
+    return xhr.post(url, { content: { update_date } })
   },
 
   async saveContent(assemblyIdentifier, contenttreeID, data) {
@@ -247,7 +248,7 @@ export default {
       url += `/contenttree/${contenttreeID}/addcontent`;
     }
 
-    return await ApiService.post(url, { content: data })
+    return xhr.post(url, { content: data })
   },
 
   async proposeContent(assemblyIdentifier, contenttreeID, data) {
@@ -267,7 +268,7 @@ export default {
       url += `/contenttree/${contenttreeID}/propose`;
     }
 
-    return await ApiService.post(url, { content: data })
+    return xhr.post(url, { content: data })
   },
 
   async contentDetail(assemblyIdentifier, contentID) {
@@ -279,8 +280,8 @@ export default {
     await refresh_token_if_required()
 
     // compose url
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/content/${contentID}/detail`
-    return await ApiService.get(url)
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/content/${contentID}/detail`
+    return xhr.get(url)
   },
 
   async retrievePeerreviews(assemblyIdentifier, contenttreeID) {
@@ -291,8 +292,8 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviews`
-    return await ApiService.get(url)
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviews`
+    return xhr.get(url)
   },
 
 
@@ -304,8 +305,8 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviewupdate`
-    return await ApiService.post(url, { content: { update_date } })
+    const url = `${process.env.ENV_APISERVER_URL}/assembly/${assemblyIdentifier}/contenttree/${contenttreeID}/peerreviewupdate`
+    return xhr.post(url, { content: { update_date } })
   },
 
 
@@ -317,7 +318,7 @@ export default {
     // const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 
-    let url = `${process.env.ENV_APISERVER_URL}/notifications`
-    return await ApiService.post(url, { update_date })
+    const url = `${process.env.ENV_APISERVER_URL}/notifications`
+    return xhr.post(url, { update_date })
   },
 }

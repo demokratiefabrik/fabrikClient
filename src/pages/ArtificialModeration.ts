@@ -1,7 +1,3 @@
-import useAuthComposable from 'src/composables/auth.composable';
-const {authorized, login} = useAuthComposable();
-
-
 const AMs = {
 
 
@@ -13,7 +9,7 @@ const AMs = {
       {
         id: 1,
         prosa: 'GÄSTE',
-        condition: () => !ctx.authorized,
+        condition: (ctx) => !ctx.authorized,
         body: (ctx) => [
           'Guten Tag liebe Besucherinnen und Besucher!',
           `Wir sind ${ctx.$.t('am.actor.2')} und ${ctx.$t('am.actor.1')} und wir freuen uns sehr, dass Sie hier sind.`

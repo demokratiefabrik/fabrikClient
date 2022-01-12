@@ -15,6 +15,7 @@ import useAuthComposable from 'src/composables/auth.composable'
 import { scroll } from 'quasar';
 const { setScrollPosition } = scroll;
 import { dom } from 'quasar'
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable'
 const { offset } = dom
 
 
@@ -22,6 +23,7 @@ export default {
 
   async setup() {
     const appComposable = useAppComposable()
+    const {setBrokenSession} = usePKCEComposable()
     const authComposable = await useAuthComposable()
     oauthEmitter = useOAuthEmitter()
     return {oauthEmitter, appComposable, authComposable}
@@ -177,7 +179,7 @@ export default {
 
 
       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
-      authComposable.setBrokenSession()
+      setBrokenSession()
       console.log('SILENT LOGOUT,,,')
       this.authComposable.logout(null, {}, true);
 

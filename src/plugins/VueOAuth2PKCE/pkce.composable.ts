@@ -25,6 +25,7 @@ import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 const oauthEmitter = useOAuthEmitter();
 const pkce = ref<any>(null);
 const jwt = ref<null | string>(null);
+const brokenSession = ref<boolean>(false);
 
 const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
 
@@ -89,7 +90,7 @@ export default function usePKCEComposable() {
     // save destiantion route to localstorage
     localStorage.setItem(
       'oauth2authcodepkce-destination',
-      JSON.stringify(destination_route)
+      JSON.stringify(destination_route) 
     );
     pkce.value.fetchAuthorizationCode();
   };
@@ -171,6 +172,11 @@ export default function usePKCEComposable() {
     // console.log('EXPIRES IN ', Math.round(payload.value.exp - (new Date().getTime() / 1000)) / 60, ' minutes.')
     return payload.value.exp < new Date().getTime() / 1000 + 5;
   };
+
+  // Session / PROFILE METHODSbrokenSession.value = state
+  const setBrokenSession = (state: boolean) => brokenSession.value = state;
+  const getBrokenSession = () => brokenSession.value;
+
 
   /* Refresh token already before a invalid request has been issued */
   const refresh_token_if_required = async function () {
@@ -266,6 +272,9 @@ export default function usePKCEComposable() {
     ongoing,
     payload,
     userid,
+    getBrokenSession,
+    setBrokenSession,
+    expiredJWT,
     refresh_token_if_required,
     login,
     logout,

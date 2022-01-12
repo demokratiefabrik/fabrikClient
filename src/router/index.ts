@@ -9,8 +9,10 @@ import {
 } from 'vue-router';
 // import { StateInterface } from '../store';
 import routes from './routes';
-
 import useEmitter from 'src/utils/emitter';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+
+
 // import useAuthComposable from 'src/composables/auth.composable';
 // const authComposable = await useAuthComposable();
 
@@ -24,6 +26,7 @@ import useEmitter from 'src/utils/emitter';
  */
 
 const emitter = useEmitter();
+const {setBrokenSession} = usePKCEComposable()
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -73,10 +76,9 @@ export default route(function (/* { store, ssrContext } */) {
       }
     }
 
-    // reset brokenSession Error
-    // @ts-ignore
-    // authComposable.setBrokenSession(false);
+    setBrokenSession(false);
 
+    // TODO: should this be uncommented?
     // console.log(to, from, store, Vue)
     // store.dispatch('assemblystore/monitor_route_changes', { to, from })
   });
