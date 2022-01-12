@@ -90,7 +90,7 @@
     </q-card>
 
   </div>
-</template>
+</template> 
 
 <script lang="ts">
 interface ExtWindowObject extends Window {
@@ -110,9 +110,8 @@ interface IUser {
 export default defineComponent({
   name: 'PySwarmPlot',
 
-
-  async setup(){
-    const cirapi = await useCIRApi()
+  setup(){
+    const cirapi = useCIRApi()
     return {api: cirapi}
   },
 
