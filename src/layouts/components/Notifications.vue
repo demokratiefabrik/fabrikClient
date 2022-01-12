@@ -73,12 +73,13 @@
           </q-item>
         </q-list>
       </q-menu>
-      <q-badge
+      <!-- TODO: disabled due to migration  -->
+      <!-- <q-badge
         :color="oneUnread ? 'blue' : 'grey'"
         floating
         v-if="notifications && notificationsList.length"
         class="q-mt-sm q-mr-sm"
-      >{{ oneUnread ? unreads.length : notificationsList.length }}</q-badge>
+      >{{ oneUnread ? unreads.length : notificationsList.length }}</q-badge> -->
     </q-btn>
 
     <q-dialog
@@ -134,9 +135,10 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'Notifications',
 
-  async setup() {
+  setup() {
+        console.log('DEBUG setup notifications')
     const appComposable = useAppComposable();
-    const {authorized, userid} = await useAuthComposable();
+    const {authorized, userid} = useAuthComposable();
     const {formatTimeLeft} = filters
     const $store = useStore()
     return { $store, appComposable, authorized, userid, formatTimeLeft };
@@ -177,14 +179,15 @@ export default defineComponent({
       return notificationsList.slice(0, 10);
     },
 
-    unreads() {
-      // console.log(this.notificationsList);
-      return this.notificationsList.filter((x) => x.is_read !== true);
-    },
+    // Disable due to migration vue 3
+    // unreads() {
+    //   // console.log(this.notificationsList);
+    //   return this.notificationsList.filter((x) => x.is_read !== true);
+    // },
 
-    oneUnread() {
-      return this.unreads.length > 0;
-    },
+    // oneUnread() {
+    //   return this.unreads.length > 0;
+    // },
 
     ...mapGetters({
       // get_peerreview: "peerreviewstore/get_peerreview",
@@ -197,7 +200,8 @@ export default defineComponent({
       this.showDetailView = false;
     },
     expandMenu() {
-      this.$root.monitorLog(constants.MONITOR_NOTIFICATION_SHOW);
+      // DISABLE BY migratin vue 3
+      // this.$root.monitorLog(constants.MONITOR_NOTIFICATION_SHOW);
       this.showDetailView = false;
 
       // preload data:

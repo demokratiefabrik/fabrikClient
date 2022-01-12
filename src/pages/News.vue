@@ -188,9 +188,9 @@
 </template>
 
 
-<script>
+<script  lang="ts">
 // import ArtificialModerator from "src/components/ArtificialModerator";
-import AMs from 'src/pages/ArtificialModeration.js';
+import AMs from 'src/pages/ArtificialModeration';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 
 export default {

@@ -8,10 +8,12 @@ import { useStore } from 'vuex';
 const emitter = useEmitter();
 
 // Anonther Boot Hook. For subscribing to events
-export default boot(async ({ app }) => {
-  console.log('BOOOT EVENTS', app);
+export default boot(async ({ }) => {
+  console.log('DEBUG boot events start')
+
 
   // SUBSCRIBER
+  // TODO: outsource somewhere else...
 
   // RECEIVE MESSAGES FROM FROMBACKEND
   // TODO: write type for data
@@ -21,7 +23,7 @@ export default boot(async ({ app }) => {
     // Shortcuts
     const $q = useQuasar()   
     if (!data.ok) {return null;}
-    const { logoutState, authorized } = await useAuthComposable();
+    const { logoutState, authorized } = useAuthComposable();
     if (logoutState) {
       console.log(
         'LOGOUT PROCESS IS GOING ON: DO NOT PROCESS NEW INCOMING DATA.'
@@ -65,4 +67,7 @@ export default boot(async ({ app }) => {
       store.dispatch('profilestore/checkToUpdateNotifications')
     }
   });
+
+  console.log('DEBUG boot events ends')
+
 });

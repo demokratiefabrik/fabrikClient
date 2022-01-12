@@ -118,8 +118,8 @@
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
             clickable
-            @click="authComposable.logout()"
           >
+            <!-- @click="authComposable.logout()" -->
             {{ $t('auth.logout') }}
           </q-chip>
           <q-chip
@@ -131,7 +131,7 @@
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
             clickable
-            @click="$router.pushR(NotificationBannerRedirectRoute)"
+            @click="$pushR(NotificationBannerRedirectRoute)"
           >
             {{ $t('app.btn_next') }}
           </q-chip>
@@ -167,10 +167,11 @@ import { defineComponent } from 'vue';
 import MainMenu from './components/MainMenu.vue';
 import Footer from './components/Footer.vue';
 import { mapGetters} from 'vuex';
-import useAuthComposable from 'src/composables/auth.composable';
+// import useAuthComposable from 'src/composables/auth.composable';
 import { useStore } from 'vuex'
 import useEmitter from 'src/utils/emitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import useAuthComposable from 'src/composables/auth.composable';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -180,14 +181,16 @@ export default defineComponent({
   },
 
 
-  async setup() {
+  setup() {
+    console.log('DEBUG setup mainLayout')
 
     const emitter = useEmitter()
-    const $store = useStore()
-    const authComposable = await useAuthComposable();
+    const store = useStore()
+    const authComposable = useAuthComposable();
     const {login} = usePKCEComposable();
     
-    return { emitter, $store, authComposable, login };
+    console.log('DEBUG setup mainLayout ends')
+    return { emitter, store, authComposable, login };
   },
 
   data() {
@@ -220,7 +223,7 @@ export default defineComponent({
   // },
 
   computed: {
-    applyCssVarProfileColor: function () {
+    applyCssVarProfileColor(): Record<string, unknown> {
       // This code apply writes the profile color into the css variable profilecolor.
       // the variable is used for the css classes: .bg-profilecolor and .profilecolor
       return {
@@ -230,25 +233,25 @@ export default defineComponent({
     },
 
     // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
-    AssemblyMenuComponentLoader() {
-      if (this.showAssemblyMenu) {
-        // TODO: disabled. due to error
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        // return () => import(`../plugins/${this.assemblyType}/Menu.vue`);
-      }
-      return () => null;
-    },
+    // AssemblyMenuComponentLoader() {
+    //   if (this.showAssemblyMenu) {
+    //     // TODO: disabled. due to error
+    //     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    //     // return () => import(`../plugins/${this.assemblyType}/Menu.vue`);
+    //   }
+    //   return () => null;
+    // },
 
-    frontpage: function () {
-      return this.$route.name == 'home';
-    },
+    // frontpage: function () {
+    //   return this.$route.name == 'home';
+    // },
 
-    is_assembly_page: function () {
-      return (
-        this.$route.name === 'assemblies' ||
-        !!this.$route.params.assemblyIdentifier
-      );
-    },
+    // is_assembly_page: function () {
+    //   return (
+    //     this.$route.name === 'assemblies' ||
+    //     !!this.$route.params.assemblyIdentifier
+    //   );
+    // },
 
     ...mapGetters({
       profileColor: 'profilestore/profileColor',
@@ -263,8 +266,8 @@ export default defineComponent({
     clickAuthLink: function () {
       // const destination_route = { name: "home" };
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const destination_route = this.$router.currentRouteObject();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const current = this.$router.currentRoute;
+      const destination_route = { name: current.value.name, params: current.value.params };      
       this.login(destination_route);
     },
 
@@ -302,12 +305,12 @@ export default defineComponent({
     //   /* resets the counter to zero */
     //   // Only marginal user data is lost.
     //   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.$store.dispatch('monitorReset');
+      this.store.dispatch('monitorReset');
     //   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.$store.dispatch('assemblystore/deleteAssemblyStore');
-    //   // this.$store.dispatch("contentstore/deleteContentStore");
-    //   // this.$store.dispatch("peerreviewstore/deletePeerreviewStore");
-    //   // this.$store.dispatch("profilestore/deletePublicProfile", {
+      this.store.dispatch('assemblystore/deleteAssemblyStore');
+    //   // this.store.dispatch("contentstore/deleteContentStore");
+    //   // this.store.dispatch("peerreviewstore/deletePeerreviewStore");
+    //   // this.store.dispatch("profilestore/deletePublicProfile", {
       window.location.reload();
     },
 
@@ -328,20 +331,26 @@ export default defineComponent({
     },
     gotoHome() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.$router.pushR({ name: 'home' });
+      // this.pushR({ name: 'home' });
+      console.log(this.$filters);
     },
   },
+  created() {
 
+    console.log('DEBUG create MainLayout')
+  },
   mounted() {
+
+    console.log('DEBUG mount MainLayout')
     // if (this.is_assembly_page) {
     // loadComponent();
     // }
 
-    this.emitter.on('hideLoading', () => {
+    this.$emitter.on('hideLoading', () => {
       // this.hideLoadingGif();
     });
 
-    this.emitter.on('showLoading', () => {
+    this.$emitter.on('showLoading', () => {
       this.showLoadingGif();
     });
 

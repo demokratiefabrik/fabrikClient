@@ -11,7 +11,7 @@ const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
 
 // export default {
-export default async function useAuthComposable() {
+export default function useAuthComposable() {
   console.log('DEBUG: AUTH COMPOSABLE - START');
 
   // Session / PROFILE METHODS
@@ -76,7 +76,7 @@ export default async function useAuthComposable() {
     }
   };
 
-  console.log('auth c. end')
+  console.log('DEBUG auth composable end')
   return {
     logoutState: readonly(logoutState),
     authorized: readonly(pkce.authorized),

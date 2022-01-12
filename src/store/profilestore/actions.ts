@@ -88,11 +88,9 @@ export const  touchRandomSeed = ({ commit }) => {
 
  export const  gotoProfile =() => {
     // console.log(` goto public profile`)
-
-    // CHECK Profile requierments
-    
     const router = useRouter() as any
-    const destination_route = router.currentRouteObject();
+    const current = router.currentRoute;
+    const destination_route = { name: current.value.name, params: current.value.params };      
     console.log(destination_route)
 
     if (destination_route.name == 'profile') {

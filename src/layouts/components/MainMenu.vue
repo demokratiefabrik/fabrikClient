@@ -54,7 +54,7 @@
         :class="
           item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'
         "
-        @click="$router.pushR(item.to)"
+        @click="$pushR(item.to)"
         :key="item.text"
         >{{ item.text }}
       </q-item>
@@ -79,7 +79,7 @@
                 ? 'topmenuSelected'
                 : 'topmenuDefault'
             "
-            @click="$router.pushR(item.to)"
+            @click="$pushR(item.to)"
             v-close-popup
           >
             <q-item-section>{{ item.text }}</q-item-section>
@@ -171,9 +171,9 @@ export default defineComponent({
     Notifications
   },
 
-  async setup() {
-    const appComposable = await useAppComposable();
-    const {logout, authorized, getUsernameDerivation} = await useAuthComposable();
+  setup() {
+    const appComposable = useAppComposable();
+    const {logout, authorized, getUsernameDerivation} = useAuthComposable();
     return { appComposable, logout, authorized, getUsernameDerivation };
   },
 
@@ -204,9 +204,9 @@ export default defineComponent({
     currentRoute: function () {
       return this.$route.name;
     },
-    frontpage: function () {
-      return this.$route.name == 'home';
-    },
+    // frontpage: function () {
+    //   return this.$route.name == 'home';
+    // },
 
     // TODO: methods exist twice!!
     is_assembly_page: function () {

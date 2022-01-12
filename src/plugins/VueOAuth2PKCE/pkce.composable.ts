@@ -84,10 +84,13 @@ const pkce_config = {
 
 // export default {
 export default function usePKCEComposable() {
+  console.log('DEBUG usePKCEComposable start')
+
   pkce.value = new OAuth2AuthCodePKCE(pkce_config);
 
-  const login = function (destination_route = null) {
+  const login = function (destination_route: Record<string, unknown> | null = null) {
     // save destiantion route to localstorage
+    
     localStorage.setItem(
       'oauth2authcodepkce-destination',
       JSON.stringify(destination_route) 
@@ -142,6 +145,7 @@ export default function usePKCEComposable() {
         setTimeout(waitForOngoingTokenRefresh, 100);
       })();
     });
+
   };
 
   const getOngoingTokenRefresh = function () {
@@ -263,6 +267,7 @@ export default function usePKCEComposable() {
       oauthEmitter.emit('AfterLogin');
     }
   };
+  console.log('DEBUG usePKCEComposable ends')
 
   return {
     jwt,

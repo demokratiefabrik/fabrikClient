@@ -13,9 +13,9 @@ interface IResponseSVG {
 }
 
 
-export default async function useCIRApi() {
+export default function useCIRApi() {
 
-  const xhr = await useXHR();
+  const xhr = useXHR();
 
   // CIR
   // *********************************

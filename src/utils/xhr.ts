@@ -149,7 +149,7 @@ export default function useXHR() {
   const oauthEmitter = useOAuthEmitter();
 
   // if (!authComposable) {
-  //   authComposable = await useAuthComposable();
+  //   authComposable = useAuthComposable();
   // }
 
   //--- Authorization Header ---

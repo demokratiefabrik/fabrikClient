@@ -123,7 +123,7 @@ export default {
   
   /* Notify Resource Server about certain user activities in the client app. */
   async monitorActivities(buffer, onlyWhenTokenValid) {
-    const {refresh_token_if_required, authorized} = await useAuthComposable()
+    const {refresh_token_if_required, authorized} = useAuthComposable()
 
     if (getBrokenSession()) {
       console.log('**** authComposable.brokenSession is set to TRUE: no ajax call is executed... ******')

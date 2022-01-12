@@ -16,15 +16,19 @@
 </template>
 
 <script lang="ts">
-// /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// /* eslint-disable @typescript-eslint/no-unsafe-call */
-// /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { defineComponent } from 'vue';
+// import { useI18n } from 'vue-i18n'
 
-export default {
+export default defineComponent({
+  setup() {
+    // const i18n = useI18n()
+    // console.log(i18n, 'SETUPPP')
+    // return {i18n}
+  },
   data() {
     return {
-      lang: this.$i18n.locale,
-      langOptions: []
+      lang: this.$i18n.locale as string,
+      langOptions: [] as  Record<string, unknown>[]
     }
   },
 
@@ -36,9 +40,9 @@ export default {
 
   mounted: function () {
     this.langOptions = [
-        { value: 'en-us', label: this.$t('language.items.en-us.label') },
-        { value: 'de-ch', label: this.$t('language.items.de-ch.label') },
+        { 'value': 'en-us', label: this.$t('language.items.en-us.label') },
+        { 'value': 'de-ch', label: this.$t('language.items.de-ch.label') },
       ]
   }
-}
+})
 </script>

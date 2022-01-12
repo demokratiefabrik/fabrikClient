@@ -147,9 +147,9 @@
   </q-page>
 </template>
 
-<script>
+<script lang="ts">
 import { mapGetters } from 'vuex';
-import AMs from 'src/pages/ArtificialModeration.js';
+import AMs from 'src/pages/ArtificialModeration';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 
 export default {

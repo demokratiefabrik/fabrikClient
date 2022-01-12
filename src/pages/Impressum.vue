@@ -82,7 +82,7 @@ Das schweizerische Datenschutzgesetz bildet die ausschliessliche rechtliche Grun
 </template>
 
 
-<script>
+<script  lang="ts">
 export default {
   name: 'Impressum',
 };
