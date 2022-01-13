@@ -5,7 +5,7 @@ const { changeAlpha } = colors
 
 
 export const  randomLocalStorageSeed = (state) => {
-    return (state.randomSeed)
+    return (state.randomSeed as number)
   }
 
  export const  is_in_testing_phase = (state) => {
@@ -85,7 +85,7 @@ export const  randomLocalStorageSeed = (state) => {
   }
 
  export const getAMCache = (state) => (cacheKey) => {
-    return state.AMCache[cacheKey];
+    return state.AMCache[cacheKey] as number;
   }
 
  export const  notifications = (state) => {

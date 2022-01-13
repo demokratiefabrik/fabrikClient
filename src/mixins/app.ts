@@ -1,10 +1,3 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable @typescript-eslint/restrict-template-expressions */
-// /* eslint-disable @typescript-eslint/require-await */
-// /* eslint-disable @typescript-eslint/no-unsafe-return */
-// /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// /* eslint-disable @typescript-eslint/no-unsafe-call */
-// /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // // import emitter from 'src/utils/emitter'
 // import { mapGetters, mapActions } from 'vuex'
 // // import { LayoutEventBus } from 'src/utils/eventbus'

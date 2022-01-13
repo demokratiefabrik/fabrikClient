@@ -182,15 +182,15 @@ export default {
       // TODO: take email from environment variables
       const email = 'demokratiefabrik.ipw@unibe.ch';
       const windowRef = window.open(`mailto:${email}`, '_blank');
-      windowRef.focus();
-      windowRef.onfocus = function () {
-        return;
-      };
-      setTimeout(function () {
-        windowRef.close();
-      }, 500);
-
-      // document.location = `mailto:${email}`;
+      if (windowRef) {
+        windowRef.focus();
+        windowRef.onfocus = function () {
+          return;
+        };
+        setTimeout(function () {
+          windowRef.close();
+        }, 500);
+      }
     },
   },
 };

@@ -1,6 +1,6 @@
 export default function () {
   return {
-    randomSeed: null,
+    randomSeed: null as number | null,
     publicProfile: {},
     notifications: {},
     oauthAcls: [],

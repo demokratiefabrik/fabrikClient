@@ -342,6 +342,8 @@ export default defineComponent({
   mounted() {
 
     console.log('DEBUG mount MainLayout')
+    // console.log(this.$parent as ComponentPublicInstance)
+    
     // if (this.is_assembly_page) {
     // loadComponent();
     // }

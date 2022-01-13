@@ -34,41 +34,38 @@
     :class="['full-width', slim && $q.screen.gt.xs ? '' : 'q-mb-xl']"
   >
     <div
-      v-if="
-    enabled
-    &&
-    (!noContent
-    ||
-    loading)"
+      v-if="enabled && (!noContent || loading)"
       align="left"
-      style="max-width:450px;"
+      style="max-width: 450px"
     >
       <q-chat-message
-        size=7
+        size="7"
         :text="loading ? [] : text"
-        :sent="alignment=='left' ? false : true"
-        :class="['artificialmoderation', actorClass, noTextPadding ? 'noTextPadding' : ''] "
+        :sent="alignment == 'left' ? false : true"
+        :class="[
+          'artificialmoderation',
+          actorClass,
+          noTextPadding ? 'noTextPadding' : '',
+        ]"
       >
         <template v-if="loading">
           <q-spinner-dots size="2rem" />
         </template>
 
         <template v-slot:avatar>
-          <div style="z-index: 5; height: 85px;">
+          <div style="z-index: 5; height: 85px">
             <!-- v-model="tooltip_shown" -->
-            <q-tooltip
-              content-class="tooltip"
-              anchor="bottom middle"
-            >{{tooltip}}</q-tooltip>
+            <q-tooltip content-class="tooltip" anchor="bottom middle">{{
+              tooltip
+            }}</q-tooltip>
             <img
               :src="avatar"
-              style="position:relative;"
+              style="position: relative"
               aria-hidden="true"
               class="q-message-avatar q-message-avatar--sent"
             />
           </div>
         </template>
-
       </q-chat-message>
       <div
         :class="['artificialmoderation', actorClass, 'full-width']"
@@ -76,27 +73,28 @@
         v-if="buttons && !loading"
       >
         <q-btn
-          v-for="(item, index) in buttons"
+          v-for="(button, index) in (buttons as IArtificialModerationButton[])"
           :key="index"
           class="q-ma-xs"
-          :icon="item.icon"
-          :size="item.size ? item.size : 'md'"
-          :style="actor == 1 ? 'background-color:#776d58' : 'background-color:#1d496d'"
+          :icon="button.icon ? button.icon : ''"
+          :size="button.size ? button.size : 'md'"
+          :style="
+            actor == 1 ? 'background-color:#776d58' : 'background-color:#1d496d'
+          "
           rounded
           text-color="white"
-          @click="item.action(ctx)"
-          :label="item.label ? item.label(ctx) : '...'"
+          @click="button.action(ctx)"
+          :label="button.label ? button.label(ctx) : '...'"
         />
-
       </div>
     </div>
   </div>
 </template>
 
-
 <script lang="ts">
-import { mapGetters, mapActions } from 'vuex';
-
+// import { mapGetters } from 'vuex';
+import { defineComponent, PropType, ComponentPublicInstance} from 'vue';
+import { mapActions, mapGetters } from 'vuex';
 /** EXAMPLE OF A AM-CONFIGURATION OBJECT
   topics_after_saliencing: {
     condition: (ctx) => ctx.routed_stage,
@@ -117,31 +115,57 @@ import { mapGetters, mapActions } from 'vuex';
   }
  * 
  */
+
+interface IArtificialModerationButton {
+  condition: (ctx) => boolean;
+  action: (ctx) => () => void;
+  label: (ctx) => string;
+  size: (ctx) => string | undefined;
+  icon: (ctx) => string | undefined;
+}
+
+interface IArtificialModeration {
+  id: number;
+  prosa: string;
+  priority: number | undefined;
+  loading: (ctx) => boolean;
+  condition: (ctx, params: Record<string, unknown>) => boolean;
+  buttons: IArtificialModerationButton[];
+  items: IArtificialModeration[] | undefined;
+  body: (ctx, params: Record<string, unknown>) => string[];
+}
+
+// interface IArtificialModerationSet{
+//   buttons: IArtificialModerationButton[];
+//   items: IArtificialModeration[]
+// }
+
+
 const numberOfActors = 2;
 // TODO: AMcache does only work with one AM per page...
-export default {
+export default defineComponent({
   /*
   Variables:
   "this.amGroup" -Prop allows to specify whether the ArtificialModerators are played by
     distinct actors or the same actors. (If not specified, it is a random choice)
   */
-
+  // setup() {
+  //   return {};
+  // },
   data() {
     return {
-      AMpatched: null,
+      AMpatched: null as null | IArtificialModeration,
     };
   },
 
   props: {
-    AM: {
-      // AM Configuration Data-Object (see above)
-      type: [Array, Object],
+    ctx:  {
+      // Context, where all the required varaibles are defiend. (passed to ongoing, condition ete. functions)
+      type: Object as PropType<ComponentPublicInstance>,
       required: true,
     },
-    AMs: Array,
-    ctx: {
-      // Context, where all the required varaibles are defiend. (passed to ongoing, condition ete. functions)
-      type: Object,
+    AM: {
+      type: Object as PropType<IArtificialModeration>,
       required: true,
     },
     slim: {
@@ -156,11 +180,11 @@ export default {
     },
     alignment: {
       // right, left, center
-      type: String,
+      type: String as PropType<'left' | 'center' | 'right'>,
       default: 'left',
-      validator(value) {
-        return ['left', 'center', 'right'].indexOf(value) !== -1;
-      },
+      // validator(value: string): boolean {
+      //   return ['left', 'center', 'right'].includes(value)
+      // },
     },
 
     amGroup: {
@@ -185,39 +209,45 @@ export default {
   },
 
   computed: {
-    enabled() {
-      return (
-        this.AMpatched &&
-        (!this.AMpatched.condition || this.AMpatched.condition(this.ctx))
-      );
+    enabled(): boolean {
+      console.log(this.ctx);
+      const response = true
+      // const response = !this.AMpatched?.condition || this.AMpatched.condition(this.ctx);
+      return response;
     },
 
-    tooltip() {
+    tooltip(): string {
       const name = this.$t(`am.actor.${this.actor}`);
       return this.$t(`am.tooltip.${this.actor}`, { actor: name });
     },
 
-    alignmentForced() {
+    alignmentForced(): 'left' | 'right' | 'center' {
       // dont allo "center" here
-      return this.alignment == 'left' ? 'left' : 'right';
+      return this.alignment === 'left' ? 'left' : 'right';
     },
 
-    loading() {
-      return (
-        this.AMpatched &&
-        this.AMpatched.loading &&
-        this.AMpatched.loading(this.ctx)
-      );
+    loading(): boolean | undefined {
+      if (this.AMpatched) {
+        const response = this.AMpatched.loading && this.AMpatched.loading(this.ctx);
+        return response;
+      }
+      return undefined
     },
 
     /* A key that allows to identify a certain AM Instance */
-    cacheKey() {
-      // _${this.role}: role must be variable always...
-      return `${this.ctx.$options.name}_${this.AMpatched.id}`;
+    cacheKey(): string | undefined {
+      if (this.AMpatched) {
+        const prefix = this.ctx.$options.name;
+        const suffix = this.AMpatched.id;
+        // _${this.role}: role must be variable always...
+        return `${prefix}_${suffix}`;
+      }
+
+      return undefined;
     },
 
     /* Calculates a seed (number) that is individual for given user and AM-Group. */
-    seed: function () {
+    seed(): number {
       // 1: get a string that is constant for current AM-group
       let randomSeedBase;
       // if amGroup is indicated: this is the seedBase
@@ -227,12 +257,10 @@ export default {
       } else {
         if (this.role) {
           // if component name is availbale, take it as seedBase
-          // if nothing is indicated: take a individual-level random seedbase
           randomSeedBase = this.ctx.$options.name;
         } else {
-          // full random: // is this used?
-          randomSeedBase =
-            this.ctx.$options.name + JSON.stringify(this.AMpatched);
+          // if nothing is indicated: take a individual-level random seedbase
+          randomSeedBase = this.ctx.$options.name + JSON.stringify(this.AMpatched);
         }
       }
       // calculate a user-specific number by the seedBase string
@@ -242,113 +270,121 @@ export default {
       }
 
       // add also a user-constant random number
-      return Math.round(
-        ((parseInt(this.randomLocalStorageSeed) + seed) * 3) / 2
-      );
+      const seedFloat = (((this.randomLocalStorageSeed as number) + seed) * 3) / 2;
+      return Math.round(seedFloat);
     },
 
-    actor: function () {
+    actor(): number {
       // Lets do the allocation of AM-roles and avatars based on the user-random seed.
       if (this.fixedActor) {
         return this.fixedActor;
       }
-      const allocationShift = this.seed % numberOfActors;
+      const b = this.seed as number
+      const allocationShift = b % numberOfActors;
       return ((this.role + allocationShift) % numberOfActors) + 1;
     },
 
     // Which is the displayed name of the Actor?
-    actorName: function () {
+    actorName(): string {
       return this.$t(`am.actor.${this.actor}`);
     },
 
     // Which is the gender of the displayed Actor?
-    actorGender: function () {
+    // TODO: return "f" and "m"
+    actorGender(): string {
       return this.$t(`am.gender.${this.actor}`);
     },
 
     // Name of Partner AM
-    actorPartner: function () {
+    actorPartner(): string {
       // console.log("kkk", this.alternate(this.actor));
       return this.$t(`am.actor.${this.alternate(this.actor)}`);
     },
 
     // How this AM refers to the other one?
-    actorPartnerReference: function () {
+    actorPartnerReference(): string {
       // console.log(this.actorGender, this.actorPartner, "lll");
-      const partnerGender = this.$t(
-        `am.gender.${this.alternate(this.actor)}`
-      );
+      const partnerGender = this.$t(`am.gender.${this.alternate(this.actor)}`);
       return this.$t('am.reference', partnerGender, {
         actorPartner: this.actorPartner,
       });
     },
 
-    actorClass: function () {
+    actorClass(): string {
       return `artificialmoderator${this.actor}`;
     },
 
     // Which is the displayed avatar of the AM-Actor?
-    avatar: function () {
+    avatar(): string {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       let path = require(`src/assets/actor${this.actor}.png`);
       return path;
     },
 
-    invAlignment: function () {
-      if (this.alignment == 'left') {
+    invAlignment(): 'left' | 'right' | 'center' {
+      if (this.alignment === 'left') {
         return 'right';
       }
-      if (this.alignment == 'rigth') {
+      if (this.alignment === 'right') {
         return 'left';
       }
       return this.alignment;
     },
 
-    validItems() {
-      return this.AMpatched.items.filter(
-        (item) =>
-          !item.condition || item.condition(this.ctx, { role: this.role })
-      );
+    validItems(): IArtificialModeration[] | undefined {
+      if (this.AMpatched && this.AMpatched.items) {
+        const items = this.AMpatched.items as IArtificialModeration[];
+        return items.filter(
+          (item) =>
+            !item.condition || item.condition(this.ctx, { role: this.role })
+        ) 
+      }
+
+      return undefined
     },
 
-    validMaxPriorityItems() {
+    validMaxPriorityItems(): any[] {
       if (!this.validItems) {
         return [];
       }
 
       // get max priorities
-      const priorities = this.validItems.map((item) =>
+      const items = this.validItems as IArtificialModeration[]
+      const priorities = items.map((item) =>
         item.priority ? item.priority : 0
       );
       const max = Math.max(...priorities);
       // console.log("MAXX: ", max, priorities);
       if (!max || max < 1) {
-        return this.validItems;
+        return items;
       }
 
-      return this.validItems.filter((item) => max === item.priority);
+      return items.filter((item) => max === item.priority);
     },
 
-    selectedItem() {
-      if (!this.AMpatched || this.loading) {
+    selectedItem(): IArtificialModeration | undefined {
+      if (!this.AMpatched || this.loading || !this.validItems) {
         // not yet loaded
-        return;
+        return undefined;
       }
-      if (!this.validItems.length) {
-        // console.log("::::SELECT AMs", "no valid items");
-        return null;
-      }
+      // if (!this.validItems.length) {
+      //   // console.log("::::SELECT AMs", "no valid items");
+      //   return undefined;
+      // }
 
       // CACHE
-      const itemId = this.getAMCache(this.cacheKey);
-      if (itemId) {
-        const cachedItem = this.validMaxPriorityItems.find(
-          (item) => item.id === itemId
-        );
-        if (cachedItem) {
-          // selected item by cache
-          console.log('selected item by cache...');
-          return cachedItem;
+      const getCacheKey = this.getAMCache as (string) => number
+
+      if (this.cacheKey) {
+        const itemId = getCacheKey(this.cacheKey);
+        if (itemId) {
+          const items = this.validMaxPriorityItems as IArtificialModeration[]
+          const cachedItem = items.find((item) => item.id === itemId);
+          if (cachedItem) {
+            // selected item by cache
+            console.log('selected item by cache...');
+            return cachedItem;
+          }
         }
       }
 
@@ -357,15 +393,15 @@ export default {
       // console.log("RANDOM DRAW", this.validMaxPriorityItems);
       const selected = this.$library.sample(this.validMaxPriorityItems);
       console.log('SELECTED', selected.id, selected);
-      return selected;
+      return selected as IArtificialModeration;
     },
 
-    text() {
+    text(): string[] | unknown {
       if (!this.selectedItem) {
         return [];
       }
 
-      const body = this.selectedItem.body(this.ctx, {
+      const body = (this.selectedItem as IArtificialModeration).body(this.ctx, {
         actorName: this.actorName,
         actorGender: this.actorGender,
         actorPartner: this.actorPartner,
@@ -380,33 +416,32 @@ export default {
       if (Array.isArray(body)) {
         // filter empty values
         return body.filter((x) => x && x.length > 0);
-        //console.log("mm", body2, body)
-        //return body2;
       }
 
       return [body];
     },
 
-    noContent() {
+    noContent(): boolean {
       // console.log(this.text, "ll")
-      return this.text?.length === 0;
+      return !this.text || (this.text as string[]).length === 0;
     },
 
-    buttons() {
+    buttons(): IArtificialModerationButton[] | undefined {
       if (!this.selectedItem) {
-        return [];
+        return undefined;
       }
 
-      var buttons = [];
-      if (this.selectedItem.buttons?.length) {
-        this.selectedItem.buttons.forEach((button) => {
+      var buttons: IArtificialModerationButton[] = [];
+      const selectedItem = this.selectedItem as IArtificialModeration
+      if (selectedItem.buttons?.length) {
+        selectedItem.buttons.forEach((button) => {
           if (button && (!button.condition || button.condition(this.ctx))) {
             buttons.push(button);
           }
         });
       }
 
-      if (this.AMpatched.buttons && this.AMpatched.buttons.length) {
+      if (this.AMpatched && this.AMpatched.buttons && this.AMpatched.buttons.length) {
         this.AMpatched.buttons.forEach((button) => {
           if (button && (!button.condition || button.condition(this.ctx))) {
             buttons.push(button);
@@ -415,7 +450,7 @@ export default {
       }
 
       // console.log("AM buttons", buttons);
-      return buttons;
+      return buttons as IArtificialModerationButton[];
     },
 
     ...mapGetters({
@@ -430,11 +465,14 @@ export default {
     selectedItem(item) {
       // update cache
       // console.log(item);
-      const itemId = item ? item.id : null;
-      this.setAMCache({ cacheKey: this.cacheKey, itemId });
+      if (item  && this.text) {
+        const itemId = item ? item.id : null;
+        this.setAMCache({ cacheKey: this.cacheKey, itemId });
 
-      // emit event
-      this.$emit('am-change', { item, text: this.text.join('') });
+        // emit event
+        const text = this.text as string[]
+        this.$emit('am-change', { item, text: text.join('') });
+      }
     },
   },
 
@@ -469,19 +507,18 @@ export default {
   },
 
   created() {
-    this.AMpatched = Array.isArray(this.AM)
-      ? this.mergeAMs(this.AM[0], this.AM[1])
-      : this.AM;
-
-    if (
-      !this.AMpatched ||
-      !Object.values(this.AMpatched).length ||
-      !this.AMpatched.items.length
-    ) {
-      console.log(
-        'Artificial Moderator did not receive any instructions. AM is empty...'
-      );
-    }
+    // this.AMpatched = Array.isArray(this.AM)
+    //   ? this.mergeAMs(this.AM[0], this.AM[1])
+    //   : this.AM;
+    // if (
+    //   !this.AMpatched ||
+    //   !Object.values(this.AMpatched).length ||
+    //   !this.AMpatched.items.length
+    // ) {
+    //   // console.log(
+    //   //   'Artificial Moderator did not receive any instructions. AM is empty...'
+    //   // );
+    // }
   },
-};
+});
 </script>

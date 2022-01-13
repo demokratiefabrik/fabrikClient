@@ -20,9 +20,9 @@ export default function useAuthComposable() {
 
   const logout = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    eventString: string | null = null,
+    _eventString: string | null = null,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    extra = {},
+    _extra = {},
     silent = false
   ) => {
     

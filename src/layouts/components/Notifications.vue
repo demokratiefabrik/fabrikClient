@@ -140,8 +140,8 @@ export default defineComponent({
     const appComposable = useAppComposable();
     const {authorized, userid} = useAuthComposable();
     const {formatTimeLeft} = filters
-    const $store = useStore()
-    return { $store, appComposable, authorized, userid, formatTimeLeft };
+    const store = useStore()
+    return { store, appComposable, authorized, userid, formatTimeLeft };
   },
   data() {
     return {
@@ -231,14 +231,14 @@ export default defineComponent({
       });
 
       preloadAssemblies.forEach((assemblyIdentifier) => {
-        this.$store.dispatch('assemblystore/syncAssembly', {
+        this.store.dispatch('assemblystore/syncAssembly', {
           assemblyIdentifier: assemblyIdentifier,
           oauthUserID: this.userid,
         });
       });
 
       preloadContenttrees.forEach((contenttreeID) => {
-        this.$store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contentstore/syncContenttree', {
           assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.userid,
@@ -246,7 +246,7 @@ export default defineComponent({
       });
 
       preloadPeerreviews.forEach((contenttreeID) => {
-        this.$store.dispatch('peerreviewstore/syncPeerreviews', {
+        this.store.dispatch('peerreviewstore/syncPeerreviews', {
           assemblyIdentifier: this.appComposable.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.userid,
