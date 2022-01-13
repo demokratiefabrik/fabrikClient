@@ -54,7 +54,7 @@
         :class="
           item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'
         "
-        @click="$pushR(item.to)"
+        @click="pushR(item.to)"
         :key="item.text"
         >{{ item.text }}
       </q-item>
@@ -79,7 +79,7 @@
                 ? 'topmenuSelected'
                 : 'topmenuDefault'
             "
-            @click="$pushR(item.to)"
+            @click="pushR(item.to)"
             v-close-popup
           >
             <q-item-section>{{ item.text }}</q-item-section>
@@ -158,9 +158,8 @@
 import { defineComponent } from 'vue';
 import useAppComposable from 'src/composables/app.composable';
 import useAuthComposable from 'src/composables/auth.composable';
+import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
-// import UserAvatar from 'src/components/UserAvatar';
-// import api from 'src/utils/api';
 import Notifications from './Notifications.vue';
 
 export default defineComponent({
@@ -171,15 +170,17 @@ export default defineComponent({
     Notifications
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setup() {
-    const appComposable = useAppComposable();
+    const {setHeaderOffset} = useAppComposable()
+    const {pushR} = useRouterComposable()
     const {logout, authorized, getUsernameDerivation} = useAuthComposable();
-    return { appComposable, logout, authorized, getUsernameDerivation };
+    return { setHeaderOffset, logout, pushR, authorized, getUsernameDerivation };
   },
 
   mounted() {
     // TODO: why here?
-    this.appComposable.setHeaderOffset(150);
+    this.setHeaderOffset(150);
   },
 
   data() {
@@ -202,6 +203,7 @@ export default defineComponent({
   },
   computed: {
     currentRoute: function () {
+      console.log(this.$router, ',,,,,,')
       return this.$route.name;
     },
     // frontpage: function () {
@@ -229,6 +231,7 @@ export default defineComponent({
     }),
   },
   methods: {
+
     ...mapActions({
       gotoProfile: 'profilestore/gotoProfile',
       // username: "profilestore/username",

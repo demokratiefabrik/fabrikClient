@@ -1,0 +1,8 @@
+<style scoped>
+.user-input-color {
+  background-color: v-bind(color)
+}
+</style>
+
+
+https://stackoverflow.com/questions/47322875/vue-js-dynamic-style-with-variables

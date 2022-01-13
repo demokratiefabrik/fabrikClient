@@ -1,58 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-var-requires */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
+import { ref, computed } from 'vue';
+import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 
 /// POLYFILL (IE11 for oAuth2 PKCE Module)
 // Note: does not work anymore when outsourced in seperate files..
 (function (window) {
   if (typeof window.TextEncoder !== 'function') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const TextEncodingPolyfill = require('text-encoding');
     window.TextEncoder = TextEncodingPolyfill.TextEncoder;
     window.TextDecoder = TextEncodingPolyfill.TextDecoder;
   }
   if (typeof window.crypto === 'undefined') {
-    const { webcrypto } = require('webcrypto-shim');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const webcryptoShim = require('webcrypto-shim');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { webcrypto } = webcryptoShim;
   }
   if (typeof window.fetch === 'undefined') {
-    const { fetch } = require('whatwg-fetch');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const whatwg = require('whatwg-fetch');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { fetch } = whatwg;
   }
 })(window);
-
-const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
-import { ref, computed } from 'vue';
-import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-
-// Global Properties and Computeds
-const oauthEmitter = useOAuthEmitter();
-const pkce = ref<any>(null);
-const jwt = ref<null | string>(null);
-const brokenSession = ref<boolean>(false);
-
-const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
-
-const authorized = computed(() => {
-  if (!jwt.value) {
-    // THis should not be required, however, you never know;-)
-    jwt.value = pkce.value?.state?.accessToken?.value;
-  }
-  const _authorized = jwt.value && pkce.value.isAuthorized();
-  return !!_authorized;
-});
-
-const ongoing = computed(() => {
-  // During oauth setup: if its not yet clear, if user is logged in (i.e. login process is ongoing)
-  return authorized.value === null || authorized.value === undefined;
-});
-
-const payload = computed(() => {
-  if (!authorized.value || !jwt.value) {
-    return null;
-  }
-  return JSON.parse(window.atob(jwt.value.split('.')[1]));
-});
-
-const userid = computed(() => {
-  return payload.value?.sub;
-});
 
 /**
  * OAuth2AuthCodePKCE Configuration
@@ -82,18 +54,61 @@ const pkce_config = {
   },
 };
 
+// Global Properties and Computeds
+const oauthEmitter = useOAuthEmitter();
+const pkce = ref<any>(new OAuth2AuthCodePKCE(pkce_config));
+const jwt = ref<null | string>(null);
+const accessToken = ref<null | IAccessToken>(null);
+
+const brokenSession = ref<boolean>(false);
+
+const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
+
+const authorized = computed(() => {
+  // TODO: remove this (and test...)
+  if (!jwt.value) {
+    console.error('IS THIS NEEDED? jwt value backup');
+    // THis should not be required, however, you never know;-)
+    jwt.value = pkce.value?.state?.accessToken?.value;
+  }
+  const _authorized = jwt.value && pkce.value.isAuthorized();
+  return !!_authorized;
+});
+
+const ongoing = computed(() => {
+  // During oauth setup: if its not yet clear, if user is logged in (i.e. login process is ongoing)
+  return authorized.value === null || authorized.value === undefined;
+});
+
+const payload = computed(() => {
+  if (!authorized.value || !jwt.value) {
+    return null;
+  }
+  console.log(jwt.value, jwt, 'jwt split??');
+  return JSON.parse(window.atob(jwt.value.split('.')[1]));
+});
+
+const userid = computed(() => {
+  return payload.value?.sub;
+});
+
+export interface IAccessToken {
+  token: { value: string; expiry: Date };
+  scopes: string[];
+}
+
 // export default {
 export default function usePKCEComposable() {
-  console.log('DEBUG usePKCEComposable start')
+  // console.log('DEBUG usePKCEComposable start')
 
-  pkce.value = new OAuth2AuthCodePKCE(pkce_config);
-
-  const login = function (destination_route: Record<string, unknown> | null = null) {
+  const login = function (
+    destination_route: Record<string, unknown> | null = null
+  ) {
     // save destiantion route to localstorage
-    
+
     localStorage.setItem(
       'oauth2authcodepkce-destination',
-      JSON.stringify(destination_route) 
+      JSON.stringify(destination_route)
     );
     pkce.value.fetchAuthorizationCode();
   };
@@ -119,6 +134,11 @@ export default function usePKCEComposable() {
     }
     // TOKEN REFRESH ENDS: Notify the computed properties
     const jwt = pkce.value.state?.accessToken?.value;
+    console.error(
+      jwt,
+      '......token change after refresh token: is format correct?',
+      typeof jwt
+    );
     oauthEmitter.emit('TokenChanges', jwt);
     oauthEmitter.emit('AfterTokenChanged', jwt);
     setOngoingTokenRefresh(false);
@@ -145,28 +165,19 @@ export default function usePKCEComposable() {
         setTimeout(waitForOngoingTokenRefresh, 100);
       })();
     });
-
   };
 
   const getOngoingTokenRefresh = function () {
-    // return $ongoingTokenRefresh
     const val = localStorage.getItem('oauth2authcodepkce-ongoingrefresh');
-    // console.log("whats the stage? ", val)
     return val == '1';
   };
 
   const setOngoingTokenRefresh = function (value: boolean) {
-    // $ongoingTokenRefresh = value
     return localStorage.setItem(
       'oauth2authcodepkce-ongoingrefresh',
       value ? '1' : '0'
     );
   };
-
-  // TODO:
-  // ...mapActions({
-  //   storeOauthAcls: 'profilestore/storeOauthAcls'
-  // }),
 
   const expiredJWT = function () {
     if (!payload.value) {
@@ -178,9 +189,8 @@ export default function usePKCEComposable() {
   };
 
   // Session / PROFILE METHODSbrokenSession.value = state
-  const setBrokenSession = (state: boolean) => brokenSession.value = state;
+  const setBrokenSession = (state: boolean) => (brokenSession.value = state);
   const getBrokenSession = () => brokenSession.value;
-
 
   /* Refresh token already before a invalid request has been issued */
   const refresh_token_if_required = async function () {
@@ -190,7 +200,8 @@ export default function usePKCEComposable() {
 
     if (await expiredJWT()) {
       if (getOngoingTokenRefresh()) {
-        await ensureNoRefreshTokenIsOngoing().catch((_error) => {
+        await ensureNoRefreshTokenIsOngoing().catch((error) => {
+          console.error(error);
           return false;
         });
       } else {
@@ -211,11 +222,8 @@ export default function usePKCEComposable() {
     console.assert(!pkce.value.isAuthorized());
     console.log(pkce.value.state);
     pkce.value.setState({});
-    // Second trial....
-    // console.log(pkce.state)
     jwt.value = null;
-    // oauthEmitter.emit('TokenChanges', null)
-    // oauthEmitter.emit('AfterTokenChanged', null)
+    accessToken.value = null;
 
     // wait few seconds...before deleting everything...
     setTimeout(() => {
@@ -224,7 +232,7 @@ export default function usePKCEComposable() {
       pkce.value.reset();
       pkce.value.setState({});
       jwt.value = null;
-      // oauthEmitter.emit('TokenChanges', null)
+      accessToken.value = null;
       oauthEmitter.emit('AfterTokenChanged', null);
       if (!silent) {
         oauthEmitter.emit('AfterLogout');
@@ -232,12 +240,18 @@ export default function usePKCEComposable() {
     }, 10);
   };
 
-  const initialize = async function () {
+  // SHOULD BE RUN ONLY ONCE...
+  const initialize = async (): Promise<void> => {
     // During Startup
-    oauthEmitter.on('TokenChanges', (jwt_) => {
-      jwt.value = jwt_ as string | null;
-      // const refresh = pkce.state.refreshToken.value
-      // console.log("............NEW NEW REFRESH TOKEN: ", !!refresh, refresh.substring(refresh.length - 5))
+    oauthEmitter.on('TokenChanges', (localAccessToken) => {
+      accessToken.value = localAccessToken as IAccessToken | null;
+      if (accessToken.value) {
+        console.log('New TOKEN', accessToken.value.token.value);
+        jwt.value = accessToken.value.token.value;
+        console.log('............NEW NEW REFRESH TOKEN ');
+      } else {
+        jwt.value = null;
+      }
     });
 
     const hasAuthCode = await pkce.value
@@ -249,25 +263,28 @@ export default function usePKCEComposable() {
         }
         console.log('catch without potentialError?', potentialError);
       });
+    console.log('DEBUG: is returning from auth server:', hasAuthCode);
 
-    // const token = pkce.isAuthorized() ? await pkce.getAccessToken() : null
-
-    let token = null;
+    // Retrieve Access Token
+    let localAccessToken: IAccessToken | null = null;
     try {
-      token = await pkce.value.getAccessToken();
-      console.log(token, 'TODO: what is that format?', 'l');
-      // token = token?.token?.value
+      localAccessToken = (await pkce.value.getAccessToken()) as IAccessToken;
     } catch (error) {
       console.log('Not logged in, right?', error);
     }
+    console.log('DEBUG: new access token', localAccessToken);
 
-    oauthEmitter.emit('TokenChanges', token);
-    oauthEmitter.emit('AfterTokenChanged', token);
+    // NOTIFY APP That Token is available...
+    // TODO: dont send tokenChange events when token did not change...(i.e. in case of an error)
+    console.log(jwt, '......token change during initizalization');
+    oauthEmitter.emit('TokenChanges', localAccessToken);
+    oauthEmitter.emit('AfterTokenChanged', localAccessToken);
+    console.log(jwt, '......after notificaiton...');
     if (hasAuthCode) {
       oauthEmitter.emit('AfterLogin');
     }
   };
-  console.log('DEBUG usePKCEComposable ends')
+  console.log('DEBUG usePKCEComposable ends');
 
   return {
     jwt,
@@ -283,6 +300,6 @@ export default function usePKCEComposable() {
     refresh_token_if_required,
     login,
     logout,
-    initialize
+    initialize,
   };
 }

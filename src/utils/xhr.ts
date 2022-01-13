@@ -1,7 +1,7 @@
 //  * Provides methods for XHR-calls using Axios.
 import axios from 'axios';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import usePKCEComposable, { IAccessToken } from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useEmitter from './emitter';
 
 
@@ -306,7 +306,9 @@ export default function useXHR() {
   };
 
   // Subscribe to token changes...
-  oauthEmitter.on('TokenChanges', (jwt) => {
+  oauthEmitter.on('TokenChanges', (localAccessToken) => {
+    const accessToken = localAccessToken as IAccessToken
+    const jwt = accessToken?.token?.value
     if (jwt && typeof jwt === 'string') {
       setHeader(jwt);
     } else {

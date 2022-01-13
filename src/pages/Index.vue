@@ -17,7 +17,7 @@ export default defineComponent({
   name: 'PageIndex',
   
   setup() {
-    console.log('DEBUG: INDEX:VUE');
+    // console.log('DEBUG: INDEX:VUE');
     const pkce = usePKCEComposable();
     return {pkce, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
   },

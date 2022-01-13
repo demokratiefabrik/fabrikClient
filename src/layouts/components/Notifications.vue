@@ -136,7 +136,7 @@ export default defineComponent({
   name: 'Notifications',
 
   setup() {
-        console.log('DEBUG setup notifications')
+        // console.log('DEBUG setup notifications')
     const appComposable = useAppComposable();
     const {authorized, userid} = useAuthComposable();
     const {formatTimeLeft} = filters

@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
 
       { path: '', name: 'home', component: () => import('pages/Index.vue') },
       { path: '/authorization', props: true, name: 'authorization', component: () => import(/* webpackPrefetch: true */ 'pages/Empty.vue') },
-      // { path: '/logout', name: 'logout', component: () => import(/* webpackPrefetch: true */ 'pages/Auth/Logout.vue') },
+      { path: '/logout', name: 'logout', component: () => import(/* webpackPrefetch: true */ 'pages/Auth/Logout.vue') },
 
       // Encypted Pin (eg.g QC)
       { path: '/t/:ttoken', name: 'tokenlogin', component: () => import('src/plugins/VueOAuth2PKCE/TokenLogin.vue') },

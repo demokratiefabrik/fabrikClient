@@ -9,7 +9,7 @@ const emitter = useEmitter();
 
 // Anonther Boot Hook. For subscribing to events
 export default boot(async ({ }) => {
-  console.log('DEBUG boot events start')
+  // console.log('DEBUG boot events start')
 
 
   // SUBSCRIBER
@@ -68,6 +68,6 @@ export default boot(async ({ }) => {
     }
   });
 
-  console.log('DEBUG boot events ends')
+  // console.log('DEBUG boot events ends')
 
 });

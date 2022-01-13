@@ -131,7 +131,7 @@
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
             clickable
-            @click="$pushR(NotificationBannerRedirectRoute)"
+            @click="pushR(NotificationBannerRedirectRoute)"
           >
             {{ $t('app.btn_next') }}
           </q-chip>
@@ -172,6 +172,7 @@ import { useStore } from 'vuex'
 import useEmitter from 'src/utils/emitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useAuthComposable from 'src/composables/auth.composable';
+import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -182,15 +183,16 @@ export default defineComponent({
 
 
   setup() {
-    console.log('DEBUG setup mainLayout')
+    // console.log('DEBUG setup mainLayout')
 
     const emitter = useEmitter()
     const store = useStore()
     const authComposable = useAuthComposable();
     const {login} = usePKCEComposable();
-    
-    console.log('DEBUG setup mainLayout ends')
-    return { emitter, store, authComposable, login };
+    const {pushR} = useRouterComposable()
+
+    // console.log('DEBUG setup mainLayout ends')
+    return { emitter, store, authComposable, login, pushR };
   },
 
   data() {
@@ -337,11 +339,11 @@ export default defineComponent({
   },
   created() {
 
-    console.log('DEBUG create MainLayout')
+    // console.log('DEBUG create MainLayout')
   },
   mounted() {
 
-    console.log('DEBUG mount MainLayout')
+    // console.log('DEBUG mount MainLayout')
     // console.log(this.$parent as ComponentPublicInstance)
     
     // if (this.is_assembly_page) {

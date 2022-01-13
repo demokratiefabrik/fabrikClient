@@ -3,12 +3,19 @@ import { ref, readonly, getCurrentInstance } from 'vue';
 import Constants from 'src/utils/constants';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { useStore } from 'vuex';
+import useEmitter from 'src/utils/emitter';
 // import {useStore} from 'vuex';
 //   // const store = useStore()
 //   // await store.dispatch('appstore/monitorFire', {
 
 const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
+const emailIsAvailable = ref<boolean>(false);
+const emitter = useEmitter();
+// import {
+//   useRouter,
+// } from 'vue-router';
+
 
 // export default {
 export default function useAuthComposable() {
@@ -17,6 +24,25 @@ export default function useAuthComposable() {
   // Session / PROFILE METHODS
   const setLogoutState = (state: boolean) => (logoutState.value = state);
   const username = (profile) => (profile ? profile.U : 'Anonymous');
+
+  const initialize = async (): Promise<void> => {
+
+    console.log('*** INIT OAUTH ***')
+    try {
+      return pkce.initialize()
+    } catch (error) {
+      console.log('error in oauth initialization...', error)
+      switch ((error as any).message) {
+        case 'ErrorInvalidGrant':
+          emitter.emit('showAuthorizationInvalidToken')
+          break;
+        default:
+          emitter.emit('showServiceError', { nobuttons: true })
+          break;
+      }
+      // end mounting...
+    }
+  }
 
   const logout = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,6 +69,10 @@ export default function useAuthComposable() {
     pkce.logout(silent);
   };
 
+  const markEmailAsAvailable = (): void => {
+    emailIsAvailable.value = true
+  };
+  
   const getUsernameDerivation = (
     profile,
     shortversion = false,
@@ -76,16 +106,24 @@ export default function useAuthComposable() {
     }
   };
 
+  // set userEmail<boolean> = true, if email has been added recently...
+  const editedPayload = JSON.parse(JSON.stringify(pkce.payload))
+  if (emailIsAvailable.value){
+    editedPayload.userEmail = true;
+  }
+
   console.log('DEBUG auth composable end')
   return {
     logoutState: readonly(logoutState),
     authorized: readonly(pkce.authorized),
     jwt: readonly(pkce.jwt),
-    payload: readonly(pkce.payload),
+    payload: readonly(editedPayload),
     userid: readonly(pkce.userid),
     setLogoutState,
     getUsernameDerivation,
     username,
+    markEmailAsAvailable,
+    initialize,
     logout,
     login: pkce.login,
     refresh_token_if_required: pkce.refresh_token_if_required,
