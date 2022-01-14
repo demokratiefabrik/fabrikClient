@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 <template>
   <div
     class="items-center text-overline"
@@ -25,12 +24,21 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+import { defineComponent } from 'vue';
+import useAuthComposable from 'src/composables/auth.composable';
 
-export default {
+export default defineComponent({
   name: 'UserAvatar',
   props: ['profile', 'menu'],
+
+  setup() {
+    // console.log('DEBUG setup mainLayout')
+
+    const authComposable = useAuthComposable();
+
+    // console.log('DEBUG setup mainLayout ends')
+    return { authComposable };
+  },
 
   data() {
     return {
@@ -44,14 +52,14 @@ export default {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      return 'H. Mönch'
+      // return 'H. Mönch'
       // return profile ? profile.U : 'Anonymous';
-      // return this.$root.username(this.profile);
+      return this.authComposable.username(this.profile);
     },
 
-    // username_derivation: function () {
-    //   return this.$root.username_derivation(this.profile);
-    // },
+    username_derivation: function () {
+      return this.authComposable.getUsernameDerivation(this.profile);
+    },
   },
-};
+});
 </script>

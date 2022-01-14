@@ -1,9 +1,11 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { ref, readonly, getCurrentInstance } from 'vue';
+import { ref, readonly, getCurrentInstance, computed } from 'vue';
 import Constants from 'src/utils/constants';
-import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import usePKCEComposable, { IPayload } from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
+// import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
+
 // import {useStore} from 'vuex';
 //   // const store = useStore()
 //   // await store.dispatch('appstore/monitorFire', {
@@ -12,6 +14,7 @@ const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
 const emailIsAvailable = ref<boolean>(false);
 const emitter = useEmitter();
+// const oauthEmitter = useOAuthEmitter();
 // import {
 //   useRouter,
 // } from 'vue-router';
@@ -29,7 +32,7 @@ export default function useAuthComposable() {
 
     console.log('*** INIT OAUTH ***')
     try {
-      return pkce.initialize()
+      return await pkce.initialize()
     } catch (error) {
       console.log('error in oauth initialization...', error)
       switch ((error as any).message) {
@@ -37,6 +40,7 @@ export default function useAuthComposable() {
           emitter.emit('showAuthorizationInvalidToken')
           break;
         default:
+          console.error(error)
           emitter.emit('showServiceError', { nobuttons: true })
           break;
       }
@@ -107,17 +111,24 @@ export default function useAuthComposable() {
   };
 
   // set userEmail<boolean> = true, if email has been added recently...
-  const editedPayload = JSON.parse(JSON.stringify(pkce.payload))
-  if (emailIsAvailable.value){
-    editedPayload.userEmail = true;
-  }
+  const editedPayload = pkce.payload.value as IPayload
 
-  console.log('DEBUG auth composable end')
+    
+  const payload = computed(() => {
+    const payload = pkce.payload.value as IPayload
+    if (emailIsAvailable.value){
+      editedPayload.userEmail = true;
+    }
+    return payload
+  });
+
+
+  // console.log('DEBUG @@ auth composable end')
   return {
     logoutState: readonly(logoutState),
     authorized: readonly(pkce.authorized),
     jwt: readonly(pkce.jwt),
-    payload: readonly(editedPayload),
+    payload: readonly(payload),
     userid: readonly(pkce.userid),
     setLogoutState,
     getUsernameDerivation,

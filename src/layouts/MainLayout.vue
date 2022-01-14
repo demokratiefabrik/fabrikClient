@@ -117,9 +117,9 @@
             color="primary"
             text-color="primary"
             class="bg-white cursor-pointer q-mt-md"
+            @click="authComposable.logout()"
             clickable
           >
-            <!-- @click="authComposable.logout()" -->
             {{ $t('auth.logout') }}
           </q-chip>
           <q-chip
@@ -173,6 +173,7 @@ import useEmitter from 'src/utils/emitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useAuthComposable from 'src/composables/auth.composable';
 import useRouterComposable from 'src/composables/router.composable';
+import { RouteRecordRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -204,7 +205,7 @@ export default defineComponent({
       NotificationBannerVisible: false,
       NotificationBannerType: 'info',
       NotificationBannerTitle: '',
-      NotificationBannerRedirectRoute: {} as Record<string, unknown>,
+      NotificationBannerRedirectRoute: {} as RouteRecordRaw,
       NotificationBannerBody: '',
       NotificationBannerIcon: '',
       NotificationBannerButtons: [] as any[],
@@ -280,7 +281,7 @@ export default defineComponent({
       icon,
       settimer = false,
       buttons = ['hide'],
-      redirectRoute = null
+      redirectRoute: null | RouteRecordRaw = null
     ) {
       this.NotificationBannerVisible = true;
       this.NotificationBannerBody = body;
@@ -288,7 +289,7 @@ export default defineComponent({
       this.NotificationBannerType = type;
       this.NotificationBannerIcon = icon;
       this.NotificationBannerButtons = buttons;
-      this.NotificationBannerRedirectRoute = redirectRoute ? redirectRoute : { name: 'home' }
+      this.NotificationBannerRedirectRoute = redirectRoute ? redirectRoute : { name: 'home' } as RouteRecordRaw
 
       // TODO: uncomment
       // this.hideLoadingGif();

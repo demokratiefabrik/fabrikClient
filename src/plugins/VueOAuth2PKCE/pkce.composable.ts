@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
-import { ref, computed } from 'vue';
+import { ref, computed, readonly } from 'vue';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 
 /// POLYFILL (IE11 for oAuth2 PKCE Module)
@@ -35,7 +35,13 @@ export interface IAccessTokenPartial {
   value: string;
   expiry: Date;
 }
-
+export interface IPayload {
+  exp: Date,
+  iss: string,
+  roles: string[]
+  sub: number
+  userEmail: boolean
+}
 
 /**
  * OAuth2AuthCodePKCE Configuration
@@ -84,18 +90,6 @@ const brokenSession = ref<boolean>(false);
 const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
 
 const authorized = computed(() => {
-
-
-  // // TODO: Put this to a better place: THis is run at app initialization
-  // if (!jwt.value) {
-  //   console.error('IS THIS NEEDED? jwt value backup');
-  //   // THis should not be required, however, you never know;-)
-  //   accessToken.value = {
-  //     token: pkce.value?.state?.accessToken as IAccessTokenPartial,
-  //     scopes: pkce.value?.state?.scopes
-  //   };
-  //   console.error(jwt.value, accessToken.value, pkce.value?.state, pkce.value?.state?.accessToken)
-  // }
   const _authorized = jwt.value && pkce.value.isAuthorized();
   return !!_authorized;
 });
@@ -109,9 +103,9 @@ const payload = computed(() => {
   if (!authorized.value || !jwt.value) {
     return null;
   }
-  console.log(jwt.value, jwt, 'jwt split??');
   return JSON.parse(window.atob(jwt.value.split('.')[1]));
 });
+
 
 const userid = computed(() => {
   return payload.value?.sub;
@@ -125,7 +119,6 @@ export default function usePKCEComposable() {
     destination_route: Record<string, unknown> | null = null
   ) {
     // save destiantion route to localstorage
-
     localStorage.setItem(
       'oauth2authcodepkce-destination',
       JSON.stringify(destination_route)
@@ -154,11 +147,6 @@ export default function usePKCEComposable() {
     }
     // TOKEN REFRESH ENDS: Notify the computed properties
     const accessTokenPartial = pkce.value.state?.accessToken as IAccessTokenPartial;
-    console.error(
-      accessTokenPartial,
-      '......token change after refresh token: is format correct?',
-      typeof accessTokenPartial
-    );
     oauthEmitter.emit('TokenChanges', accessTokenPartial);
     oauthEmitter.emit('AfterTokenChanged', accessTokenPartial);
     setOngoingTokenRefresh(false);
@@ -174,7 +162,6 @@ export default function usePKCEComposable() {
         if (!val) {
           return resolve(true);
         }
-
         iter++;
         if (iter >= maxSeconds * 10) {
           console.log('(infinity loop)');
@@ -203,8 +190,6 @@ export default function usePKCEComposable() {
     if (!payload.value) {
       return;
     }
-
-    // console.log('EXPIRES IN ', Math.round(payload.value.exp - (new Date().getTime() / 1000)) / 60, ' minutes.')
     return payload.value.exp < new Date().getTime() / 1000 + 5;
   };
 
@@ -240,18 +225,16 @@ export default function usePKCEComposable() {
     console.log('$$$ LOGOUT IN PLUGIN', silent);
     pkce.value.reset();
     console.assert(!pkce.value.isAuthorized());
-    // console.log(pkce.value.state);
     pkce.value.setState({});
-    // jwt.value = null;
     accessToken.value = null;
 
     // wait few seconds...before deleting everything...
+    // TODO: try without (a lot changed with Vue3)
     setTimeout(() => {
       // Run it twice: dont know why this is required... but sometimes...
       // console.log(pkce.value.state, 'oauth.logout performed => emit events');
       pkce.value.reset();
       pkce.value.setState({});
-      // jwt.value = null;
       accessToken.value = null;
       oauthEmitter.emit('AfterTokenChanged', null);
       if (!silent) {
@@ -262,18 +245,15 @@ export default function usePKCEComposable() {
 
   // SHOULD BE RUN ONLY ONCE...
   const initialize = async (): Promise<void> => {
-    // During Startup
+
+    // Subsribe Event Listener(s)
     oauthEmitter.on('TokenChanges', (localAccessTokenPartial) => {
-      // jwt.value = localAccessToken as string | null;
       if (localAccessTokenPartial && accessToken.value) {
-        console.log('New TOKEN', localAccessTokenPartial);
         accessToken.value.token = localAccessTokenPartial as IAccessTokenPartial;
-        console.log('............NEW NEW REFRESH TOKEN ');
       } else {
         accessToken.value = null;
       }
     });
-
 
     // Load Starting Value
     if (pkce.value?.state) {
@@ -281,9 +261,13 @@ export default function usePKCEComposable() {
         token: pkce.value?.state?.accessToken as IAccessTokenPartial,
         scopes: pkce.value?.state?.scopes
       };
-      // console.error(jwt.value, accessToken.value, pkce.value?.state, pkce.value?.state?.accessToken)
-    }
 
+      // Check if initially loaded access token is expired:
+      if(pkce.value.isAccessTokenExpired()){
+        await refresh_token()
+        console.assert(pkce.value.isAccessTokenExpired());
+      }
+    }
 
     // Catch: oauth server returns
     const hasAuthCode = await pkce.value
@@ -293,37 +277,33 @@ export default function usePKCEComposable() {
           console.log(potentialError, '#4385');
           Promise.reject(potentialError);
         }
-        console.log('catch without potentialError?', potentialError);
+        console.log('DEBUG: PKCE --- catch (no potentialError) TODO: useless?', potentialError);
       });
-    // console.log('DEBUG: is returning from auth server:', hasAuthCode);
-
     // Retrieve Access Token by auth codes
     let localAccessToken: IAccessToken | null = null;
     try {
-      localAccessToken = (await pkce.value.getAccessToken()) as IAccessToken;
+      localAccessToken = await pkce.value.getAccessToken() as IAccessToken;
+      // console.log('DEBUG: PKCE --- localAccessToken', !!localAccessToken)
     } catch (error) {
-      console.log('Not logged in, right?', error);
+      console.log('DEBUG: PKCE --- Not logged in, right?', error);
     }
-    // console.log('DEBUG: new access token', localAccessToken);
 
     // NOTIFY APP That Token is available...
-    console.log(jwt, '......token change during initizalization');
+    // console.log('DEBUG: PKCE --- EVERYTHING LOADED, ',jwt, '---> notify');
     oauthEmitter.emit('TokenChanges', localAccessToken?.token);
     oauthEmitter.emit('AfterTokenChanged', localAccessToken?.token);
-    console.log(jwt, '......after notificaiton...');
+    // console.log(jwt, 'DEBUG: PKCE --- ......after notificaiton...');
     if (hasAuthCode) {
       oauthEmitter.emit('AfterLogin');
     }
   };
-  // console.log('DEBUG usePKCEComposable ends');
 
   return {
-    jwt,
-    pkce,
-    oauthEmitter,
-    authorized,
-    ongoing,
-    payload,
+    jwt: readonly(jwt),
+    pkce: readonly(pkce),
+    authorized: readonly(authorized),
+    ongoing: readonly(ongoing),
+    payload: readonly(payload),
     userid,
     getBrokenSession,
     setBrokenSession,

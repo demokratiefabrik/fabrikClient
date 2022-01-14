@@ -87,9 +87,9 @@
         </q-list>
       </q-menu>
     </q-btn>
-
+{{public_profile}}
     <!-- ACCOUNT DROPDOWN -->
-    <!-- <q-btn-dropdown
+    <q-btn-dropdown
       stretch
       flat
       v-if="authorized"
@@ -124,7 +124,7 @@
           </q-item-section>
         </q-item>
 
-        <q-item
+        <!-- <q-item
           clickable
           v-if="authorized && UsersDelegateAssemblies"
           :class="'profile'==currentRoute ? 'dropdownSelected' : ''"
@@ -135,7 +135,7 @@
             <q-item-label>Eingang</q-item-label>
             <q-item-label caption>Zur Könizer Demokratiefabrik</q-item-label>
           </q-item-section>
-        </q-item>
+        </q-item> -->
 
         <q-item
           @click="logout()"
@@ -150,7 +150,7 @@
         </q-item>
 
       </q-list>
-    </q-btn-dropdown> -->
+    </q-btn-dropdown>
   </q-toolbar>
 </template>
 
@@ -161,12 +161,15 @@ import useAuthComposable from 'src/composables/auth.composable';
 import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
 import Notifications from './Notifications.vue';
+import UserAvatar from 'src/components/UserAvatar.vue';
+import { RouteRecordRaw } from 'vue-router';
+
 
 export default defineComponent({
   name: 'MainMenu',
   // props: ['assemblyName'],
   components: {
-    // UserAvatar,
+    UserAvatar,
     Notifications
   },
 
@@ -174,8 +177,8 @@ export default defineComponent({
   setup() {
     const {setHeaderOffset} = useAppComposable()
     const {pushR} = useRouterComposable()
-    const {logout, authorized, getUsernameDerivation} = useAuthComposable();
-    return { setHeaderOffset, logout, pushR, authorized, getUsernameDerivation };
+    const {logout, authorized, getUsernameDerivation, payload} = useAuthComposable();
+    return { setHeaderOffset, logout, pushR, authorized, payload, getUsernameDerivation };
   },
 
   mounted() {
@@ -188,15 +191,15 @@ export default defineComponent({
       menu: [
         {
           text: 'Startseite',
-          to: { name: 'home' },
+          to: { name: 'home' }  as RouteRecordRaw,
         },
         {
           text: 'News',
-          to: { name: 'news' },
+          to: { name: 'news' } as RouteRecordRaw,
         },
         {
           text: 'Hintergrund',
-          to: { name: 'background' },
+          to: { name: 'background' }  as RouteRecordRaw,
         },
       ],
     };
