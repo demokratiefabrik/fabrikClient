@@ -84,11 +84,17 @@ const brokenSession = ref<boolean>(false);
 const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
 
 const authorized = computed(() => {
-  // TODO: remove this (and test...)
+
+
+  // // TODO: Put this to a better place: THis is run at app initialization
   // if (!jwt.value) {
   //   console.error('IS THIS NEEDED? jwt value backup');
   //   // THis should not be required, however, you never know;-)
-  //   accessToken.value.token.value = pkce.value?.state?.accessToken?.value as string;
+  //   accessToken.value = {
+  //     token: pkce.value?.state?.accessToken as IAccessTokenPartial,
+  //     scopes: pkce.value?.state?.scopes
+  //   };
+  //   console.error(jwt.value, accessToken.value, pkce.value?.state, pkce.value?.state?.accessToken)
   // }
   const _authorized = jwt.value && pkce.value.isAuthorized();
   return !!_authorized;
@@ -234,7 +240,7 @@ export default function usePKCEComposable() {
     console.log('$$$ LOGOUT IN PLUGIN', silent);
     pkce.value.reset();
     console.assert(!pkce.value.isAuthorized());
-    console.log(pkce.value.state);
+    // console.log(pkce.value.state);
     pkce.value.setState({});
     // jwt.value = null;
     accessToken.value = null;
@@ -268,6 +274,18 @@ export default function usePKCEComposable() {
       }
     });
 
+
+    // Load Starting Value
+    if (pkce.value?.state) {
+      accessToken.value = {
+        token: pkce.value?.state?.accessToken as IAccessTokenPartial,
+        scopes: pkce.value?.state?.scopes
+      };
+      // console.error(jwt.value, accessToken.value, pkce.value?.state, pkce.value?.state?.accessToken)
+    }
+
+
+    // Catch: oauth server returns
     const hasAuthCode = await pkce.value
       .isReturningFromAuthServer()
       .catch((potentialError) => {
@@ -277,19 +295,18 @@ export default function usePKCEComposable() {
         }
         console.log('catch without potentialError?', potentialError);
       });
-    console.log('DEBUG: is returning from auth server:', hasAuthCode);
+    // console.log('DEBUG: is returning from auth server:', hasAuthCode);
 
-    // Retrieve Access Token
+    // Retrieve Access Token by auth codes
     let localAccessToken: IAccessToken | null = null;
     try {
       localAccessToken = (await pkce.value.getAccessToken()) as IAccessToken;
     } catch (error) {
       console.log('Not logged in, right?', error);
     }
-    console.log('DEBUG: new access token', localAccessToken);
+    // console.log('DEBUG: new access token', localAccessToken);
 
     // NOTIFY APP That Token is available...
-    // TODO: dont send tokenChange events when token did not change...(i.e. in case of an error)
     console.log(jwt, '......token change during initizalization');
     oauthEmitter.emit('TokenChanges', localAccessToken?.token);
     oauthEmitter.emit('AfterTokenChanged', localAccessToken?.token);
@@ -298,7 +315,7 @@ export default function usePKCEComposable() {
       oauthEmitter.emit('AfterLogin');
     }
   };
-  console.log('DEBUG usePKCEComposable ends');
+  // console.log('DEBUG usePKCEComposable ends');
 
   return {
     jwt,
