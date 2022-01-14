@@ -283,7 +283,7 @@ export default function useAppComposable() {
 //     // oAuth2PKCE Hooks
 //     this.oauthEmitter.on('AfterTokenChanged', data => {
 //       // NOTIFY EVERYONE, THAT TOKEN HAS CHANGED NOW!
-//       if (data) {
+//       if (data as localAccessTokenPartial) {
 //         this.storeOauthAcls({ oauthAcls: this.oauth?.payload?.roles })
 //       } else {
 //         console.log('reset oauth acls...')
