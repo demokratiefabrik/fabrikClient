@@ -265,7 +265,7 @@ export default function usePKCEComposable() {
       // Check if initially loaded access token is expired:
       if(pkce.value.isAccessTokenExpired()){
         await refresh_token()
-        console.assert(pkce.value.isAccessTokenExpired());
+        console.assert(!pkce.value.isAccessTokenExpired());
       }
     }
 

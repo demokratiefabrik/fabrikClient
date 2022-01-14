@@ -49,7 +49,7 @@
       <!-- TRANSPARENCY -->
       <q-expansion-item
         group="somegroup"
-        icon="mdi-monitor-clean"
+        icon="mdi-monitor-eye"
         :label="$t('background.transparency.label')"
         header-class="text-secondary"
       >

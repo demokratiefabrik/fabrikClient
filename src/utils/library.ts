@@ -12,6 +12,12 @@ export default function useLibraryComposable() {
       .filter((key) => predicate(obj[key]))
       .reduce((res, key) => ((res[key] = obj[key]), res), {});
 
+  const removeItem = (arr: any[], value:any): any[] => { 
+        return arr.filter(function(ele){ 
+            return ele != value; 
+        });
+  }
+
   const nLength = (object1) => {
     if (object1 === null) {
       return 0;
@@ -58,7 +64,14 @@ export default function useLibraryComposable() {
     return offsetTop;
   };
 
+  const timestamp = (): number => {
+    const ts = Date.now()
+    return Math.round(ts / 1000);
+  }
+
   return {
+    timestamp,
+    removeItem,
     getOffsetTop,
     pushSorted,
     sample,

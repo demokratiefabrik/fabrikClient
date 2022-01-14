@@ -1,145 +1,279 @@
-/* eslint-disable quotes */
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { ref, readonly } from 'vue';
+import { watch, ref, readonly } from 'vue';
+import { RouteRecordRaw, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import useLibraryComposable from 'src/utils/library'
+import useEmitter from 'src/utils/emitter';
+
+const {removeItem} = useLibraryComposable()
+export interface INotificationConfig {
+  settimer?: boolean;
+  nobuttons?: boolean;
+}
+export interface INotificationBanner {
+  type: string;
+  // 'error' | 'warning';
+  title: string;
+  body: string;
+  icon: string;
+  buttons?: string[];
+  settimer?: boolean;
+  redirectRoute?: RouteRecordRaw;
+}
 
 // APP State
 const stageID = ref<number | null>(null);
 const assemblyIdentifier = ref<string | null>(null);
 const appExitState = ref<boolean>(false);
-
+const emitter = useEmitter()
 // Layout
-const headerOffset = ref<number>(150);
+const headerOffset = ref<number>(150); // default header is minimized within assembly sections
 const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
-// const emitter = useEmitter();
+// Notifications
+const notificationBanner = ref<INotificationBanner | null>(null);
+const loadingGifStack = ref<string[]>([]);
 
 export default function useAppComposable() {
   // console.log('DEBUG: APP COMPOSABLE - START');
-  
+
+  const { t } = useI18n();
+  const currentRoute = useRoute()
   const exitApp = () => (appExitState.value = true);
   const setStageID = (id: number | null) => (stageID.value = id);
   const setAssemblyIdentifier = (identifier: string | null) =>
     (assemblyIdentifier.value = identifier);
 
 
+  /* LOADING GIF: give a label to facilitate debugging... 
+    -------------------------
+  */
+  const showLoadingGif = (label) => {    
+    // const extlabel = `${label}${timestamp()}`
+    loadingGifStack.value.push(label)
+    emitter.emit('loadingGifStackChange', loadingGifStack.value)
+    setTimeout(() => {
+      // disable loadingGif after five seconds... (if not already removed)
+      emitter.emit('loadingGifStackChange', loadingGifStack.value)
+      loadingGifStack.value = removeItem(loadingGifStack.value, label)
+    }, 5000);
+  }
+
+  const hideLoadingGif = (label) => {    
+    // const extlabel = `${label}${timestamp()}`
+    loadingGifStack.value = removeItem(loadingGifStack.value, label)
+    emitter.emit('loadingGifStackChange', loadingGifStack.value)
+  }
+  
+  /** Remove all loadingGifs (used in case of errors) */
+  const clearLoadingGif = () => {
+    loadingGifStack.value = []
+  }
+
+  /* NOTIFICATIONS 
+  -------------------------*/
+  const showNotification = (banner: INotificationBanner): void => {
+    if (banner.settimer) {
+      setTimeout(() => {
+        notificationBanner.value = null        
+        emitter.emit('notificationBannerChange', notificationBanner.value)
+      }, 5000);
+    }
+    if (banner.type === 'error') {
+      clearLoadingGif()
+    }
+    notificationBanner.value = banner;
+    emitter.emit('notificationBannerChange', notificationBanner.value)
+  }
+
+  /* Ensure that all (error) messages disappear, when route changes.. */
+  watch(currentRoute, () => {
+    console.log('route change in API')
+    notificationBanner.value = null        
+  })
+
+  const showAuthorizationError = (
+    config: INotificationConfig | null = null
+  ) => {
+    // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, data)
+    const banner = {
+      type: 'error',
+      icon: 'mdi-key-outline',
+      title: t('app.error.authorization_error_title'),
+      body: t('app.error.authorization_error_body'),
+      buttons: ['home'],
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showServiceError = (config: INotificationConfig | null = null) => {
+    const banner = {
+      type: 'error',
+      icon: 'mdi-alarm-light-outline',
+      title: t('app.error.service_error_title'),
+      body: t('app.error.service_error_body'),
+      buttons: config?.nobuttons ? ['hide'] : ['reload'],
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showNetworkError = (config: INotificationConfig | null = null) => {
+    // this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
+    const banner = {
+      type: 'error',
+      icon: 'mdi-alarm-light-outline',
+      title: t('app.error.network_error_title'),
+      body: t('app.error.network_error_body'),
+      buttons: ['reload', 'hide'],
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showAuthorizationInvalidToken = (
+    config: INotificationConfig | null = null
+  ) => {
+    //       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
+    //       setBrokenSession()
+    //       console.log('SILENT LOGOUT,,,')
+    //       this.authComposable.logout(null, {}, true);
+    const banner = {
+      type: 'error',
+      icon: 'mdi-key-outline',
+      title: t('auth.authentication_invalid_warning_title'),
+      body: t('auth.authentication_invalid_warning_body'),
+      buttons: ['auth', 'home'],
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showTooManyRequestsError = (
+    config: INotificationConfig | null = null
+  ) => {
+    // this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
+    const banner = {
+      type: 'error',
+      icon: 'mdi-car-multiple',
+      title: t('app.error.toomanyrequests_error_title'),
+      body: t('app.error.toomanyrequests_error_body'),
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showAuthenticationWarning = (
+    config: INotificationConfig | null = null
+  ) => {
+    // this.$root.monitorLog(constants.MONITOR_WARNING_AUTHENTICATION, data)
+    const banner = {
+      type: 'warning',
+      icon: 'mdi-emoticon-cool-outline',
+      title: t('auth.authentication_warning_title'),
+      body: t('auth.authentication_warning_body'),
+      buttons: ['auth', 'home'], 
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+  const showAuthenticationError = (
+    config: INotificationConfig | null = null
+  ) => {
+    // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHENTICATION, data)
+    const banner = {
+      type: 'error',
+      icon: 'mdi-alarm-light-outline',
+      title: t('auth.authentication_error_title'),
+      body: t('auth.authentication_error_body'),
+      settimer: config?.settimer ? true : false,
+    };
+
+    showNotification(banner)
+  };
+
+
+  const initialize = () => {
+    emitter.on('showNetworkError', () => {
+      // TODO: monitorLog Once
+      showNetworkError();      
+    });
+    
+    emitter.on('showServiceError', () => {
+      // TODO: monitorLog Once
+      showServiceError();      
+    });
+    
+    emitter.on('showAuthorizationError', () => {
+      // TODO: monitorLog Once
+      showAuthorizationError();      
+    });
+    
+    emitter.on('showTooManyRequestsError', () => {
+      // TODO: monitorLog Once
+      showTooManyRequestsError();      
+    });
+    
+    emitter.on('showAuthenticationWarning', () => {
+      // TODO: monitorLog Once
+      showAuthenticationWarning();      
+    });
+    
+    emitter.on('showServiceError', () => {
+      // TODO: monitorLog Once
+      showServiceError();      
+    });
+  }
+
   return {
     stageID: readonly(stageID),
     assemblyIdentifier: readonly(assemblyIdentifier),
     appExitState: readonly(appExitState),
     headerOffset: readonly(headerOffset),
+    showAuthenticationError,
+    showServiceError,
+    showAuthenticationWarning,
+    showNetworkError,
+    showTooManyRequestsError,
+    showAuthorizationInvalidToken,
+    showAuthorizationError,
     exitApp,
+    initialize,
     setStageID,
     setAssemblyIdentifier,
     setHeaderOffset,
+    hideLoadingGif,
+    showLoadingGif
   };
 }
 
-// // import emitter from 'src/utils/emitter'
-// import { mapGetters, mapActions } from 'vuex'
-// // import { LayoutEventBus } from 'src/utils/eventbus'
-// // import { useOAuthEmitter } from 'src/plugins/VueOAuth2PKCE/oauthEmitter'
-// import constants from 'src/utils/constants'
-// // import useAppComposable from 'src/composables/app.composable'
-// // import useAuthComposable from 'src/composables/auth.composable'
 // import { scroll } from 'quasar';
 // const { setScrollPosition } = scroll;
 // import { dom } from 'quasar'
-// import { useRouter } from 'vue-router';
-// // import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable'
 // const { offset } = dom
-
-// export default {
-
-//   // setup() {
-//   //   const appComposable = useAppComposable()
-//   //   const {setBrokenSession} = usePKCEComposable()
-//   //   const authComposable = useAuthComposable()
-//   //   oauthEmitter = useOAuthEmitter()
-//   //   return {oauthEmitter, appComposable, authComposable}
-//   // },
 
 //   data() {
 //     return {
 //       appInitialized: false,
 //       componentKey: 0,
-//       username_derivate: ''
 //     };
 //   },
 
-//   watch: {
-//     // if route changes, hide TextLoading
-//     // from param removed
-//     $route(to) {
-
-//       // check permission
-//       if (to.meta.assemblyAcl) {
-//         if (!Array.isArray(to.meta.assemblyAcl)){
-//           to.meta.assemblyAcl = [to.meta.assemblyAcl]
-//         }
-
-//         // Not allowed....
-//         if (!to.params.assemblyIdentifier) {
-//           console.error('WRONGLY CONFIUGRED ROUTE: assemblyACL option requires and Identifier in the route params')
-//           this.$router.push({ name: 'home' });
-//           throw new Error("Oops! You don't seem to have access to that page.");
-//         }
-
-//         // find first permission that is allowed.
-//         const allowed = to.meta.assemblyAcl.find(assemblyAcl => {
-//           const role = `${assemblyAcl}@${to.params.assemblyIdentifier}`
-//           // console.log("ROLE", role, this.oauth.payload.roles.includes(role), this.oauth.payload.roles, "llllllllllllllllllllllllllll")
-//           return this.oauth.payload.roles.includes(role);
-//         })
-
-//         if (!allowed) {
-//           this.$router.push({ name: 'home' });
-//           throw new Error("Oops! You don't seem to have access to that page.");
-//         }
-//       }
-
-//       // Monitor ROute change
-//       this.$root.monitorLog(constants.MONITOR_ROUTE_CHANGE)
-//     },
-//   },
-
 //   computed: {
-
 //     ready() {
 //       // Can be overwritten by child components.
 //       this.$emitter.emit('hideLoading')
 //       return true;
 //     },
-
 //     appExitState: function () {
 //       return this.appComposable.appExitState.value
-//     },
-
-//     ...mapGetters({
-//       ongoing_assemblies: 'publicindexstore/ongoing_assemblies',
-//       isUserAssemblyManager: 'publicindexstore/storeOisUserAssemblyManagerauthAcls',
-//       // lightProfileColor: "publicindexstore/lightProfileColor",
-//       // profileColor: "profilestore/profileColor",
-//     })
-
-//   },
-
-//   methods: {
-
-//     showAuthorizationError(data) {
-//       // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, data)
-//       let msg_title = this.$t('app.error.authorization_error_title');
-//       let msg_body = this.$t('app.error.authorization_error_body');
-//       let icon = 'mdi-key-outline';
-//       let type = 'error';
-//       let buttons = ['home'];
-//       // let buttons = ['reload', 'hide'];
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon,
-//         false,
-//         buttons
-//       );
 //     },
 
 //     onPageLeave: function handler(event) {
@@ -149,124 +283,15 @@ export default function useAppComposable() {
 //       // this.$root.monitorFire(constants.MONITOR_EXIT)
 //       appComposable.exitApp()
 //     },
-
-//     ...mapActions({
-//       touchRandomSeed: 'profilestore/touchRandomSeed',
-//       storeOauthAcls: 'profilestore/storeOauthAcls',
-//       clearUserData: 'clearUserData',
-//     })
 //   },
 
 //   created: function () {
-
 //     // GlOBAL Page Unmount Listener
 //     window.addEventListener('beforeunload', this.onPageLeave)
-
 //     // Catch globally all show and hide TextLoading events
 //     this.$emitter.on('reload', () => {
 //       this.$root.reload();
 //     });
-//     this.$emitter.on('showServiceError', (data) => {
-//       let msg_title = this.$t('app.error.service_error_title');
-//       let msg_body = this.$t('app.error.service_error_body');
-//       let icon = 'mdi-alarm-light-outline';
-//       let settimer = data?.settimer ? data.settimer : false;
-//       let buttons = data?.nobuttons ? ['hide'] : ['reload'];
-//       let type = 'error';
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon,
-//         settimer,
-//         buttons
-//       )
-//     })
-//     this.$emitter.once('showNetworkError', (data) => {
-//       this.$root.monitorLog(constants.MONITOR_ERROR_NETWORK, data)
-//     })
-//     this.$emitter.on('showNetworkError', (data) => {
-//       let msg_title = this.$t('app.error.network_error_title');
-//       let msg_body = this.$t('app.error.network_error_body');
-//       let icon = 'mdi-alarm-light-outline';
-//       let type = 'error';
-//       let buttons = ['reload', 'hide'];
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon,
-//         null,
-//         buttons
-//       )
-//     })
-//     this.$emitter.on('showAuthorizationError', (data) => {
-//       this.showAuthorizationError(data)
-//     });
-//     this.$emitter.on('showAuthorizationInvalidToken', (data) => {
-
-//       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
-//       setBrokenSession()
-//       console.log('SILENT LOGOUT,,,')
-//       this.authComposable.logout(null, {}, true);
-
-//       let msg_title = this.$t('auth.authentication_invalid_warning_title');
-//       let msg_body = this.$t('auth.authentication_invalid_warning_body');
-//       let icon = 'mdi-key-outline';
-//       let type = 'error';
-//       let settimer = data?.settimer ? data.settimer : false;
-//       let buttons = ['auth', 'home'];
-
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon,
-//         settimer,
-//         buttons
-//       )
-//     })
-//     this.$emitter.on('showTooManyRequestsError', (data) => {
-//       this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
-//       let msg_title = this.$t('app.error.toomanyrequests_error_title');
-//       let msg_body = this.$t('app.error.toomanyrequests_error_body');
-//       let icon = 'mdi-car-multiple';
-//       let type = 'error';
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon
-//       );
-//     });
-//     this.$emitter.on('showAuthenticationWarning', (data) => {
-//       this.$root.monitorLog(constants.MONITOR_WARNING_AUTHENTICATION, data)
-//       let type = 'warning';
-//       let icon = 'mdi-emoticon-cool-outline';
-//       let msg_title = this.$t('auth.authentication_warning_title');
-//       let msg_body = this.$t('auth.authentication_warning_body');
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon,
-//         false,
-//         ['auth', 'home']
-//       );
-//     });
-//     this.$emitter.on('showAuthenticationError', (data) => {
-//       this.$root.monitorLog(constants.MONITOR_ERROR_AUTHENTICATION, data)
-//       let type = 'error';
-//       let icon = 'mdi-alarm-light-outline';
-//       let msg_title = this.$t('auth.authentication_error_title');
-//       let msg_body = this.$t('auth.authentication_error_body');
-//       this.$refs?.maincontent?.showNotificationBanner(
-//         type,
-//         msg_title,
-//         msg_body,
-//         icon
-//       )
-//     })
 
 //     this.$emitter.on('PublicProfileLoaded', () => {
 //       // SYNC USER PROFILE

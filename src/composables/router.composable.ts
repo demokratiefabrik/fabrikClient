@@ -1,4 +1,5 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
+// import { computed } from 'vue';
 import useEmitter from 'src/utils/emitter';
 import { useRouter, useRoute, RouteRecordRaw} from 'vue-router';
 const emitter = useEmitter();
@@ -6,6 +7,13 @@ const emitter = useEmitter();
 export default function useRouterComposable() {
   const router = useRouter();
   const currentRoute = useRoute();
+
+
+  // const routeParams = () =>{ return currentRoute.params}
+  // const fullPath = computed(() => currentRoute.fullPath)
+  // const routeParams = (): any => {
+  //   return currentRoute.params
+  // };
 
   /* Reload the page when redirecting to the same page */
   const pushR = (route: RouteRecordRaw) => {
@@ -33,6 +41,11 @@ export default function useRouterComposable() {
     console.log('ignore push route (same site).. ');
   };
 
+  const gotoHome = () => {
+    pushR({ name: 'home' } as RouteRecordRaw);
+  };
+
+
   /* Scroll To #Anchor */
   // NOT USED
   // const anchor = (anchor: string) => {
@@ -51,6 +64,8 @@ export default function useRouterComposable() {
   return {
     pushR,
     pushI,
+    gotoHome,
+    // fullPath,
     // anchor
   };
 }

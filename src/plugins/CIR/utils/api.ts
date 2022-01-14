@@ -12,6 +12,13 @@ interface IResponseSVG {
   data: string;
 }
 
+export interface IPolarBeeRequest {
+  distribution: string;
+  markerColorMap: string;
+  markerSizeFactor: number;
+  number: number;
+} 
+
 
 export default function useCIRApi() {
 
@@ -22,8 +29,9 @@ export default function useCIRApi() {
   /**
    * Get CIR plot svg..
    */
-  const polarbee = async (url: string): Promise<IResponseSVG> => {
+  const polarbee = async (request: IPolarBeeRequest): Promise<IResponseSVG> => {
 
+    const url = `/cirplot?distribution=${request.distribution}&marker-color-map=${request.markerColorMap}&number=${request.number}&marker-size-factor=${request.markerSizeFactor}`
     const {refresh_token_if_required} = usePKCEComposable()
     await refresh_token_if_required()
 

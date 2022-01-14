@@ -54,6 +54,7 @@ const axiosErrorHandling = async function (
   // enfoce that ApiService Wrapper is used, (and not pure Axios)
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // console.log(error?.config, '<<<< INIT >>>>>>>>')
   const PREVIOUS_HTTP_ERROR_CODE = error?.config?.PREVIOUS_HTTP_ERROR_CODE;
   const NEW_STATUS = error.response?.status
     ? parseInt(error.response?.status)
@@ -68,30 +69,32 @@ const axiosErrorHandling = async function (
   // No remote connection established
   // Invalid URL or Server not reachable...
   if (!NEW_STATUS && !error?.response) {
-    console.log('Network error: empty response set', error);
+    // console.log('###Network error: empty response set', PREVIOUS_HTTP_ERROR_CODE);
 
     // check if two in a row...
     if (PREVIOUS_HTTP_ERROR_CODE != 'NETWORK') {
-      // no, this is the first one..
+      // no, this is the first time..
+      // console.log('DEBUG: first network error.. try again..', error);
       return { HTTP_ERROR_CODE: 'NETWORK' };
     }
+    // console.log('Network error: empty response set (Twice)', error);
     emitter.emit('showNetworkError');
     return Promise.reject(error);
 
     // Server Error
   } else if (NEW_STATUS && ERROR_CODES_TO_RETRY.includes(NEW_STATUS)) {
-    console.log('error code retrieved', NEW_STATUS);
+    // console.log('error code retrieved', NEW_STATUS);
     // HTTP errors (parse errors, etc..)
     if (Allow400Status(error.config)) {
       // dont raise 400 errors, if this is desired explicitly
-      console.log(`AXIOS: Pass Error ${PREVIOUS_HTTP_ERROR_CODE}`);
+      // console.log(`AXIOS: Pass Error ${PREVIOUS_HTTP_ERROR_CODE}`);
       return true;
     }
 
     // check if two in a row...
     if (NEW_STATUS != PREVIOUS_HTTP_ERROR_CODE) {
       // no, this is the first one..
-      console.log('ERROR CODES: first trial finished');
+      // console.log('ERROR CODES: first trial finished');
       return { HTTP_ERROR_CODE: NEW_STATUS };
     }
     emitter.emit('showServiceError');
@@ -100,22 +103,22 @@ const axiosErrorHandling = async function (
     // 405 Authorization errors : probably not enough privileges...
   } else if (error.response.status == 405) {
     // 405 errors (parse errors)
-    console.log('AXIOS: Pass Error 405');
+    // console.log('AXIOS: Pass Error 405');
     emitter.emit('showAuthorizationError');
     return Promise.reject(error);
 
     // 429 Too Many Requests...
   } else if (error.response.status == 429) {
-    console.log('AXIOS: Pass Error 429');
+    // console.log('AXIOS: Pass Error 429');
     emitter.emit('showTooManyRequestsError');
     return Promise.reject(error);
 
     // 403 Permission errors : probaly token expired...
   } else if (error.response.status == 403) {
-    console.log('403 Error');
+    // console.log('403 Error');
 
     if (ReloginOnStatus403(error.config)) {
-      console.log('AXIOS: ReloginOnStatus403');
+      // console.log('AXIOS: ReloginOnStatus403');
       error.response.status = 449;
 
       // TODO: global pkce Variable
@@ -128,14 +131,14 @@ const axiosErrorHandling = async function (
       // }
 
       // Token Refresh, seems not be possible / desired :-(
-      console.log('Not Authenticated');
+      // console.log('Not Authenticated');
       emitter.emit('showAuthenticationWarning');
       return Promise.reject(error);
     }
   }
 
   // All other errors:
-  console.log('Unknown API Request Error');
+  // console.log('Unknown API Request Error');
   // console.log(`status: ${error.response.status}`)
   emitter.emit('showServiceError');
   return Promise.reject(error);
@@ -270,7 +273,7 @@ export default function useXHR() {
     // retoken parameter is set within the interceptor on 403 errors.
     // At this point, the jwt token is already refreshed (within the interceptor)
     if (response.retoken) {
-      console.log('PERMISSION ERROR: Initiate a secont attempt');
+      console.log('PERMISSION ERROR: Initiate a secont attempt', response);
 
       // Re-axios (same as before...)  (token should already be refreshed...)
       response = await axios(data);
@@ -285,14 +288,13 @@ export default function useXHR() {
     // retry parameter is set within the interceptor on 400 errors.
     // => DB-Deadlock or Database Data-Integritiy Errors (two parallel requests, that insert a specific entry...)
     if (response.HTTP_ERROR_CODE) {
+      // data.HTTP_ERROR_CODE = response.HTTP_ERROR_CODE;
+      data.PREVIOUS_HTTP_ERROR_CODE = response.HTTP_ERROR_CODE;
       console.log(
         'HTTP ERROR: Initiate a second attempt',
-        data.HTTP_ERROR_CODE,
         response.HTTP_ERROR_CODE
       );
-      data.HTTP_ERROR_CODE = response.HTTP_ERROR_CODE;
       // ReIssue the request
-      console.assert(data.url);
       if (data?.url && typeof data.url == 'string' && data?.url.includes('?')) {
         data.url = `${data.url}&rty=1`;
       } else {

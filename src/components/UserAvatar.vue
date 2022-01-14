@@ -54,7 +54,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       // return 'H. Mönch'
       // return profile ? profile.U : 'Anonymous';
-      return this.authComposable.username(this.profile);
+      return this.authComposable.getUsername(this.profile);
     },
 
     username_derivation: function () {

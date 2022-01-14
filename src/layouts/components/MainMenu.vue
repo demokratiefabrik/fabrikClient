@@ -87,33 +87,27 @@
         </q-list>
       </q-menu>
     </q-btn>
-{{public_profile}}
+
+    {{ public_profile }}
+
     <!-- ACCOUNT DROPDOWN -->
-    <q-btn-dropdown
-      stretch
-      flat
-      v-if="authorized"
-    >
+    <q-btn-dropdown stretch flat v-if="authorized">
       <template v-slot:label>
-        <UserAvatar
-          :profile="public_profile"
-          menu="true"
-        ></UserAvatar>
+        <UserAvatar :profile="public_profile" menu="true"></UserAvatar>
       </template>
 
       <q-list class="z-max">
         <q-item>
           <q-item-section>
-            <q-item-label
-              caption
-              style="max-width:250px"
-            >{{ username_derivation }}</q-item-label>
+            <q-item-label caption style="max-width: 250px">{{
+              username_derivation
+            }}</q-item-label>
           </q-item-section>
         </q-item>
 
         <q-item
           clickable
-          :class="'profile'==currentRoute ? 'dropdownSelected' : ''"
+          :class="'profile' == currentRoute ? 'dropdownSelected' : ''"
           @click="gotoProfile()"
           v-if="authorized"
           v-close-popup
@@ -137,18 +131,12 @@
           </q-item-section>
         </q-item> -->
 
-        <q-item
-          @click="logout()"
-          clickable
-          class=""
-          v-close-popup
-        >
+        <q-item @click="logout()" clickable class="" v-close-popup>
           <q-item-section v-if="authorized">
-            <q-item-label>{{$t('auth.logout')}}</q-item-label>
+            <q-item-label>{{ $t('auth.logout') }}</q-item-label>
             <q-item-label caption>Demokratiefabrik verlassen.</q-item-label>
           </q-item-section>
         </q-item>
-
       </q-list>
     </q-btn-dropdown>
   </q-toolbar>
@@ -164,21 +152,28 @@ import Notifications from './Notifications.vue';
 import UserAvatar from 'src/components/UserAvatar.vue';
 import { RouteRecordRaw } from 'vue-router';
 
-
 export default defineComponent({
   name: 'MainMenu',
   // props: ['assemblyName'],
   components: {
     UserAvatar,
-    Notifications
+    Notifications,
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setup() {
-    const {setHeaderOffset} = useAppComposable()
-    const {pushR} = useRouterComposable()
-    const {logout, authorized, getUsernameDerivation, payload} = useAuthComposable();
-    return { setHeaderOffset, logout, pushR, authorized, payload, getUsernameDerivation };
+    const { setHeaderOffset } = useAppComposable();
+    const { pushR } = useRouterComposable();
+    const { logout, authorized, getUsernameDerivation, payload } =
+      useAuthComposable();
+    return {
+      setHeaderOffset,
+      logout,
+      pushR,
+      authorized,
+      payload,
+      getUsernameDerivation,
+    };
   },
 
   mounted() {
@@ -191,7 +186,7 @@ export default defineComponent({
       menu: [
         {
           text: 'Startseite',
-          to: { name: 'home' }  as RouteRecordRaw,
+          to: { name: 'home' } as RouteRecordRaw,
         },
         {
           text: 'News',
@@ -199,14 +194,13 @@ export default defineComponent({
         },
         {
           text: 'Hintergrund',
-          to: { name: 'background' }  as RouteRecordRaw,
+          to: { name: 'background' } as RouteRecordRaw,
         },
       ],
     };
   },
   computed: {
     currentRoute: function () {
-      console.log(this.$router, ',,,,,,')
       return this.$route.name;
     },
     // frontpage: function () {
@@ -234,7 +228,6 @@ export default defineComponent({
     }),
   },
   methods: {
-
     ...mapActions({
       gotoProfile: 'profilestore/gotoProfile',
       // username: "profilestore/username",

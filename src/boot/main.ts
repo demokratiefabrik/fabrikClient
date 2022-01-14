@@ -29,12 +29,8 @@ declare module '@vue/runtime-core' {
 // Anonther Boot Hook.
 export default boot(async ({ app }) => {
   console.log('DEBUG boot main.ts start');
-
   app.config.globalProperties.$emitter = emitter;
   app.config.globalProperties.$filters = filters;
   app.config.globalProperties.$constants = Constants;
   app.config.globalProperties.$library = library;
-  
-  /* Reload Page, when redirecting to the same page */
-  // app.config.globalProperties.$pushR = pushR;
 });
