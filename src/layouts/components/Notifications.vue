@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- ACCOUNT DROPDOWN -->
+    <!-- NOTIFIcATIONS DROPDOWN -->
     <q-btn
       stretch
       size="md"
