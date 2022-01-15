@@ -1,8 +1,5 @@
 <template>
   <q-page class="row">
-    {{pkce.authorized}}
-    <br><br><br>
-    <!-- <input @click="pkce.login()" type="button" value="login"/> -->
     <PySwarmPlot></PySwarmPlot>
   </q-page>
 </template>

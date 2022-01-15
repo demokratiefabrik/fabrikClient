@@ -51,3 +51,77 @@
 //     />
 //   </div> -->
 //   <!-- END DYNAMIC MENU -->
+
+
+
+// <!-- MENU: for assembly views  -->
+// <q-btn
+//   size="lg"
+//   flat
+//   icon="mdi-menu"
+//   label=""
+//   v-if="is_assembly_page || $q.screen.lt.sm"
+// >
+//   <q-menu>
+//     <q-list style="min-width: 100px">
+//       <q-item
+//         v-for="item in menu"
+//         clickable
+//         :key="item.text"
+//         :class="
+//           item.to.name == currentRoute
+//             ? 'topmenuSelected'
+//             : 'topmenuDefault'
+//         "
+//         @click="pushR(item.to)"
+//         v-close-popup
+//       >
+//         <q-item-section>{{ item.text }}</q-item-section>
+//       </q-item>
+//     </q-list>
+//   </q-menu>
+// </q-btn>
+
+
+// <!-- Left-Align: Small PAges -->
+// <!-- <q-toolbar-title
+//   v-if="$q.screen.lt.md && assemblyName"
+//   @click="$root.gotoAssemblyHome(assembly)"
+//   class="cursor-pointer"
+//   style=" font-weight:400"
+// >
+//   {{assemblyName}}
+// </q-toolbar-title> -->
+// <!-- {{assemblyName}} -->
+// <!-- v-if="$q.screen.gt.xs "  -->
+// <!-- Center: Large Pages -->
+// <!-- v-if="$q.screen.gt.sm && assemblyName" -->
+
+// <!-- TODO uncomment-->
+// <!-- @click="$root.gotoAssemblyHome(assembly)" -->
+
+
+
+// <q-toolbar-title
+// shrink
+// v-if="$q.screen.gt.sm && assemblyName"
+// class="cursor-pointer"
+// style="font-weight: 400"
+// >
+// {{ assemblyName }}
+// </q-toolbar-title>
+
+
+
+    // // TODO: methods exist twice!!
+    // is_assembly_page: function () {
+    //   return (
+    //     this.$route.name === 'assemblies' ||
+    //     !!this.$route.params.assemblyIdentifier
+    //   );
+    // },
+
+
+        // frontpage: function () {
+    //   return this.$route.name == 'home';
+    // },

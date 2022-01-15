@@ -46,7 +46,8 @@
     <!-- NOTIFICATION BELL  -->
     <Notifications></Notifications>
 
-    <span v-if="!is_assembly_page && $q.screen.gt.xs">
+    <!-- Expanded Menus: Wide pages  -->
+    <template v-if="!is_assembly_page && $q.screen.gt.xs">
       <q-item
         v-for="item in menu"
         clickable
@@ -58,15 +59,15 @@
         :key="item.text"
         >{{ item.text }}
       </q-item>
-    </span>
+    </template>
 
-    <!-- MENU: for assembly views  -->
-    <q-btn
+    <!-- Collapsed menu: Small  pages Or assembly pages  -->
+    <template v-if="is_assembly_page || !$q.screen.gt.xs">
+        <q-btn
       size="lg"
       flat
       icon="mdi-menu"
       label=""
-      v-if="is_assembly_page || $q.screen.lt.sm"
     >
       <q-menu>
         <q-list style="min-width: 100px">
@@ -87,15 +88,14 @@
         </q-list>
       </q-menu>
     </q-btn>
+    </template>
 
-    {{ public_profile }}
 
     <!-- ACCOUNT DROPDOWN -->
     <q-btn-dropdown stretch flat v-if="authorized">
       <template v-slot:label>
         <UserAvatar :profile="public_profile" menu="true"></UserAvatar>
       </template>
-
       <q-list class="z-max">
         <q-item>
           <q-item-section>
@@ -104,7 +104,6 @@
             }}</q-item-label>
           </q-item-section>
         </q-item>
-
         <q-item
           clickable
           :class="'profile' == currentRoute ? 'dropdownSelected' : ''"
