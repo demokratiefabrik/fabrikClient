@@ -20,7 +20,7 @@
             </q-input>
           </p>
 
-          <p v-if="!loading">
+          <p v-if="!loading && !error">
             <b>Kontaktangabe: </b>
             {{
               this.profile.original_email
@@ -121,21 +121,19 @@
 </template>
 
 <script lang="ts">
-
-
 // import Configuration from 'src/utils/configuration'
 // import ApiService from 'src/utils/xhr';
 import api from 'src/utils/api';
 import { mapGetters } from 'vuex';
 import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
 import useAuthComposable from 'src/composables/auth.composable';
-import { PropType, defineComponent} from 'vue';
+import { PropType, defineComponent } from 'vue';
 import { RouteRecordRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'Profile',
   props: {
-      destination_route: {
+    destination_route: {
       // right, left, center
       type: Object as PropType<RouteRecordRaw>,
     },
@@ -143,7 +141,9 @@ export default defineComponent({
 
   setup() {
     const { payload, markEmailAsAvailable } = useAuthComposable();
+    // const q = useQuasar()
     return { payload, markEmailAsAvailable };
+
   },
   components: { AlgorithmDisclaimer },
 
@@ -179,7 +179,7 @@ export default defineComponent({
     },
 
     ...mapGetters({
-      public_profile: 'publicprofilestore/get_public_profile',
+      public_profile: 'profilestore/public_profile',
     }),
 
     isEnabledSubmitButton(): boolean {
@@ -242,10 +242,57 @@ export default defineComponent({
     skipProfile: function () {
       const route = this.destination_route
         ? this.destination_route
-        : { name: 'home' } as RouteRecordRaw;
+        : ({ name: 'home' } as RouteRecordRaw);
       this.$router.push(route);
     },
 
+    loadProfile: function () {
+      if (!this.public_profile) {
+        
+        // Error
+        const message = this.$t('auth.profile_load_error');
+        this.$q.notify({
+          type: 'nFabrikError',
+          message,
+        });
+
+        this.error = true
+
+        return;
+      }
+
+      // Get Username from the JWT token
+      this.profile.pseudonym = this.public_profile.U;
+
+      // Get Email from oauth server
+      api
+        .authProfile({})
+        .then((response) => {
+          if (response.data) {
+            // Okay
+            this.profile.email = this.emailToSms(response.data.email);
+            // this.profile.last_name = response.data.last_name;
+            this.profile.original_email = this.emailToSms(response.data.email);
+            this.error = false
+
+          } else {
+            // Error
+            const message = this.$t('auth.profile_load_error');
+            this.error = true
+          this.error = true;
+            this.$q.notify({
+              type: 'nFabrikError',
+              message,
+            });
+          }
+          this.loading = false;
+        })
+        .catch((e) => {
+          console.log(e);
+          this.loading = false;
+          this.error = true;
+        });
+    },
     saveProfile: function () {
       const changed = this.profile.original_email != this.profile.email;
       console.log('nothing changed... ');
@@ -253,7 +300,6 @@ export default defineComponent({
         this.confirmation = true;
         return;
       }
-
 
       this.loading = true;
       console.log('Save profile !!!');
@@ -288,33 +334,17 @@ export default defineComponent({
     if (!this.payload) {
       // not logged in
       this.$router.push({ name: 'home' });
+      return;
     }
-    // Get Username from the JWT token
-    this.profile.pseudonym = this.public_profile.U;
-    // Get Email from oauth server
-    api
-      .authProfile({})
-      .then((response) => {
-        if (response.data) {
-          // Okay
-          this.profile.email = this.emailToSms(response.data.email);
-          // this.profile.last_name = response.data.last_name;
-          this.profile.original_email = this.emailToSms(response.data.email);
-        } else {
-          // Error
-          const message = this.$t('auth.profile_load_error');
-          this.$q.notify({
-            type: 'nFabrikError',
-            message,
-          });
-        }
 
-        this.loading = false;
-      })
-      .catch((e) => {
-        console.log(e);
-        this.loading = false;
-      });
+    this.loadProfile();
   },
+
+  watch: {
+    public_profile() {
+      // public profile changed
+      this.loadProfile();
+    },
+  }
 });
 </script>

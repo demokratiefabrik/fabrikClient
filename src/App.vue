@@ -23,6 +23,7 @@ export default defineComponent({
     const currentRoute = useRoute();
     watch(
       () => currentRoute, (currentRoute) => {
+        console.log('route change in APP.vue')
         // Page Permission
         authComposable.checkPagePermission(currentRoute)
         // TODO: Monitor Route change

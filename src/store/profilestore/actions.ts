@@ -1,7 +1,7 @@
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 import api from 'src/utils/api';
-import useEmitter from 'src/utils/emitter';
-const emitter = useEmitter()
+// import useEmitter from 'src/utils/emitter';
+// const emitter = useEmitter()
 
 export const  touchRandomSeed = ({ commit }) => {
     commit('set_random_seed')
@@ -86,23 +86,6 @@ export const  touchRandomSeed = ({ commit }) => {
     commit('update_notifications', { notifications });
   }
 
- export const  gotoProfile =() => {
-    // console.log(` goto public profile`)
-    const router = useRouter() as any
-    const current = router.currentRoute;
-    const destination_route = { name: current.value.name, params: current.value.params };      
-    console.log(destination_route)
-
-    if (destination_route.name == 'profile') {
-      // LayoutEventBus.$emit('reload');
-      emitter.emit('reload')
-    } else {
-      router.push({
-        name: 'profile',
-        params: { destination_route: destination_route },
-      });
-    }
-  }
 
  export const  deleteNotification= ({ commit }, { notificationID }) => {
     console.log('deleteNotification1/2', notificationID)

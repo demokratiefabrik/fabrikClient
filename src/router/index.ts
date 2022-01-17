@@ -1,7 +1,6 @@
 
 
 import { route } from 'quasar/wrappers';
-import useAppComposable from 'src/composables/app.composable';
 import {
   // NavigationFailure,
   // RouteLocationRaw,
@@ -14,6 +13,7 @@ import {
 import routes from './routes';
 import useEmitter from 'src/utils/emitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 
 /*
  * If not building with SSR mode, you can
@@ -62,14 +62,14 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.afterEach((to) => { 
+
     if (to.params?.assemblyIdentifier) {
-      const appComposable = useAppComposable();
-      appComposable.setAssemblyIdentifier(to?.params?.assemblyIdentifier as string | null);
+      const {setAssemblyIdentifier, setStageID} = useAssemblyComposable();
+      setAssemblyIdentifier(to?.params?.assemblyIdentifier as string | null);
 
       if (to.params?.stageID !== null && to.params?.stageID !== undefined) {
         // TODO: redirect to asembly home, when stage is invalid
-        // console.log("router after each : new stage", to.params.stageID, to)
-        appComposable.setStageID(parseInt(to.params.stageID as string));
+        setStageID(parseInt(to.params.stageID as string));
         emitter.emit('showLoading');
       }
     }

@@ -1,4 +1,5 @@
 <template>
+
   <q-page class="row">
     <PySwarmPlot></PySwarmPlot>
   </q-page>
@@ -7,7 +8,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PySwarmPlot from 'src/plugins/CIR/components/PySwarmPlot.vue';
-import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import useAuthComposable from 'src/composables/auth.composable';
+// import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 
 
 export default defineComponent({
@@ -15,8 +17,8 @@ export default defineComponent({
   
   setup() {
     // console.log('DEBUG: INDEX:VUE');
-    const pkce = usePKCEComposable();
-    return {pkce, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
+    const auth = useAuthComposable();
+    return {auth, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
   },
   components: { PySwarmPlot },
 

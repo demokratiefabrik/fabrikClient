@@ -63,35 +63,31 @@
 
     <!-- Collapsed menu: Small  pages Or assembly pages  -->
     <template v-if="is_assembly_page || !$q.screen.gt.xs">
-        <q-btn
-      size="lg"
-      flat
-      icon="mdi-menu"
-      label=""
-    >
-      <q-menu>
-        <q-list style="min-width: 100px">
-          <q-item
-            v-for="item in menu"
-            clickable
-            :key="item.text"
-            :class="
-              item.to.name == currentRoute
-                ? 'topmenuSelected'
-                : 'topmenuDefault'
-            "
-            @click="pushR(item.to)"
-            v-close-popup
-          >
-            <q-item-section>{{ item.text }}</q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
-    </q-btn>
+      <q-btn size="lg" flat icon="mdi-menu" label="">
+        <q-menu>
+          <q-list style="min-width: 100px">
+            <q-item
+              v-for="item in menu"
+              clickable
+              :key="item.text"
+              :class="
+                item.to.name == currentRoute
+                  ? 'topmenuSelected'
+                  : 'topmenuDefault'
+              "
+              @click="pushR(item.to)"
+              v-close-popup
+            >
+              <q-item-section>{{ item.text }}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
     </template>
 
-
     <!-- ACCOUNT DROPDOWN -->
+    <button @click="loginToCurrentPage" v-if="!authorized">Login</button>
+    
     <q-btn-dropdown stretch flat v-if="authorized">
       <template v-slot:label>
         <UserAvatar :profile="public_profile" menu="true"></UserAvatar>
@@ -162,16 +158,23 @@ export default defineComponent({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setup() {
     const { setHeaderOffset } = useAppComposable();
-    const { pushR } = useRouterComposable();
-    const { logout, authorized, getUsernameDerivation, payload } =
-      useAuthComposable();
+    const { pushR, gotoProfile } = useRouterComposable();
+    const {
+      logout,
+      authorized,
+      getUsernameDerivation,
+      payload,
+      loginToCurrentPage,
+    } = useAuthComposable();
     return {
       setHeaderOffset,
       logout,
       pushR,
+      gotoProfile,
       authorized,
       payload,
       getUsernameDerivation,
+      loginToCurrentPage,
     };
   },
 
@@ -219,7 +222,7 @@ export default defineComponent({
     },
 
     ...mapGetters({
-      public_profile: 'profilestore/get_public_profile',
+      public_profile: 'profilestore/public_profile',
       UsersDelegateAssemblies: 'publicindexstore/UsersDelegateAssemblies',
       is_in_testing_phase: 'profilestore/is_in_testing_phase',
       assemblyName: 'assemblystore/assemblyName',
@@ -228,7 +231,7 @@ export default defineComponent({
   },
   methods: {
     ...mapActions({
-      gotoProfile: 'profilestore/gotoProfile',
+      // gotoProfile: 'profilestore/gotoProfile',
       // username: "profilestore/username",
       // username_derivate: "profilestore/username_derivate",
     }),

@@ -7,6 +7,13 @@ import usePKCEComposable, {
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
 import { useRouter, useRoute } from 'vue-router';
+import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
+import useRouterComposable from './router.composable';
+import useMonitorComposable from './monitor.composable';
+import constants from 'src/utils/constants';
+import useAppComposable from './app.composable';
+import { useQuasar } from 'quasar';
+
 // import { useRoute} from 'vue-router';
 // import useRouterComposable from './router.composable';
 
@@ -20,6 +27,7 @@ const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
 const emailIsAvailable = ref<boolean>(false);
 const emitter = useEmitter();
+const oauthEmitter = useOAuthEmitter();
 
 // const oauthEmitter = useOAuthEmitter();
 // import {
@@ -31,6 +39,12 @@ export default function useAuthComposable() {
   // console.log('DEBUG: AUTH COMPOSABLE - START');
   const router = useRouter();
   const currentRoute = useRoute();
+  const routerComposable = useRouterComposable();
+  const monitorComposable = useMonitorComposable();
+  const appComposable = useAppComposable()
+  const store = useStore();
+  const $q = useQuasar()   
+
 
   // Session / PROFILE METHODS
   const setLogoutState = (state: boolean) => (logoutState.value = state);
@@ -74,6 +88,34 @@ export default function useAuthComposable() {
 
   const initialize = async (): Promise<void> => {
     console.log('*** INIT OAUTH ***');
+
+    oauthEmitter.on('AfterLogin', () => {
+      // CHECK FOR REDIRECTION URL in local storage (During Login)
+      const desitionationRouteJson = localStorage.getItem(
+        'oauth2authcodepkce-destination'
+      );
+      if (desitionationRouteJson) {
+        const destination_route = JSON.parse(desitionationRouteJson);
+        if (destination_route) {
+          // console.log(destination_route, 'destination_route')
+          localStorage.removeItem('oauth2authcodepkce-destination');
+          routerComposable.pushR(destination_route);
+          return;
+        }
+      }
+      routerComposable.gotoHome();
+      setLogoutState(false)
+      // reset monitor routine (and push first action)
+      store.dispatch('monitorSetup')
+      monitorComposable.monitorLog(constants.MONITOR_LOGIN)
+        //send context data
+      const data: Record<string, unknown> = { extra: $q.platform.is };
+      data.screenW = screen.width
+      monitorComposable.monitorLog(constants.MONITOR_CONTEXT, data);
+      // Clear data of last session...
+      appComposable.clearSession()
+    });
+
     try {
       return await pkce.initialize();
     } catch (error) {
@@ -89,6 +131,7 @@ export default function useAuthComposable() {
       }
       // end mounting...
     }
+
   };
   // # SETUP WATCHER
   // WATCH ROUTER => Check Permissions
@@ -107,7 +150,6 @@ export default function useAuthComposable() {
 
     setLogoutState(false);
 
-    const store = useStore();
     await store.dispatch('appstore/monitorFire', {
       eventString: Constants.MONITOR_LOGOUT,
       data: {},

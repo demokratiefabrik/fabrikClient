@@ -2,6 +2,7 @@ import useEmitter from 'src/utils/emitter';
 const emitter = useEmitter();
 import api from 'src/utils/api';
 import useAppComposable from 'src/composables/app.composable';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export const syncAssembly = (
   { state, dispatch },
@@ -67,8 +68,8 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
 };
 
 export const addOrUpdateStage = ({ commit }, { stage }) => {
-  const appComposable = useAppComposable();
-  const assemblyIdentifier = appComposable.assemblyIdentifier.value;
+  // const appComposable = useAppComposable();
+  const {assemblyIdentifier} = useAssemblyComposable();
   console.log('stage: ', stage, assemblyIdentifier);
   api
     .addOrUpdateStage(assemblyIdentifier, stage)
@@ -167,7 +168,7 @@ export const incrementAssemblyActivityCounter = (
       counterName
     )
   );
-  const { assemblyIdentifier } = useAppComposable();
+  const { assemblyIdentifier } = useAssemblyComposable();
   commit('incrementAssemblyActivityCounter', {
     assemblyIdentifier: assemblyIdentifier.value,
     counterName,

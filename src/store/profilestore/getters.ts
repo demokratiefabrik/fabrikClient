@@ -15,7 +15,7 @@ export const  randomLocalStorageSeed = (state) => {
     return (state.publicProfile?.configuration?.t)
   }
 
- export const  get_public_profile = (state) => {
+ export const  public_profile = (state) => {
     if (!state.publicProfile) {
       return (null)
     }

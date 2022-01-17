@@ -5,7 +5,7 @@
       v-if="!expanded"
       @click="showDisclaimer = !showDisclaimer"
       align="right"
-      icon="mdi-monitor-clean"
+      icon="mdi-monitor-eye"
     >
       {{ $t('disclaimer.btnLabel') }}
     </q-chip>
@@ -17,7 +17,7 @@
       <span class="text-weight-thin">
         <q-icon
           class="float-left q-mr-sm q-mb-sm q-mt-xs"
-          name="mdi-monitor-clean"
+          name="mdi-monitor-eye"
           size="sm"
         /><span v-dompurify-html="text" />
       </span>

@@ -4,7 +4,7 @@ const AMs = {
   indexpage_left: {
     id: 'indexpage_left',
     prosa: ' Erster AM: Begrüsst die Leute auf der Webseite.',
-    loading: (ctx) => ctx.authorized === null || (ctx.authorized && !ctx.get_public_profile),
+    loading: (ctx) => ctx.authorized === null || (ctx.authorized && !ctx.public_profile),
     items: [
       {
         id: 1,
@@ -19,18 +19,18 @@ const AMs = {
       {
         id: 4,
         prosa: 'ctx.authorized: LONGTERM!',
-        condition: (ctx) => ctx.authorized && ctx.$options.filters.minutesSince(ctx.get_public_profile.date_created) > 60,
-        body: (ctx) => `Herzlich willkommen zurück, ${ctx.get_public_profile.U}! Es freut uns, dass Sie wieder hier sind!`
+        condition: (ctx) => ctx.authorized && ctx.$options.filters.minutesSince(ctx.public_profile.date_created) > 60,
+        body: (ctx) => `Herzlich willkommen zurück, ${ctx.public_profile.U}! Es freut uns, dass Sie wieder hier sind!`
       },
 
       {
         id: 5,
         prosa: 'ctx.authorized: FIRST HOUR!',
-        condition: (ctx) => ctx.authorized && ctx.$options.filters.minutesSince(ctx.get_public_profile.date_created) <= 60,
+        condition: (ctx) => ctx.authorized && ctx.$options.filters.minutesSince(ctx.public_profile.date_created) <= 60,
         body: (ctx) => {
           return [
             'Herzlich willkommen!',
-            `In der Demokratiefabrik tragen Sie den Namen ${ctx.get_public_profile.U}. ${ctx.$root.username_derivation(ctx.get_public_profile, false, false)}. So bleiben Sie in der Demokratiefabrik anonym.`
+            `In der Demokratiefabrik tragen Sie den Namen ${ctx.public_profile.U}. ${ctx.$root.username_derivation(ctx.public_profile, false, false)}. So bleiben Sie in der Demokratiefabrik anonym.`
           ]
         }
       },
@@ -40,7 +40,7 @@ const AMs = {
   indexpage_right: {
     id: 'indexpage_right',
     prosa: ' Zweite: Informiert über Aktualität.',
-    loading: (ctx) => ctx.authorized === null || (ctx.authorized && !ctx.get_public_profile),
+    loading: (ctx) => ctx.authorized === null || (ctx.authorized && !ctx.public_profile),
     items: [
 
       // {
@@ -80,7 +80,7 @@ const AMs = {
         id: 2,
         condition: (ctx) => ctx.authorized && ctx.IsUserDelegateOfOngoingAssembly,
         body: (ctx) => {
-          const firstDay = ctx.get_public_profile && (ctx.$options.filters.minutesSince(ctx.get_public_profile.date_created) <= 60);
+          const firstDay = ctx.public_profile && (ctx.$options.filters.minutesSince(ctx.public_profile.date_created) <= 60);
           return [
             firstDay ? 'Wir freuen uns sehr, dass Sie hier sind! Ist es für Sie in Ordnung, wenn wir gleich starten?' :
               'Wir können gleich wieder weiterfahren. Sind Sie bereit?',

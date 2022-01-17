@@ -48,7 +48,7 @@ const routes: RouteRecordRaw[] = [
       // Email Token
       { path: '/l/:ltoken', name: 'ltokenlogin', component: () => import('src/plugins/VueOAuth2PKCE/TokenLogin.vue') },
 
-      // { path: '/sekretariat', name: 'profile', props: true, component: () => import(/* webpackPrefetch: true */ 'pages/Auth/Profile.vue') },
+      { path: '/sekretariat', name: 'profile', props: true, component: () => import(/* webpackPrefetch: true */ 'pages/Auth/Profile.vue') },
       { path: '/hintergrund', name: 'background', component: () => import(/* webpackPrefetch: true */ 'pages/Background.vue') },
       { path: '/news', name: 'news', component: () => import(/* webpackPrefetch: true */ 'pages/News.vue') },
       { path: '/pause', name: 'pause', component: () => import(/* webpackPrefetch: true */ 'pages/Construction.vue') },

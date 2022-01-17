@@ -17,6 +17,8 @@ export default function useRouterComposable() {
 
   /* Reload the page when redirecting to the same page */
   const pushR = (route: RouteRecordRaw) => {
+
+    console.log(route, 'ROUTE in RESOLVE PUSHR')
     const target = router.resolve(route).href;
     // const currentRouteCleaned = ({ name: currentRoute.name, params: currentRoute.params }) as RouteLocationRaw;
     const current = router.resolve(currentRoute).href;
@@ -45,6 +47,25 @@ export default function useRouterComposable() {
     pushR({ name: 'home' } as RouteRecordRaw);
   };
 
+  
+ const  gotoProfile = () => {
+  // console.log(` goto public profile`)
+  // const current = router.currentRoute;
+  // const destination_route = { name: current.value.name, params: current.value.params };      
+  // // console.log(destination_route)
+
+  // if (destination_route.name == 'profile') {
+  //   // LayoutEventBus.$emit('reload');
+  //   emitter.emit('reload')
+  // } else {
+  //   router.push({
+  //     name: 'profile',
+  //     params: { destination_route },
+  //   });
+  // }
+  
+  pushR({ name: 'profile' } as RouteRecordRaw); 
+}
 
   /* Scroll To #Anchor */
   // NOT USED
@@ -64,6 +85,7 @@ export default function useRouterComposable() {
   return {
     pushR,
     pushI,
+    gotoProfile,
     gotoHome,
     // fullPath,
     // anchor

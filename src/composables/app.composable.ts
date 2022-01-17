@@ -2,10 +2,11 @@
 import { watch, ref, readonly } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import useLibraryComposable from 'src/utils/library'
+import useLibraryComposable from 'src/utils/library';
 import useEmitter from 'src/utils/emitter';
+import useAssemblyComposable from './assembly.composable';
 
-const {removeItem} = useLibraryComposable()
+const { removeItem } = useLibraryComposable();
 export interface INotificationConfig {
   settimer?: boolean;
   nobuttons?: boolean;
@@ -23,9 +24,8 @@ export interface INotificationBanner {
 
 // APP State
 const stageID = ref<number | null>(null);
-const assemblyIdentifier = ref<string | null>(null);
 const appExitState = ref<boolean>(false);
-const emitter = useEmitter()
+const emitter = useEmitter();
 // Layout
 const headerOffset = ref<number>(150); // default header is minimized within assembly sections
 const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
@@ -36,60 +36,51 @@ const loadingGifStack = ref<string[]>([]);
 export default function useAppComposable() {
   // console.log('DEBUG: APP COMPOSABLE - START');
 
+  const assemblyComposable = useAssemblyComposable();
   const { t } = useI18n();
-  const currentRoute = useRoute()
+  const currentRoute = useRoute();
   const exitApp = () => (appExitState.value = true);
-  const setStageID = (id: number | null) => (stageID.value = id);
-  const setAssemblyIdentifier = (identifier: string | null) =>
-    (assemblyIdentifier.value = identifier);
-
 
   /* LOADING GIF: give a label to facilitate debugging... 
     -------------------------
   */
-  const showLoadingGif = (label) => {    
+  const showLoadingGif = (label) => {
     // const extlabel = `${label}${timestamp()}`
-    loadingGifStack.value.push(label)
-    emitter.emit('loadingGifStackChange', loadingGifStack.value)
+    loadingGifStack.value.push(label);
+    emitter.emit('loadingGifStackChange', loadingGifStack.value);
     setTimeout(() => {
       // disable loadingGif after five seconds... (if not already removed)
-      emitter.emit('loadingGifStackChange', loadingGifStack.value)
-      loadingGifStack.value = removeItem(loadingGifStack.value, label)
+      emitter.emit('loadingGifStackChange', loadingGifStack.value);
+      loadingGifStack.value = removeItem(loadingGifStack.value, label);
     }, 5000);
-  }
+  };
 
-  const hideLoadingGif = (label) => {    
+  const hideLoadingGif = (label) => {
     // const extlabel = `${label}${timestamp()}`
-    loadingGifStack.value = removeItem(loadingGifStack.value, label)
-    emitter.emit('loadingGifStackChange', loadingGifStack.value)
-  }
-  
+    loadingGifStack.value = removeItem(loadingGifStack.value, label);
+    emitter.emit('loadingGifStackChange', loadingGifStack.value);
+  };
+
   /** Remove all loadingGifs (used in case of errors) */
   const clearLoadingGif = () => {
-    loadingGifStack.value = []
-  }
+    loadingGifStack.value = [];
+  };
 
   /* NOTIFICATIONS 
   -------------------------*/
   const showNotification = (banner: INotificationBanner): void => {
     if (banner.settimer) {
       setTimeout(() => {
-        notificationBanner.value = null        
-        emitter.emit('notificationBannerChange', notificationBanner.value)
+        notificationBanner.value = null;
+        emitter.emit('notificationBannerChange', notificationBanner.value);
       }, 5000);
     }
     if (banner.type === 'error') {
-      clearLoadingGif()
+      clearLoadingGif();
     }
     notificationBanner.value = banner;
-    emitter.emit('notificationBannerChange', notificationBanner.value)
-  }
-
-  /* Ensure that all (error) messages disappear, when route changes.. */
-  watch(currentRoute, () => {
-    console.log('route change in API')
-    notificationBanner.value = null        
-  })
+    emitter.emit('notificationBannerChange', notificationBanner.value);
+  };
 
   const showAuthorizationError = (
     config: INotificationConfig | null = null
@@ -104,7 +95,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showServiceError = (config: INotificationConfig | null = null) => {
@@ -117,7 +108,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showNetworkError = (config: INotificationConfig | null = null) => {
@@ -131,7 +122,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showAuthorizationInvalidToken = (
@@ -150,7 +141,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showTooManyRequestsError = (
@@ -165,7 +156,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showAuthenticationWarning = (
@@ -177,11 +168,11 @@ export default function useAppComposable() {
       icon: 'mdi-emoticon-cool-outline',
       title: t('auth.authentication_warning_title'),
       body: t('auth.authentication_warning_body'),
-      buttons: ['auth', 'home'], 
+      buttons: ['auth', 'home'],
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
 
   const showAuthenticationError = (
@@ -196,45 +187,54 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
-    showNotification(banner)
+    showNotification(banner);
   };
-
 
   const initialize = () => {
     emitter.on('showNetworkError', () => {
       // TODO: monitorLog Once
-      showNetworkError();      
+      showNetworkError();
     });
-    
+
     emitter.on('showServiceError', () => {
       // TODO: monitorLog Once
-      showServiceError();      
+      showServiceError();
     });
-    
+
     emitter.on('showAuthorizationError', () => {
       // TODO: monitorLog Once
-      showAuthorizationError();      
+      showAuthorizationError();
     });
-    
+
     emitter.on('showTooManyRequestsError', () => {
       // TODO: monitorLog Once
-      showTooManyRequestsError();      
+      showTooManyRequestsError();
     });
-    
+
     emitter.on('showAuthenticationWarning', () => {
       // TODO: monitorLog Once
-      showAuthenticationWarning();      
+      showAuthenticationWarning();
     });
-    
+
     emitter.on('showServiceError', () => {
       // TODO: monitorLog Once
-      showServiceError();      
+      showServiceError();
     });
-  }
+
+    /* Ensure that all (error) messages disappear, when route changes.. */
+    watch(currentRoute, () => {
+      console.log('route change in API');
+      notificationBanner.value = null;
+    });
+  };
+
+  const clearSession = () => {
+    assemblyComposable.setStageID(null);
+    assemblyComposable.setAssemblyIdentifier(null);
+  };
 
   return {
     stageID: readonly(stageID),
-    assemblyIdentifier: readonly(assemblyIdentifier),
     appExitState: readonly(appExitState),
     headerOffset: readonly(headerOffset),
     showAuthenticationError,
@@ -246,11 +246,10 @@ export default function useAppComposable() {
     showAuthorizationError,
     exitApp,
     initialize,
-    setStageID,
-    setAssemblyIdentifier,
+    clearSession,
     setHeaderOffset,
     hideLoadingGif,
-    showLoadingGif
+    showLoadingGif,
   };
 }
 
@@ -323,20 +322,6 @@ export default function useAppComposable() {
 //     })
 
 //     this.outhEmitter.on('AfterLogin', () => {
-
-//       // reset monitor routine (and push first action)
-//       appComposable.setLogoutState(false)
-//       this.$store.dispatch('monitorSetup',)
-//       this.$root.monitorLog(constants.MONITOR_LOGIN)
-
-//       // CHECK FOR REDIRECTION URL in local storage (During Login)
-//       const destination_route = JSON.parse(localStorage.getItem('oauth2authcodepkce-destination'));
-//       if (destination_route) {
-//         localStorage.removeItem('oauth2authcodepkce-destination');
-//         this.$router.push(destination_route);
-//       } else {
-//         this.$router.push({ name: 'home' });
-//       }
 
 //       // send context data
 //       const data = { extra: this.$q.platform.is };
@@ -431,44 +416,6 @@ export default function useAppComposable() {
 //       //   console.log('await monitorFire ended => call oauth logout function. SILENT:', silent)
 //       //   this.oauth.logout(silent)
 //       // }
-
-//     this.$root.monitorLog = async (eventString = null, data = {}) => {
-//       if (!this.oauth.authorized) {
-//         return (null)
-//       }
-
-//       const current = this.$router.currentRoute;
-//       if (eventString === constants.MONITOR_ROUTE_CHANGE) {
-//         data.extra = { 'name': current.name }
-//       }
-//       data = { name: current.name, ...current.params, ...data }
-//       if (this.appComposable.assemblyIdentifier.value && !data.assemblyIdentifier) {
-//         data.assemblyIdentifier = this.appComposable.assemblyIdentifier.value
-//       }
-//       this.$store.dispatch('monitorLog', {
-//         eventString,
-//         data
-//       })
-//     }
-
-//     this.$root.monitorFire = async (eventString = null, extra = {}, onlyWhenTokenValid = false) => {
-//       if (!this.oauth.authorized) {
-//         return (null)
-//       }
-
-//       const router = useRouter()
-//       const current = router.currentRoute;
-//       const data = { name: current.name, ...current.params, ...extra }
-//       if (this.appComposable.assemblyIdentifier.value && !data.assemblyIdentifier) {
-//         data.assemblyIdentifier = this.appComposable.assemblyIdentifier.value
-//       }
-
-//       await this.$store.dispatch('monitorFire', {
-//         eventString,
-//         data,
-//         onlyWhenTokenValid
-//       })
-//     }
 
 //     /**
 //      * Clear all the data, that we want to reset for every participation session

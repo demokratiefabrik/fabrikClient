@@ -2,6 +2,8 @@
 const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
 import { ref, computed, readonly } from 'vue';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
+// import { useRouter } from 'vue-router';
+// import useRouterComposable from 'src/composables/router.composable';
 
 /// POLYFILL (IE11 for oAuth2 PKCE Module)
 // Note: does not work anymore when outsourced in seperate files..
@@ -26,7 +28,6 @@ import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
   }
 })(window);
 
-
 export interface IAccessToken {
   token: IAccessTokenPartial;
   scopes: string[];
@@ -36,11 +37,11 @@ export interface IAccessTokenPartial {
   expiry: Date;
 }
 export interface IPayload {
-  exp: Date,
-  iss: string,
-  roles: string[]
-  sub: number
-  userEmail: boolean
+  exp: Date;
+  iss: string;
+  roles: string[];
+  sub: number;
+  userEmail: boolean;
 }
 
 /**
@@ -78,12 +79,8 @@ const pkce = ref<any>(new OAuth2AuthCodePKCE(pkce_config));
 
 const accessToken = ref<null | IAccessToken>(null);
 const jwt = computed(() => {
-  if (!accessToken.value) {
-    return null
-  }
-  return accessToken.value.token.value;
+  return accessToken?.value?.token?.value;
 });
-
 
 const brokenSession = ref<boolean>(false);
 
@@ -106,7 +103,6 @@ const payload = computed(() => {
   return JSON.parse(window.atob(jwt.value.split('.')[1]));
 });
 
-
 const userid = computed(() => {
   return payload.value?.sub;
 });
@@ -114,6 +110,7 @@ const userid = computed(() => {
 // export default {
 export default function usePKCEComposable() {
   // console.log('DEBUG usePKCEComposable start')
+  // const router = useRouterComposable();
 
   const login = function (
     destination_route: Record<string, unknown> | null = null
@@ -146,7 +143,8 @@ export default function usePKCEComposable() {
       }
     }
     // TOKEN REFRESH ENDS: Notify the computed properties
-    const accessTokenPartial = pkce.value.state?.accessToken as IAccessTokenPartial;
+    const accessTokenPartial = pkce.value.state
+      ?.accessToken as IAccessTokenPartial;
     oauthEmitter.emit('TokenChanges', accessTokenPartial);
     oauthEmitter.emit('AfterTokenChanged', accessTokenPartial);
     setOngoingTokenRefresh(false);
@@ -245,11 +243,11 @@ export default function usePKCEComposable() {
 
   // SHOULD BE RUN ONLY ONCE...
   const initialize = async (): Promise<void> => {
-
     // Subsribe Event Listener(s)
     oauthEmitter.on('TokenChanges', (localAccessTokenPartial) => {
       if (localAccessTokenPartial && accessToken.value) {
-        accessToken.value.token = localAccessTokenPartial as IAccessTokenPartial;
+        accessToken.value.token =
+          localAccessTokenPartial as IAccessTokenPartial;
       } else {
         accessToken.value = null;
       }
@@ -259,40 +257,39 @@ export default function usePKCEComposable() {
     if (pkce.value?.state) {
       accessToken.value = {
         token: pkce.value?.state?.accessToken as IAccessTokenPartial,
-        scopes: pkce.value?.state?.scopes
+        scopes: pkce.value?.state?.scopes,
       };
 
       // Check if initially loaded access token is expired:
-      if(pkce.value.isAccessTokenExpired()){
-        await refresh_token()
+      if (pkce.value.isAccessTokenExpired()) {
+        await refresh_token();
         console.assert(!pkce.value.isAccessTokenExpired());
       }
     }
 
     // Catch: oauth server returns
-    const hasAuthCode = await pkce.value
+    const hasAuthCode: boolean = await pkce.value
       .isReturningFromAuthServer()
       .catch((potentialError) => {
-        if (potentialError) {
-          console.log(potentialError, '#4385');
-          Promise.reject(potentialError);
-        }
-        console.log('DEBUG: PKCE --- catch (no potentialError) TODO: useless?', potentialError);
-      });
+        console.log(potentialError, '#4385');
+        Promise.reject(potentialError);
+    });
+
     // Retrieve Access Token by auth codes
     let localAccessToken: IAccessToken | null = null;
     try {
-      localAccessToken = await pkce.value.getAccessToken() as IAccessToken;
+      localAccessToken = (await pkce.value.getAccessToken()) as IAccessToken;
       // console.log('DEBUG: PKCE --- localAccessToken', !!localAccessToken)
     } catch (error) {
-      console.log('DEBUG: PKCE --- Not logged in, right?', error);
+      console.error('DEBUG: PKCE --- Not logged in, right?', error);
     }
 
     // NOTIFY APP That Token is available...
     // console.log('DEBUG: PKCE --- EVERYTHING LOADED, ',jwt, '---> notify');
     oauthEmitter.emit('TokenChanges', localAccessToken?.token);
     oauthEmitter.emit('AfterTokenChanged', localAccessToken?.token);
-    // console.log(jwt, 'DEBUG: PKCE --- ......after notificaiton...');
+    
+    // console.log(jwt, 'DEBUG: PKCE --- ......after notificaiton...', hasAuthCode);
     if (hasAuthCode) {
       oauthEmitter.emit('AfterLogin');
     }

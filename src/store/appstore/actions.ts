@@ -16,7 +16,7 @@ export const clearUserData = ({ dispatch, commit }) => {
 
 export const monitorSetup = ({ commit }) => {
   /* resets the counter to zero */
-  commit('monitor_setup');
+  commit('monitorSetup');
   console.log('/setup ');
 };
 

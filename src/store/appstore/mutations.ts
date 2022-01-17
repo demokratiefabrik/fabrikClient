@@ -1,7 +1,7 @@
 import { date } from 'quasar'
 const { getDateDiff } = date
 
-export function monitor_setup(state) {
+export function monitorSetup(state) {
   const now = new Date();
   state.monitor_date = now;
 }

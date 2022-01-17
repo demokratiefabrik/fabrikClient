@@ -9,11 +9,8 @@
       flat
       v-if="false && authorized"
     >
-    <!-- // TODO disabled by DW for migration to vue3 -->
-      <q-menu
-        anchor="bottom left"
-        self="top left"
-      >
+      <!-- // TODO disabled by DW for migration to vue3 -->
+      <q-menu anchor="bottom left" self="top left">
         <!-- @hide="onHideDialog" -->
         <q-list
           class="scroll"
@@ -35,11 +32,12 @@
             </q-item-section>
 
             <q-item-section>
-              <q-item-label
-                caption
-                style="max-width:450px"
-              >{{formatTimeLeft(entry.date_created)}}</q-item-label>
-              <q-item-label style="max-width:450px">{{$t(`notifications.${entry.action}`, {value: entry.value})}}</q-item-label>
+              <q-item-label caption style="max-width: 450px">{{
+                formatTimeLeft(entry.date_created)
+              }}</q-item-label>
+              <q-item-label style="max-width: 450px">{{
+                $t(`notifications.${entry.action}`, { value: entry.value })
+              }}</q-item-label>
             </q-item-section>
 
             <q-item-section side>
@@ -55,7 +53,6 @@
                   round
                   icon="mdi-open-in-new"
                 />
-
               </div>
             </q-item-section>
           </q-item>
@@ -68,7 +65,9 @@
         >
           <q-item>
             <q-item-section>
-              <q-item-label style="max-width:450px">Für Sie liegt noch keine Nachricht bereit.</q-item-label>
+              <q-item-label style="max-width: 450px"
+                >Für Sie liegt noch keine Nachricht bereit.</q-item-label
+              >
             </q-item-section>
           </q-item>
         </q-list>
@@ -87,11 +86,7 @@
       full-height
       :maximized="$q.screen.lt.md ? true : false"
     >
-
-      <q-card
-        class="full-height "
-        style="width:95%; max-width: 800px"
-      >
+      <q-card class="full-height" style="width: 95%; max-width: 800px">
         <!-- 
         <q-card-section class="row items-center q-pb-none">
           <q-space />
@@ -104,10 +99,7 @@
           />
         </q-card-section> -->
 
-        <q-card-section
-          class="scroll"
-          v-if="selectedNotification"
-        >
+        <!-- <q-card-section class="scroll" v-if="selectedNotification">
           <component
             :is="PeerreviewViewLoader"
             v-on:close-modal="closeModal"
@@ -115,19 +107,16 @@
             :peerreviewID="selectedPeerreviewID"
             :contentID="selectedContentID"
           />
-
-        </q-card-section>
-
+        </q-card-section> -->
       </q-card>
     </q-dialog>
-
   </div>
 </template>
 
 <script lang="ts">
 import constants from 'src/utils/constants';
 import { mapGetters, useStore } from 'vuex';
-import useAppComposable from 'src/composables/app.composable';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 import useAuthComposable from 'src/composables/auth.composable';
 import filters from 'src/utils/filters';
 import { defineComponent } from 'vue';
@@ -136,13 +125,14 @@ export default defineComponent({
   name: 'Notifications',
 
   setup() {
-        // console.log('DEBUG setup notifications')
-    const appComposable = useAppComposable();
-    const {authorized, userid} = useAuthComposable();
-    const {formatTimeLeft} = filters
-    const store = useStore()
-    return { store, appComposable, authorized, userid, formatTimeLeft };
+    // console.log('DEBUG setup notifications')
+    const {assemblyIdentifier} = useAssemblyComposable();
+    const { authorized, userid } = useAuthComposable();
+    const { formatTimeLeft } = filters;
+    const store = useStore();
+    return { store, assemblyIdentifier, authorized, userid, formatTimeLeft };
   },
+
   data() {
     return {
       numberOfNotifications: 10,
@@ -156,24 +146,25 @@ export default defineComponent({
   },
 
   computed: {
-    recentNotifications() {
+    // username_derivation(): string {
+    recentNotifications(): any[] {
       return [];
     },
 
-    // TODO: Fix this...
-    // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
-    // eslint-disable-next-line vue/return-in-computed-property
-    PeerreviewViewLoader() {
-      // if (this.selectedPeerreviewID) {
-      //   return () =>
-      //     import('src/plugins/VAA/components/PeerReviewDetailLoader.vue');
-      // } else if (this.selectedContentID) {
-      //   return () =>
-      //     import('src/plugins/VAA/components/SalienceDetailLoader.vue');
-      // }
-    },
+    // // TODO: Fix this...
+    // // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
+    // // eslint-disable-next-line vue/return-in-computed-property
+    // PeerreviewViewLoader() {
+    //   // if (this.selectedPeerreviewID) {
+    //   //   return () =>
+    //   //     import('src/plugins/VAA/components/PeerReviewDetailLoader.vue');
+    //   // } else if (this.selectedContentID) {
+    //   //   return () =>
+    //   //     import('src/plugins/VAA/components/SalienceDetailLoader.vue');
+    //   // }
+    // },
 
-    notificationsList() {
+    notificationsList(): any[] {
       const notificationsList: any[] = [...Object.values(this.notifications)];
       notificationsList.sort((a, b) => b.id - a.id);
       return notificationsList.slice(0, 10);
@@ -208,7 +199,7 @@ export default defineComponent({
       const preloadContenttrees: any[] = [];
       const preloadAssemblies: any[] = [];
       const preloadPeerreviews: any[] = [];
-      this.notificationsList.forEach(notification => {
+      this.notificationsList.forEach((notification) => {
         if (
           !!notification.peerreview_id &&
           !!notification.contenttree_id &&
@@ -239,7 +230,7 @@ export default defineComponent({
 
       preloadContenttrees.forEach((contenttreeID) => {
         this.store.dispatch('contentstore/syncContenttree', {
-          assemblyIdentifier: this.appComposable.assemblyIdentifier,
+          assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.userid,
         });
@@ -247,7 +238,7 @@ export default defineComponent({
 
       preloadPeerreviews.forEach((contenttreeID) => {
         this.store.dispatch('peerreviewstore/syncPeerreviews', {
-          assemblyIdentifier: this.appComposable.assemblyIdentifier,
+          assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.userid,
         });

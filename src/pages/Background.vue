@@ -163,7 +163,7 @@ export default {
       linkAPS:
         '<a href="https://anneepolitique.swiss/pages/postvotes" target="_blank"> Webseite des Année Politique Suisse</a>',
       iconTechnicalTransparency:
-        '<i aria-hidden="true" role="presentation" class="q-tab__icon mdi mdi-monitor-clean q-icon notranslate"></i>',
+        '<i aria-hidden="true" role="presentation" class="q-tab__icon mdi mdi-monitor-eye q-icon notranslate"></i>',
     };
   },
 
