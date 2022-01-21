@@ -1,5 +1,7 @@
-import { createI18n } from 'vue-i18n';
-import messages from 'src/i18n';
+// import { createI18n } from 'vue-i18n';
+import { createI18n } from 'vue-i18n'
+
+import messages from '../i18n';
 
 export default ({ app }) => {
   // console.log('DEBUG boot i18n start')

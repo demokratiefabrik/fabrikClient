@@ -17,14 +17,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-// import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
-  setup() {
-    // const i18n = useI18n()
-    // console.log(i18n, 'SETUPPP')
-    // return {i18n}
-  },
   data() {
     return {
       lang: this.$i18n.locale as string,

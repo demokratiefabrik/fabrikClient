@@ -10,7 +10,9 @@ import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 (function (window) {
   if (typeof window.TextEncoder !== 'function') {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const TextEncodingPolyfill = require('text-encoding');
+    const TextEncodingPolyfill = require('fast-text-encoding');
+    // TODO: above encode has not been tested yet,. text-encoding ist deprecated
+    // const TextEncodingPolyfill = require('text-encoding');
     window.TextEncoder = TextEncodingPolyfill.TextEncoder;
     window.TextDecoder = TextEncodingPolyfill.TextDecoder;
   }

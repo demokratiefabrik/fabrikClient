@@ -1,9 +1,4 @@
-/** DEMOKRATIFABRIK RUNTIME VARIABLES */
-// import { watch, ref, readonly } from 'vue';
 import { useRoute } from 'vue-router';
-// import { useI18n } from 'vue-i18n';
-// import useLibraryComposable from 'src/utils/library'
-// import useEmitter from 'src/utils/emitter';
 import { useStore } from 'vuex';
 import constants from 'src/utils/constants';
 import useAssemblyComposable from './assembly.composable';

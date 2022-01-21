@@ -26,6 +26,7 @@
           <div>
             <a
               target="_blank"
+               href="/storage/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
               alt="Ergebnisbericht der Könizer Demokratiefabrik"
             >
                <q-icon
