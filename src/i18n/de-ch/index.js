@@ -58,8 +58,8 @@ export default {
 
     /* Male: 0; female: 1 */
     gender: {
-      1: () => 0,
-      2: () => 1
+      1: () => '0',
+      2: () => '1'
     },
 
     // Use pluralization for gender... 
@@ -200,13 +200,7 @@ export default {
     h1: 'Was aktuell in der Demokratiefabrik läuft',
     am: {
       newsletter: 'Möchten Sie bezüglich der Demokratiefabrik auf dem Laufenden bleiben? Dann können sie unseren Newsletter abonnieren.',
-      cmd_newsletter_abo: 'Newsletter-Abo',
-      // tooltip: {
-      //   2: [
-      //     // Tooltips for the second AM displayed on the page
-      //     'Schauen Sie sich doch auch noch auf der Seite "Hintergrund" um.'
-      //   ]
-      // }
+      cmd_newsletter_abo: 'Newsletter-Abo'
     }
   },
 

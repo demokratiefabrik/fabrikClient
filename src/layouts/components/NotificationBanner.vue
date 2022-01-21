@@ -124,7 +124,7 @@ export default defineComponent({
 
   setup() {
     const authComposable = useAuthComposable();
-    const {gotoHome, pushR } = useRouterComposable();
+    const {gotoHome, pushR, reload } = useRouterComposable();
     
     const emitter = useEmitter();
     const notificationBanner = ref<null | INotificationBanner>(null);
@@ -136,7 +136,7 @@ export default defineComponent({
         notificationBanner.value = null;
       }
     });
-    return { notificationBanner,authComposable, pushR, gotoHome };
+    return { notificationBanner,authComposable, pushR, gotoHome, reload };
   },
 
   /**
@@ -154,9 +154,11 @@ export default defineComponent({
     },
 
     pageReload() {
-      // this.store.dispatch('monitorReset');
-      // this.store.dispatch('assemblystore/deleteAssemblyStore');
+      // TODO: clean everything carefully... before reloading
+      // store.dispatch('appstore/monitorReset');
+      // store.dispatch('assemblystore/deleteAssemblyStore');
       // window.location.reload();
+      this.reload()
     },
 
     notificationRedirect() {

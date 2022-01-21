@@ -1,5 +1,5 @@
-export const  storePublicProfile = (state, { data }) => {
-    state.publicProfile = data
+export const  storeProfile = (state, { data }) => {
+    state.profile = data
   }
 
  export const  storeOauthAcls = (state, oauthAcls) => {

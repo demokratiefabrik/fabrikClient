@@ -8,14 +8,9 @@
   .q-message-text
     color: #EEE !important
 
-  // .q-chip
-  //   der: 1px solid black
-  //   background-color: #EEE !important
-
 .tooltip
   max-width: 251px
 
-/* .noTextPadding  */
 .q-message-text
   padding-bottom: 0.7em
   padding-top: 0.7em
@@ -40,7 +35,8 @@
     >
       <q-chat-message
         size="7"
-        :text="loading ? [] : text"
+        v-if="!loading"
+        :text="text"
         :sent="alignment == 'left' ? false : true"
         :class="[
           'artificialmoderation',
@@ -48,8 +44,8 @@
           noTextPadding ? 'noTextPadding' : '',
         ]"
       >
-        <template v-if="loading">
-          <q-spinner-dots size="2rem" />
+        <template v-slot:default  v-if="loading">
+            <q-spinner-dots size="2rem" v-if="loading" />
         </template>
 
         <template v-slot:avatar>
@@ -67,6 +63,7 @@
           </div>
         </template>
       </q-chat-message>
+
       <div
         :class="['artificialmoderation', actorClass, 'full-width']"
         :style="`text-align:${alignmentForced}; padding-${alignmentForced}:100px`"
@@ -76,7 +73,7 @@
           v-for="(button, index) in (buttons as IArtificialModerationButton[])"
           :key="index"
           class="q-ma-xs"
-          :icon="button.icon ? button.icon : ''"
+          :icon="button.icon ? button.icon : undefined"
           :size="button.size ? button.size : 'md'"
           :style="
             actor == 1 ? 'background-color:#776d58' : 'background-color:#1d496d'
@@ -93,7 +90,7 @@
 
 <script lang="ts">
 // import { mapGetters } from 'vuex';
-import { defineComponent, PropType, ComponentPublicInstance} from 'vue';
+import { defineComponent, PropType, ComponentPublicInstance } from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 /** EXAMPLE OF A AM-CONFIGURATION OBJECT
   topics_after_saliencing: {
@@ -140,7 +137,6 @@ interface IArtificialModeration {
 //   items: IArtificialModeration[]
 // }
 
-
 const numberOfActors = 2;
 // TODO: AMcache does only work with one AM per page...
 export default defineComponent({
@@ -159,7 +155,7 @@ export default defineComponent({
   },
 
   props: {
-    ctx:  {
+    ctx: {
       // Context, where all the required varaibles are defiend. (passed to ongoing, condition ete. functions)
       type: Object as PropType<ComponentPublicInstance>,
       required: true,
@@ -210,8 +206,8 @@ export default defineComponent({
 
   computed: {
     enabled(): boolean {
-      console.log(this.ctx);
-      const response = true
+      // console.log(this.ctx);
+      const response = true;
       // const response = !this.AMpatched?.condition || this.AMpatched.condition(this.ctx);
       return response;
     },
@@ -228,10 +224,12 @@ export default defineComponent({
 
     loading(): boolean | undefined {
       if (this.AMpatched) {
-        const response = this.AMpatched.loading && this.AMpatched.loading(this.ctx);
-        return response;
+        // const response =
+        //   this.AMpatched.loading && this.AMpatched.loading(this.ctx);
+        // return response;
+        // console.log(this.AMpatched.loading)
       }
-      return undefined
+      return undefined;
     },
 
     /* A key that allows to identify a certain AM Instance */
@@ -260,7 +258,8 @@ export default defineComponent({
           randomSeedBase = this.ctx.$options.name;
         } else {
           // if nothing is indicated: take a individual-level random seedbase
-          randomSeedBase = this.ctx.$options.name + JSON.stringify(this.AMpatched);
+          randomSeedBase =
+            this.ctx.$options.name + JSON.stringify(this.AMpatched);
         }
       }
       // calculate a user-specific number by the seedBase string
@@ -270,7 +269,8 @@ export default defineComponent({
       }
 
       // add also a user-constant random number
-      const seedFloat = (((this.randomLocalStorageSeed as number) + seed) * 3) / 2;
+      const seedFloat =
+        (((this.randomLocalStorageSeed as number) + seed) * 3) / 2;
       return Math.round(seedFloat);
     },
 
@@ -279,7 +279,7 @@ export default defineComponent({
       if (this.fixedActor) {
         return this.fixedActor;
       }
-      const b = this.seed as number
+      const b = this.seed as number;
       const allocationShift = b % numberOfActors;
       return ((this.role + allocationShift) % numberOfActors) + 1;
     },
@@ -290,7 +290,7 @@ export default defineComponent({
     },
 
     // Which is the gender of the displayed Actor?
-    // TODO: return "f" and "m"
+    // TODO: return "f" and "m" instead of '1' and '0'
     actorGender(): string {
       return this.$t(`am.gender.${this.actor}`);
     },
@@ -305,6 +305,7 @@ export default defineComponent({
     actorPartnerReference(): string {
       // console.log(this.actorGender, this.actorPartner, "lll");
       const partnerGender = this.$t(`am.gender.${this.alternate(this.actor)}`);
+      // const partnerGender = '1'
       return this.$t('am.reference', partnerGender, {
         actorPartner: this.actorPartner,
       });
@@ -337,10 +338,10 @@ export default defineComponent({
         return items.filter(
           (item) =>
             !item.condition || item.condition(this.ctx, { role: this.role })
-        ) 
+        );
       }
 
-      return undefined
+      return undefined;
     },
 
     validMaxPriorityItems(): any[] {
@@ -349,7 +350,7 @@ export default defineComponent({
       }
 
       // get max priorities
-      const items = this.validItems as IArtificialModeration[]
+      const items = this.validItems as IArtificialModeration[];
       const priorities = items.map((item) =>
         item.priority ? item.priority : 0
       );
@@ -367,33 +368,31 @@ export default defineComponent({
         // not yet loaded
         return undefined;
       }
-      // if (!this.validItems.length) {
-      //   // console.log("::::SELECT AMs", "no valid items");
-      //   return undefined;
-      // }
 
       // CACHE
-      const getCacheKey = this.getAMCache as (string) => number
+      const getCacheKey = this.getAMCache as (string) => number;
 
       if (this.cacheKey) {
         const itemId = getCacheKey(this.cacheKey);
         if (itemId) {
-          const items = this.validMaxPriorityItems as IArtificialModeration[]
+          const items = this.validMaxPriorityItems as IArtificialModeration[];
           const cachedItem = items.find((item) => item.id === itemId);
           if (cachedItem) {
             // selected item by cache
-            console.log('selected item by cache...');
+            // console.log('selected item by cache...');
             return cachedItem;
           }
         }
       }
 
       // RANDOM DRAW
-      // randomly select one item!
-      // console.log("RANDOM DRAW", this.validMaxPriorityItems);
-      const selected = this.$library.sample(this.validMaxPriorityItems);
-      console.log('SELECTED', selected.id, selected);
-      return selected as IArtificialModeration;
+      if (this.validMaxPriorityItems.length) {
+        const selected = this.$library.sample(this.validMaxPriorityItems);
+        console.log('SELECTED', selected);
+        return selected as IArtificialModeration;
+      }
+      
+      return undefined
     },
 
     text(): string[] | unknown {
@@ -432,7 +431,7 @@ export default defineComponent({
       }
 
       var buttons: IArtificialModerationButton[] = [];
-      const selectedItem = this.selectedItem as IArtificialModeration
+      const selectedItem = this.selectedItem as IArtificialModeration;
       if (selectedItem.buttons?.length) {
         selectedItem.buttons.forEach((button) => {
           if (button && (!button.condition || button.condition(this.ctx))) {
@@ -441,7 +440,11 @@ export default defineComponent({
         });
       }
 
-      if (this.AMpatched && this.AMpatched.buttons && this.AMpatched.buttons.length) {
+      if (
+        this.AMpatched &&
+        this.AMpatched.buttons &&
+        this.AMpatched.buttons.length
+      ) {
         this.AMpatched.buttons.forEach((button) => {
           if (button && (!button.condition || button.condition(this.ctx))) {
             buttons.push(button);
@@ -465,12 +468,12 @@ export default defineComponent({
     selectedItem(item) {
       // update cache
       // console.log(item);
-      if (item  && this.text) {
+      if (item && this.text) {
         const itemId = item ? item.id : null;
         this.setAMCache({ cacheKey: this.cacheKey, itemId });
 
         // emit event
-        const text = this.text as string[]
+        const text = this.text as string[];
         this.$emit('am-change', { item, text: text.join('') });
       }
     },
@@ -507,18 +510,18 @@ export default defineComponent({
   },
 
   created() {
-    // this.AMpatched = Array.isArray(this.AM)
-    //   ? this.mergeAMs(this.AM[0], this.AM[1])
-    //   : this.AM;
-    // if (
-    //   !this.AMpatched ||
-    //   !Object.values(this.AMpatched).length ||
-    //   !this.AMpatched.items.length
-    // ) {
-    //   // console.log(
-    //   //   'Artificial Moderator did not receive any instructions. AM is empty...'
-    //   // );
-    // }
+    this.AMpatched = Array.isArray(this.AM)
+      ? this.mergeAMs(this.AM[0], this.AM[1])
+      : this.AM;
+    if (
+      !this.AMpatched ||
+      !Object.values(this.AMpatched).length ||
+      !this.AMpatched?.items?.length
+    ) {
+      console.log(
+        'DEBUG: Artificial Moderator did not receive any instructions. AM is empty...'
+      );
+    }
   },
 });
 </script>

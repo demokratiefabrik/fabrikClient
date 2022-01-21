@@ -21,7 +21,7 @@
 
           <div>
             <a
-              href="/storage/koeniz2021_walkthrough_de.mp4"
+              href="/storage/upload/koeniz2021_walkthrough_de.mp4"
               style="float:left; padding-right: 15px; margin-bottom:1em;"
               target="_blank"
               alt="Könizer Demokratiefabrik Walkthrough Video"
@@ -50,7 +50,7 @@
 
           <div>
             <a
-              href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+              href="/storage/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
               style="float:left; padding-right: 15px; margin-bottom:1em;"
               target="_blank"
               alt="Ergebnisbericht der Könizer Demokratiefabrik"
@@ -72,7 +72,7 @@
               die ersten Erkenntnisse aus der Evaluation der Demokratiefabrik zusammen.</div>
 
             <!-- <a 
-               href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+               href="/storage/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
               style="float:left"
               target="_blank"
               alt="Ergebnisbericht der Könizer Demokratiefabrik"
@@ -112,7 +112,7 @@
           <div>
             Wir sind bereit für die Könizerinnen und Könizer, die sich in den nächsten Wochen in der Demokratiefabrik engagieren werden. <br><br>
             <img
-              src="/upload/demokratiefabrik-team-medium.png"
+              src="/storage/upload/demokratiefabrik-team-medium.png"
               class="full-width"
             />
             <div>Von links nach rechts: Catalina Schmid, Dominik Wyss, Viktoria Kipfer, Marlène Gerber und Giada Gianola</div>
@@ -131,15 +131,15 @@
             <ul>
               <li>der Bund vom 12. Mai 2021 (<a
                   target="_blank"
-                  href="/upload/media/Seite_25_Der_Bund_2021-05-12.pdf"
+                  href="/storage/upload/media/Seite_25_Der_Bund_2021-05-12.pdf"
                 >PDF</a>)</li>
               <li>Berner Zeitung vom 14. Mai 2021 (<a
                   target="_blank"
-                  href="/upload/media/K_20210514_BZ_smartvote.pdf"
+                  href="/storage/upload/media/K_20210514_BZ_smartvote.pdf"
                 >PDF</a>)</li>
               <li>Könizer Zeitung vom 27. Mai 2021 (<a
                   target="_blank"
-                  href="/upload/media/koenizerZeitung_mai_27.pdf"
+                  href="/storage/upload/media/koenizerZeitung_mai_27.pdf"
                 >PDF</a>)</li>
             </ul>
             <br>
@@ -204,9 +204,8 @@ export default {
   },
   methods: {
     clickNewsletter: function () {
-      // TODO: take email from environment variables
-      const email = 'demokratiefabrik@protonmail.com';
-      window.location.href = `mailto:${email}`;
+      const newsletterURL = 'https://41b4d1a2.sibforms.com/serve/MUIEALtZ0tbJUdnbW6ml1EOJEi6-GVTwt8TQOQDOH_7-Uz2XSsrJTzb5FWqz7uR9jbRyWMUke45Y1ZUaT9Ckw4KzzG4aQ2FM-R6akCrwWKr9_KqSXGQg5B0gXZTn1PXhzYWb-bJsCpGN20EmFuXXmhlVKgqD4INCKAZpsTfyqK9dPa3FDyoox8Z2Ey6yrizGtLJZzVoL45NWTPpc';
+      window.open(newsletterURL)
     },
   },
 };

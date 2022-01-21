@@ -115,7 +115,7 @@
               align="center"
             >
               <q-img
-                src="/upload/technologies.png"
+                src="/storage/upload/technologies.png"
                 style="max-width: 400px;"
               />
             </div>

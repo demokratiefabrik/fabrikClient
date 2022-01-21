@@ -40,6 +40,7 @@ const routes: RouteRecordRaw[] = [
     children: [
 
       { path: '', name: 'home', component: () => import('pages/Index.vue') },
+      { path: '/preview', name: 'preview', component: () => import('pages/Preview.vue') },
       { path: '/authorization', props: true, name: 'authorization', component: () => import(/* webpackPrefetch: true */ 'pages/Empty.vue') },
       { path: '/logout', name: 'logout', component: () => import(/* webpackPrefetch: true */ 'pages/Auth/Logout.vue') },
 

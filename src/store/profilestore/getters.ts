@@ -9,21 +9,21 @@ export const  randomLocalStorageSeed = (state) => {
   }
 
  export const  is_in_testing_phase = (state) => {
-    if (!state.publicProfile) {
+    if (!state.profile) {
       return (null)
     }
-    return (state.publicProfile?.configuration?.t)
+    return (state.profile?.configuration?.t)
   }
 
- export const  public_profile = (state) => {
-    if (!state.publicProfile) {
+ export const  profile = (state) => {
+    if (!state.profile) {
       return (null)
     }
-    return (state.publicProfile.user)
+    return (state.profile.user)
   }
 
  export const  lightProfileColor = (state) => {
-    const profile = state.publicProfile?.user;
+    const profile = state.profile?.user;
     if (!profile) {
       return '#CCCCCC'
     }
@@ -31,7 +31,7 @@ export const  randomLocalStorageSeed = (state) => {
   }
 
  export const  profileColor = (state) => {
-    const profile = state.publicProfile?.user;
+    const profile = state.profile?.user;
     if (!profile) {
       return '#AAAAAA'
     }

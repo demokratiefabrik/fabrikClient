@@ -224,7 +224,7 @@ export default defineComponent({
       preloadAssemblies.forEach((assemblyIdentifier) => {
         this.store.dispatch('assemblystore/syncAssembly', {
           assemblyIdentifier: assemblyIdentifier,
-          oauthUserID: this.userid,
+          oauthUserID: this.userid.value,
         });
       });
 
@@ -232,7 +232,7 @@ export default defineComponent({
         this.store.dispatch('contentstore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID,
-          oauthUserID: this.userid,
+          oauthUserID: this.userid.value,
         });
       });
 
@@ -240,7 +240,7 @@ export default defineComponent({
         this.store.dispatch('peerreviewstore/syncPeerreviews', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID,
-          oauthUserID: this.userid,
+          oauthUserID: this.userid.value,
         });
       });
     },

@@ -1,5 +1,5 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { ref, readonly, getCurrentInstance, computed } from 'vue';
+import { ref, readonly, computed } from 'vue';
 import Constants from 'src/utils/constants';
 import usePKCEComposable, {
   IPayload,
@@ -11,17 +11,8 @@ import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import useRouterComposable from './router.composable';
 import useMonitorComposable from './monitor.composable';
 import constants from 'src/utils/constants';
-import useAppComposable from './app.composable';
-import { useQuasar } from 'quasar';
-
-// import { useRoute} from 'vue-router';
-// import useRouterComposable from './router.composable';
-
-// import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-
-// import {useStore} from 'vuex';
-//   // const store = useStore()
-//   // await store.dispatch('appstore/monitorFire', {
+import { watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
@@ -29,113 +20,59 @@ const emailIsAvailable = ref<boolean>(false);
 const emitter = useEmitter();
 const oauthEmitter = useOAuthEmitter();
 
-// const oauthEmitter = useOAuthEmitter();
-// import {
-//   useRouter,
-// } from 'vue-router';
-
-// export default {
 export default function useAuthComposable() {
-  // console.log('DEBUG: AUTH COMPOSABLE - START');
   const router = useRouter();
   const currentRoute = useRoute();
   const routerComposable = useRouterComposable();
   const monitorComposable = useMonitorComposable();
-  const appComposable = useAppComposable()
   const store = useStore();
-  const $q = useQuasar()   
-
-
-  // Session / PROFILE METHODS
-  const setLogoutState = (state: boolean) => (logoutState.value = state);
-  const getUsername = (profile) => (profile ? profile.U : 'Anonymous');
-  const getUsernameDerivation = (
-    profile,
-    shortversion = false,
-    thirdPerson = true
-  ) => {
-    if (!profile) {
-      return '';
-    }
-
-    const altitude = profile.ALT;
-    const fullname = profile.FN;
-    const canton = profile.CA;
-    const internalInstance = getCurrentInstance();
-    const i18n = internalInstance?.appContext.config.globalProperties.$i18n;
-
-    if (thirdPerson) {
-      return i18n.t(
-        `auth.name_derivation_3rd_party${shortversion ? '_short' : ''}`,
-        {
-          fullname: fullname,
-          canton: canton,
-          altitude: altitude,
-        }
-      );
-    } else {
-      return i18n.t('auth.name_derivation', {
-        fullname: fullname,
-        canton: canton,
-        altitude: altitude,
-      });
-    }
-  };
-
-  // const currentUsername = computed(() => {
-  //   return getUsername()
-  // });
+  const { t } = useI18n();
+  // -------
 
   const initialize = async (): Promise<void> => {
     console.log('*** INIT OAUTH ***');
 
     oauthEmitter.on('AfterLogin', () => {
-      // CHECK FOR REDIRECTION URL in local storage (During Login)
-      const desitionationRouteJson = localStorage.getItem(
-        'oauth2authcodepkce-destination'
-      );
-      if (desitionationRouteJson) {
-        const destination_route = JSON.parse(desitionationRouteJson);
-        if (destination_route) {
-          // console.log(destination_route, 'destination_route')
-          localStorage.removeItem('oauth2authcodepkce-destination');
-          routerComposable.pushR(destination_route);
-          return;
-        }
-      }
-      routerComposable.gotoHome();
-      setLogoutState(false)
-      // reset monitor routine (and push first action)
-      store.dispatch('monitorSetup')
-      monitorComposable.monitorLog(constants.MONITOR_LOGIN)
-        //send context data
-      const data: Record<string, unknown> = { extra: $q.platform.is };
-      data.screenW = screen.width
-      monitorComposable.monitorLog(constants.MONITOR_CONTEXT, data);
-      // Clear data of last session...
-      appComposable.clearSession()
+      loadProfile();
+      afterLogin();
+    });
+    oauthEmitter.on('RecycleLogin', () => {
+      loadProfile();
     });
 
-    try {
-      return await pkce.initialize();
-    } catch (error) {
-      console.log('error in oauth initialization...', error);
-      switch ((error as any).message) {
-        case 'ErrorInvalidGrant':
-          emitter.emit('showAuthorizationInvalidToken');
-          break;
-        default:
-          console.error(error);
-          emitter.emit('showServiceError', { nobuttons: true });
-          break;
-      }
-      // end mounting...
-    }
-
+    addRoutePermisionWatcher();
+    const response = await pkce.initialize();
+    return response;
   };
-  // # SETUP WATCHER
-  // WATCH ROUTER => Check Permissions
 
+  const afterLogin = () => {
+    // console.log('AFTER LOGIN, OAUTH EMITTER')
+
+    // Notify Backend
+    store.dispatch('appstore/monitorSetup');
+    monitorComposable.monitorLog(constants.MONITOR_LOGIN);
+    monitorComposable.monitorContextData();
+
+    // CHECK FOR REDIRECTION URL in local storage (During Login)
+    const desitionationRouteJson = localStorage.getItem(
+      'oauth2authcodepkce-destination'
+    );
+    if (desitionationRouteJson) {
+      const destination_route = JSON.parse(desitionationRouteJson);
+      if (destination_route) {
+        localStorage.removeItem('oauth2authcodepkce-destination');
+        routerComposable.pushR(destination_route);
+        return;
+      }
+    }
+    routerComposable.gotoHome();
+    setLogoutState(false);
+  };
+  // -------
+
+  // PKCE METHODS
+  // ------------------------
+  const setLogoutState = (state: boolean) => (logoutState.value = state);
   const logout = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _eventString: string | null = null,
@@ -148,7 +85,7 @@ export default function useAuthComposable() {
       silent
     );
 
-    setLogoutState(false);
+    setLogoutState(true);
 
     await store.dispatch('appstore/monitorFire', {
       eventString: Constants.MONITOR_LOGOUT,
@@ -160,12 +97,11 @@ export default function useAuthComposable() {
   };
 
   const loginToCurrentPage = (): void => {
-    const destination_route = { name: currentRoute.name, params: currentRoute.params };      
+    const destination_route = {
+      name: currentRoute.name,
+      params: currentRoute.params,
+    };
     pkce.login(destination_route);
-  };
-
-  const markEmailAsAvailable = (): void => {
-    emailIsAvailable.value = true;
   };
 
   const payload = computed(() => {
@@ -207,30 +143,112 @@ export default function useAuthComposable() {
     }
   };
 
-  // console.log('DEBUG @@ auth composable end')
+  const addRoutePermisionWatcher = async () => {
+    try {
+      watch(
+        () => currentRoute,
+        (currentRoute) => {
+          // Add Watcher for Authorization Check (client-side)
+          checkPagePermission(currentRoute);
+        },
+        { deep: true }
+      );
+    } catch (error) {
+      console.log('error in oauth initialization...', error);
+      switch ((error as any).message) {
+        case 'ErrorInvalidGrant':
+          emitter.emit('showAuthorizationInvalidToken');
+          break;
+        default:
+          console.error(error);
+          emitter.emit('showServiceError', { nobuttons: true });
+          break;
+      }
+    }
+  };
+  // -------
+
+  // PROFILE METHODS
+  // ------------------------
+
+  const profile = computed(() => {
+    return store.state.profilestore.profile
+  });
+    
+  const getUsername = (profile) => (profile ? profile.U : 'Anonymous');
+  const getUsernameDerivation = (
+    profile,
+    shortversion = false,
+    thirdPerson = true
+  ) => {
+    if (!profile) {
+      return '';
+    }
+
+    const altitude = profile.ALT;
+    const fullname = profile.FN;
+    const canton = profile.CA;
+
+    if (thirdPerson) {
+      return t(
+        `auth.name_derivation_3rd_party${shortversion ? '_short' : ''}`,
+        {
+          fullname: fullname,
+          canton: canton,
+          altitude: altitude,
+        }
+      );
+    } else {
+      return t('auth.name_derivation', {
+        fullname: fullname,
+        canton: canton,
+        altitude: altitude,
+      });
+    }
+  };
+
+  const markEmailAsAvailable = (): void => {
+    emailIsAvailable.value = true;
+  };
+
+  const loadProfile = async () => {
+    store.dispatch('profilestore/touchRandomSeed');
+
+    // SYNC USER PROFILE
+    if (pkce.userid.value) {
+      store.dispatch('profilestore/keepInSyncProfile', {
+        oauthUserID: pkce.userid.value,
+        oauthUserEmail: payload.value.userEmail,
+      });
+    }
+    // NOT NEEDED, RIGHT?
+    //       // console.log("on ProfileLoaded")
+    // // is email already set: if not => redirect to userprofile...
+    // store.dispatch('profilestore/setUsernameDerivate', {
+    //   usernameDerivate: usernameDerivate()
+    // })
+    // }
+  };
+
   return {
     initialize,
-
-    // TODO: needed?
+    
+    // PKCE
     logoutState: readonly(logoutState),
     setLogoutState,
     logout,
     loginToCurrentPage,
-
     checkPagePermission,
-    getUsernameDerivation,
-    getUsername,
-    // currentUsername,
-    // currentUsernameDerivation,
-    markEmailAsAvailable,
-    // login: pkce.login,
-
-    // PKCE
     refresh_token_if_required: pkce.refresh_token_if_required,
     authorized: readonly(pkce.authorized),
     jwt: readonly(pkce.jwt),
     payload: readonly(payload),
     userid: readonly(pkce.userid),
 
+    // PROFILE
+    profile,
+    getUsernameDerivation,
+    getUsername,
+    markEmailAsAvailable,
   };
 }

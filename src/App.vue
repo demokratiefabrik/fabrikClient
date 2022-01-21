@@ -1,43 +1,17 @@
 <template>
-  <router-view />
+  <router-view :key="instanceNr"/>
 </template>
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
-
-import useAuthComposable from 'src/composables/auth.composable';
-import { useRoute} from 'vue-router';
+import { defineComponent } from 'vue';
 import useAppComposable from './composables/app.composable';
-// import { useRouter} from 'vue-router';
 
 export default defineComponent({
   name: 'App',
   setup() {
-
-    // INITIALIZE APP && AUTHENTICATION
-    const authComposable = useAuthComposable();
-    authComposable.initialize();
+    // INITIALIZE APP
     const appComposable = useAppComposable();
     appComposable.initialize();
-
-    // WATCH PAGE PERMISSION
-    const currentRoute = useRoute();
-    watch(
-      () => currentRoute, (currentRoute) => {
-        console.log('route change in APP.vue')
-        // Page Permission
-        authComposable.checkPagePermission(currentRoute)
-        // TODO: Monitor Route change
-        // this.$root.monitorLog(constants.MONITOR_ROUTE_CHANGE)
-        },
-      { deep: true });
-    return {}
-  },
-  created() {
-    console.log('DEBUG created APP.vue')
-  },
-  mounted() {
-    console.log('DEBUG mounted APP.vue')
-
+    return {instanceNr: appComposable.instanceNr}
   }
 })
 </script>

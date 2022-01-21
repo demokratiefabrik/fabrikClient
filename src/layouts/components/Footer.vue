@@ -41,7 +41,7 @@
             <b>Ergebnisbericht</b><br>
             Der Ergebnisbericht der Könizer Demokratiefabrik 2021 ist online. Sie können ihn hier herunterladen. <br><br>
             <a 
-               href="/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
+               href="/storage/upload/Ergebnisbericht_Demokratiefabrik_Koeniz_20210824.pdf"
               style="float:left"
               target="_blank"
               alt="Ergebnisbericht der Könizer Demokratiefabrik"
@@ -238,12 +238,6 @@ export default {
   name: 'Footer',
   components: {
     NewsletterForm
-  },
-  // methods: {
-  //   debug() {
-  //     this.$root.monitorFire(constants.MONITOR_STAGE_RANDOM_SAMPLING_CONTENT);
-  //     this.$root.monitorFire(constants.MONITOR_CONTEXT);
-  //   },
-  // },
+  }
 };
 </script>

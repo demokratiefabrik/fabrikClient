@@ -5,8 +5,20 @@ import { useI18n } from 'vue-i18n';
 import useLibraryComposable from 'src/utils/library';
 import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
+import useRouterComposable from './router.composable';
+import useAuthComposable from './auth.composable';
+import useMonitorComposable from './monitor.composable';
+import constants from 'src/utils/constants';
+import { scroll } from 'quasar';
+const { setVerticalScrollPosition  } = scroll;
+import { dom } from 'quasar';
+const { offset } = dom;
 
 const { removeItem } = useLibraryComposable();
+const headerOffset = ref<number>(150); // default header is minimized within assembly sections
+const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
+const fixedSelectedItem = ref<HTMLElement | null>(null); // Fixed Element (TODO: describe better what this is for!)
+
 export interface INotificationConfig {
   settimer?: boolean;
   nobuttons?: boolean;
@@ -26,9 +38,7 @@ export interface INotificationBanner {
 const stageID = ref<number | null>(null);
 const appExitState = ref<boolean>(false);
 const emitter = useEmitter();
-// Layout
-const headerOffset = ref<number>(150); // default header is minimized within assembly sections
-const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
+
 // Notifications
 const notificationBanner = ref<INotificationBanner | null>(null);
 const loadingGifStack = ref<string[]>([]);
@@ -37,8 +47,11 @@ export default function useAppComposable() {
   // console.log('DEBUG: APP COMPOSABLE - START');
 
   const assemblyComposable = useAssemblyComposable();
-  const { t } = useI18n();
+  const authComposable = useAuthComposable();
+  const monitorComposable = useMonitorComposable();
+  const routerComposable = useRouterComposable();
   const currentRoute = useRoute();
+  const { t } = useI18n();
   const exitApp = () => (appExitState.value = true);
 
   /* LOADING GIF: give a label to facilitate debugging... 
@@ -66,6 +79,54 @@ export default function useAppComposable() {
     loadingGifStack.value = [];
   };
 
+  /* SCROLLING */
+  // ----------------------
+  const getOffsetTop = (element) => {
+    let offsetTop = 0;
+    while (element) {
+      offsetTop += element.offsetTop;
+      element = element.offsetParent;
+    }
+    return offsetTop;
+  };
+
+  const scrollToAnchor = (anchor, duration = 300, lag = 0) => {
+    const dom = document.getElementsByName(anchor);
+    const ele = dom?.item(0);
+    const scrollFnc = () => {
+      fixedSelectedItem.value = anchor;
+      const elOffset = getOffsetTop(ele) - headerOffset.value;
+      setVerticalScrollPosition (window, elOffset, duration);
+      setTimeout(() => (fixedSelectedItem.value = null), duration);
+    };
+    if (lag) {
+      setTimeout(scrollFnc, lag);
+    } else {
+      scrollFnc();
+    }
+  };
+  const scrollToAnchorIfNecessary = (anchor, duration = 300, lag = 0) => {
+    const dom = document.getElementsByName(anchor);
+    const ele = dom?.item(0);
+    if (offset(ele).top < 50) {
+      scrollToAnchor(anchor, duration, lag);
+    }
+  };
+  /* Scroll To #Anchor */
+  // NOT USED
+  // const anchor = (anchor: string) => {
+  //   // scroll to element
+  //   const el = document.querySelector(`a[name=${anchor}]`);
+  //   el && el.scrollIntoView();
+
+  //   // account for fixed header
+  //   const headerHeight = 200;
+  //   const scrolledY = window.scrollY;
+  //   if (scrolledY) {
+  //     window.scroll(0, scrolledY - headerHeight);
+  //   }
+  // };
+
   /* NOTIFICATIONS 
   -------------------------*/
   const showNotification = (banner: INotificationBanner): void => {
@@ -85,7 +146,6 @@ export default function useAppComposable() {
   const showAuthorizationError = (
     config: INotificationConfig | null = null
   ) => {
-    // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, data)
     const banner = {
       type: 'error',
       icon: 'mdi-key-outline',
@@ -95,6 +155,7 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
+    monitorComposable.monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, banner);
     showNotification(banner);
   };
 
@@ -108,11 +169,11 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
+    monitorComposable.monitorLog(constants.MONITOR_ERROR_SERVICE, banner);
     showNotification(banner);
   };
 
   const showNetworkError = (config: INotificationConfig | null = null) => {
-    // this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
     const banner = {
       type: 'error',
       icon: 'mdi-alarm-light-outline',
@@ -122,16 +183,13 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
+    monitorComposable.monitorLog(constants.MONITOR_ERROR_NETWORK, banner);
     showNotification(banner);
   };
 
   const showAuthorizationInvalidToken = (
     config: INotificationConfig | null = null
   ) => {
-    //       this.$root.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, data)
-    //       setBrokenSession()
-    //       console.log('SILENT LOGOUT,,,')
-    //       this.authComposable.logout(null, {}, true);
     const banner = {
       type: 'error',
       icon: 'mdi-key-outline',
@@ -140,14 +198,15 @@ export default function useAppComposable() {
       buttons: ['auth', 'home'],
       settimer: config?.settimer ? true : false,
     };
-
+    monitorComposable.monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, banner);
     showNotification(banner);
+    //       setBrokenSession()
+    authComposable.logout(null, {}, true);
   };
 
   const showTooManyRequestsError = (
     config: INotificationConfig | null = null
   ) => {
-    // this.$root.monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, data)
     const banner = {
       type: 'error',
       icon: 'mdi-car-multiple',
@@ -155,14 +214,16 @@ export default function useAppComposable() {
       body: t('app.error.toomanyrequests_error_body'),
       settimer: config?.settimer ? true : false,
     };
-
+    monitorComposable.monitorLog(
+      constants.MONITOR_ERROR_TOO_MANY_REQUESTS,
+      banner
+    );
     showNotification(banner);
   };
 
   const showAuthenticationWarning = (
     config: INotificationConfig | null = null
   ) => {
-    // this.$root.monitorLog(constants.MONITOR_WARNING_AUTHENTICATION, data)
     const banner = {
       type: 'warning',
       icon: 'mdi-emoticon-cool-outline',
@@ -172,13 +233,16 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
+    monitorComposable.monitorLog(
+      constants.MONITOR_WARNING_AUTHENTICATION,
+      banner
+    );
     showNotification(banner);
   };
 
   const showAuthenticationError = (
     config: INotificationConfig | null = null
   ) => {
-    // this.$root.monitorLog(constants.MONITOR_ERROR_AUTHENTICATION, data)
     const banner = {
       type: 'error',
       icon: 'mdi-alarm-light-outline',
@@ -187,56 +251,55 @@ export default function useAppComposable() {
       settimer: config?.settimer ? true : false,
     };
 
+    monitorComposable.monitorLog(
+      constants.MONITOR_ERROR_AUTHENTICATION,
+      banner
+    );
     showNotification(banner);
   };
 
+  // const appExitState = () => {
+  //     return appExitState.value
+  // },
+
   const initialize = () => {
+    authComposable.initialize();
+    // START MONITOR ENGINE
+    monitorComposable.initialize();
+    // START ASSEMBLY ENGINE
+    assemblyComposable.initialize();
+    // LISTENING ON ERRORS
     emitter.on('showNetworkError', () => {
-      // TODO: monitorLog Once
       showNetworkError();
     });
-
     emitter.on('showServiceError', () => {
-      // TODO: monitorLog Once
       showServiceError();
     });
-
     emitter.on('showAuthorizationError', () => {
-      // TODO: monitorLog Once
       showAuthorizationError();
     });
-
     emitter.on('showTooManyRequestsError', () => {
-      // TODO: monitorLog Once
       showTooManyRequestsError();
     });
-
     emitter.on('showAuthenticationWarning', () => {
-      // TODO: monitorLog Once
       showAuthenticationWarning();
     });
-
     emitter.on('showServiceError', () => {
-      // TODO: monitorLog Once
       showServiceError();
     });
 
-    /* Ensure that all (error) messages disappear, when route changes.. */
+    /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
     watch(currentRoute, () => {
-      console.log('route change in API');
       notificationBanner.value = null;
     });
-  };
-
-  const clearSession = () => {
-    assemblyComposable.setStageID(null);
-    assemblyComposable.setAssemblyIdentifier(null);
   };
 
   return {
     stageID: readonly(stageID),
     appExitState: readonly(appExitState),
     headerOffset: readonly(headerOffset),
+    scrollToAnchorIfNecessary,
+    scrollToAnchor,
     showAuthenticationError,
     showServiceError,
     showAuthenticationWarning,
@@ -246,35 +309,28 @@ export default function useAppComposable() {
     showAuthorizationError,
     exitApp,
     initialize,
-    clearSession,
     setHeaderOffset,
     hideLoadingGif,
     showLoadingGif,
+    instanceNr: routerComposable.instanceNr,
   };
 }
 
-// import { scroll } from 'quasar';
-// const { setScrollPosition } = scroll;
-// import { dom } from 'quasar'
-// const { offset } = dom
-
-//   data() {
-//     return {
-//       appInitialized: false,
-//       componentKey: 0,
-//     };
-//   },
-
+// RESET LAYOUT
 //   computed: {
 //     ready() {
 //       // Can be overwritten by child components.
 //       this.$emitter.emit('hideLoading')
 //       return true;
 //     },
-//     appExitState: function () {
-//       return this.appComposable.appExitState.value
-//     },
+//     this.$emitter.on('hideNotificationBanners', data => {
+//       this.$refs?.maincontent?.hideNotificationBanner();
+//     })
+//     // to enforce reload of page container!
+//     this.$root.reload = () => { this.componentKey += 1 }
+//     this.$root.initialized = false
 
+// EXIT APP
 //     onPageLeave: function handler(event) {
 //       // ON PAGE LEAVE
 //       console.log('Shutdown Demokratiefabrik')
@@ -283,204 +339,7 @@ export default function useAppComposable() {
 //       appComposable.exitApp()
 //     },
 //   },
-
 //   created: function () {
 //     // GlOBAL Page Unmount Listener
 //     window.addEventListener('beforeunload', this.onPageLeave)
 //     // Catch globally all show and hide TextLoading events
-//     this.$emitter.on('reload', () => {
-//       this.$root.reload();
-//     });
-
-//     this.$emitter.on('PublicProfileLoaded', () => {
-//       // SYNC USER PROFILE
-//       // console.log("on PublicProfileLoaded")
-//       // is email already set: if not => redirect to userprofile...
-//       this.$store.dispatch('profilestore/setUsernameDerivate', {
-//         usernameDerivate: this.usernameDerivate()
-//       })
-//     })
-//     this.$emitter.on('hideNotificationBanners', data => {
-//       this.$refs?.maincontent?.hideNotificationBanner();
-//     })
-
-//     // oAuth2PKCE Hooks
-//     this.oauthEmitter.on('AfterTokenChanged', data => {
-//       // NOTIFY EVERYONE, THAT TOKEN HAS CHANGED NOW!
-//       if (data as localAccessTokenPartial) {
-//         this.storeOauthAcls({ oauthAcls: this.oauth?.payload?.roles })
-//       } else {
-//         console.log('reset oauth acls...')
-//         this.storeOauthAcls({})
-//       }
-//     })
-
-//     this.outhEmitter.on('AfterLogout', () => {
-//       console.log('CLEAR DATA AND REDIRECT TO LOGUT PAGE')
-//       this.$root.clearUserData()
-//       this.$router.push({ name: 'logout' })
-//     })
-
-//     this.outhEmitter.on('AfterLogin', () => {
-
-//       // send context data
-//       const data = { extra: this.$q.platform.is };
-//       data.screenW = screen.width
-//       this.$root.monitorLog(constants.MONITOR_CONTEXT, data);
-
-//       // Clear data of last session...
-//       this.$root.clearSession()
-//     })
-
-//     // Random Seed => for random allocation of things (i.e. artificial moderator avatars)
-//     this.touchRandomSeed()
-
-//     // to enforce reload of page container!
-//     this.$root.reload = () => { this.componentKey += 1 }
-//     this.$root.initialized = false
-
-//     // MONITOR ACTIVITIES OF USERS (periodically and on demand)
-//     this.$store.dispatch('monitorSetup')
-
-//     this.$root.getAssemblyHomeRoute = (assembly) => {
-//       // console.log("get assembly route ", assembly)
-//       if (!assembly) {
-//         return ({
-//           name: 'home',
-//         })
-
-//       }
-//       return ({
-//         name: assembly.type,
-//         params: { assemblyIdentifier: assembly.identifier }
-//       })
-//     }
-
-//     this.$root.getAssemblyManageRoute = (assembly) => {
-//       return ({
-//         name: 'assembly_manage',
-//         params: {
-//           assemblyIdentifier: assembly.identifier
-//         }
-//       })
-//     }
-
-//     this.$root.gotoAssemblyManage = (assembly) => {
-//       var route = this.$root.getAssemblyManageRoute(assembly);
-//       this.$pushR(route)
-//     }
-
-//     this.$root.gotoAssemblyHome = (assembly) => {
-
-//       var route = this.$root.getAssemblyHomeRoute(assembly);
-//       this.$pushR(route)
-//     }
-
-//     this.$root.scrollToAnchor = (anchor, duration = 300, lag = 0) => {
-//       const dom = document.getElementsByName(anchor);
-//       const ele = dom?.item(0);
-//       const scrollFnc = () => {
-//         this.fixedSelectedItem = anchor;
-//         const elOffset = this.$getOffsetTop(ele) - this.appComposable.headerOffset;
-//         setScrollPosition(window, elOffset, duration);
-//         setTimeout(() => (this.fixedSelectedItem = null), duration);
-//       }
-//       if (lag) {
-//         setTimeout(scrollFnc, lag);
-//       } else {
-//         scrollFnc()
-//       }
-//     },
-
-//       this.$root.scrollToAnchorIfNecessary = (anchor, duration = 300, lag = 0) => {
-//         const dom = document.getElementsByName(anchor);
-//         const ele = dom?.item(0);
-
-//         // Offset on screen
-//         if (offset(ele).top < 50) {
-//           this.$root.scrollToAnchor(anchor, duration = 300, lag = 0);
-//         }
-//       },
-
-//       // this.authComposable.logout = async (eventString = null, extra = {}, silent=false) => {
-//       //   console.log('authComposable.logout call => fire monitor buffer with logout entry. SILENT:', silent),
-
-//       //   await this.$store.dispatch('monitorFire', {
-//       //     eventString: constants.MONITOR_LOGOUT,
-//       //     data: {},
-//       //     onlyWhenTokenValid: true
-//       //   })
-
-//       //   appComposable.setLogoutState()
-
-//       //   console.log('await monitorFire ended => call oauth logout function. SILENT:', silent)
-//       //   this.oauth.logout(silent)
-//       // }
-
-//     /**
-//      * Clear all the data, that we want to reset for every participation session
-//      */
-//     this.$root.clearSession = () => {
-//       appComposable.setStageID(null)
-//       appComposable.setAssemblyIdentifier(null)
-//     }
-
-//     /**
-//      * Clear all the data, that is linked to a certain user. => performed at logout
-//      */
-//     this.$root.clearUserData = () => {
-//       this.$root.clearSession()
-//       this.clearUserData()
-//     }
-
-//     // console.log("--- end of app.js created")
-//   },
-
-//   mounted:
-
-//     // INITIALIZE TOKEN
-//     console.log('*** OAUTH INITIALIZATION ***')
-//     this.appInitialized = await this.oauth.refresh_token_if_required()
-
-//     console.log('*** START MONITOR ENGINE ***')
-//     // Start periodic monitorLog Raiser
-//     // keep this interval low (much lower than the intervall number specified in env. files)
-//     // (e.g. 1 Min.)
-//     let intervall = parseInt(process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS);
-//     if (!intervall) { intervall = 60 }
-//     this.$root.$monitorTimer = setInterval(() => {
-//       if (this.appComposable.assemblyIdentifier.value && this.oauth.userid) {
-//         this.$store.dispatch('assemblystore/syncAssembly', {
-//           oauthUserID: this.oauth.userid,
-//           assemblyIdentifier: this.appComposable.assemblyIdentifier.value
-//         })
-//       }
-//       this.$root.monitorFire()
-//     }, intervall * 1000)
-
-//     // In case of oauth error. Dont load data from resource server...
-//     if (this.appInitialized) {
-
-//       console.log('*** SYNC LOCAL DATA ***')
-//       console.log('...publicIndex')
-//       this.$store.dispatch('publicindexstore/syncPublicIndex')
-
-//       if (this.oauth.userid) {
-//         console.log('...profile')
-//         const fetchProfile = await this.$store.dispatch('profilestore/syncProfile', {
-//           oauthUserID: this.oauth.userid,
-//           oauthUserEmail: this.oauth.payload?.userEmail
-//         })
-
-//         // Monitor User Context
-//         console.log('FETCHED PROFILE?')
-//         if (fetchProfile) {
-//           this.$root.monitorLog(constants.MONITOR_ROUTE_CHANGE)
-//           console.log('FETCHED PROFILE!', constants.MONITOR_CONTEXT)
-
-//         }
-//       }
-//     }
-
-// TODO: destroy all eventbus listeners!!! Right?
-// this.$root.$off('openLeftDrawer', this.openLeftDrawerCallback)

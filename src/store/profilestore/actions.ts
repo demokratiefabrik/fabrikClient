@@ -11,34 +11,34 @@ export const  touchRandomSeed = ({ commit }) => {
     commit('setAMCache', { cacheKey, itemId })
   }
 
- export const  syncProfile = ({ state, dispatch }, { oauthUserID, oauthUserEmail }) => {
+  // <boolean | null>
+ export const  keepInSyncProfile = ({ state, dispatch }, { oauthUserID, oauthUserEmail }) => {
     // return: necessity to fetch new version? true/false
-
     if (!oauthUserID) {
       // Not logged in. DELETE ALL
-      dispatch('deletePublicProfile')
-      return (null)
+      dispatch('deleteProfile')
+      return (false)
     }
 
-    if (!state.publicProfile) {
-      dispatch('retrievePublicProfile', { oauthUserID, oauthUserEmail })
+    if (!state.profile) {
+      dispatch('retrieveProfile', { oauthUserID, oauthUserEmail })
       return (true)
     }
 
     // wrong user? and renew cache all x- minutes!
-    const wrongUser = oauthUserID != state.publicProfile.access_sub
+    const wrongUser = oauthUserID != state.profile.access_sub
     if (wrongUser) {
-      dispatch('deletePublicProfile')
+      dispatch('deleteProfile')
     }
 
-    const expired = api.expiredCacheDate(state.publicProfile?.access_date)
+    const expired = api.expiredCacheDate(state.profile?.access_date)
     if (expired || wrongUser) {
       console.log(' Public Profile not in sync  or wrong user...')
-      dispatch('retrievePublicProfile', { oauthUserID, oauthUserEmail })
+      dispatch('retrieveProfile', { oauthUserID, oauthUserEmail })
       return (true)
     }
 
-    return (null)
+    return (false)
   }
 
  export const  checkToUpdateNotifications = ({ state, dispatch }) => {
@@ -92,23 +92,21 @@ export const  touchRandomSeed = ({ commit }) => {
     commit('deleteNotification', { notificationID })
   }
 
- export const  deletePublicProfile= ({ commit }) => {
-    commit('storePublicProfile', {})
+ export const  deleteProfile= ({ commit }) => {
+    commit('storeProfile', {})
     commit('storeNotifications', {})
     commit('deleteAMCache')
   }
 
- export const  retrievePublicProfile= ({ commit, dispatch }, {}) => {
+ export const  retrieveProfile= ({ commit, dispatch }) => {
 
     // console.log('Retrieve public profile from resource server', oauthUserEmail)
-    api.publicProfile()
+    api.profile()
       .then(
         response => {
-
           // console.log('save retrieved profile to cache.')
           const data = response.data
-          commit('storePublicProfile', { data })
-
+          commit('storeProfile', { data })
           dispatch('checkToUpdateNotifications')
           return (null)
         }

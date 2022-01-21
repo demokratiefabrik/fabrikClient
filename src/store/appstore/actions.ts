@@ -7,9 +7,8 @@ const emitter = useEmitter()
 export const clearUserData = ({ dispatch, commit }) => {
   /* resets the counter to zero */
   dispatch('monitorExit');
-  dispatch('profilestore/deletePublicProfile', { commit });
+  dispatch('profilestore/deleteProfile', { commit });
   dispatch('contentstore/deleteContentStore', { commit });
-  console.log('delete peerreviews...');
   dispatch('peerreviewstore/deletePeerreviewStore', { commit });
   dispatch('assemblystore/deleteAssemblyStore', { commit });
 };

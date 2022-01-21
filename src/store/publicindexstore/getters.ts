@@ -32,8 +32,14 @@ export const UsersManagerAssemblies = (
   _rootState,
   rootGetters
 ) => {
+
+
+  // not yet loaded
+  if (state.publicIndex?.assemblies === null || state.publicIndex?.assemblies === undefined) {
+    return null;
+  }
   // Check if there is at least one ongoing assembly.
-  if (state.publicIndex.assemblies.length === 0) {
+  if (state.publicIndex?.assemblies?.length === 0) {
     return false;
   }
 

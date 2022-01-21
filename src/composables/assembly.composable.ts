@@ -1,19 +1,124 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
+import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { ref, readonly } from 'vue';
+import { useStore } from 'vuex';
+
+const oauthEmitter = useOAuthEmitter();
+const { userid } = usePKCEComposable();
 const assemblyIdentifier = ref<string | null>(null);
 const stageID = ref<number | null>(null);
 
+
 export default function useAssemblyComposable() {
+  const store = useStore();
+
+  const initialize = () => {
+    oauthEmitter.on('AfterLogin', () => {
+      clearSession();
+      syncUserAssembly();
+      setSyncIntervall();
+    });
+    oauthEmitter.on('RecycleLogin', () => {
+      syncUserAssembly();
+      setSyncIntervall();
+    });
+
+    // INITIAL SYNC of Public Assembly (no authentication needed)
+    syncPublicAssembly();
+  };
+
+  const syncPublicAssembly = () => {
+    // console.log('syncAssembliesSync...')
+    // sync public assembly...
+    store.dispatch('publicindexstore/syncPublicIndex');
+  };
+
+  const syncUserAssembly = () => {
+    // console.log('syncAssembliesSync...')
+    // sync public assembly...
+    if (assemblyIdentifier.value && userid.value) {
+      store.dispatch('assemblystore/syncAssembly', {
+        oauthUserID: userid.value,
+        assemblyIdentifier: assemblyIdentifier.value,
+      });
+    }
+  };
+
+  const setSyncIntervall = () => {
+    // CREATE INTERVALL TO KEEP IN SYNC ASSEMBLY
+    const intervallString: string = process.env
+      .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+      ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+      : '60';
+    const intervall = (parseInt(intervallString) + 5) * 1000;
+    // console.log(intervall);
+    setInterval(() => {
+      // INTERVALL SYNC
+      syncPublicAssembly();
+      syncUserAssembly();
+    }, intervall);
+  };
+
   const setAssemblyIdentifier = (identifier: string | null) =>
     (assemblyIdentifier.value = identifier);
 
   const setStageID = (id: number | null) => (stageID.value = id);
 
+  const clearSession = () => {
+    setStageID(null);
+    setAssemblyIdentifier(null);
+  };
+
+  //     /**
+  //      * Clear all the data, that is linked to a certain user. => performed at logout
+  //      */
+  //     this.$root.clearUserData = () => {
+  //       this.$root.clearSession()
+  //       this.clearUserData()
+  //     }
+
+  //     this.$root.getAssemblyHomeRoute = (assembly) => {
+  //       // console.log("get assembly route ", assembly)
+  //       if (!assembly) {
+  //         return ({
+  //           name: 'home',
+  //         })
+
+  //       }
+  //       return ({
+  //         name: assembly.type,
+  //         params: { assemblyIdentifier: assembly.identifier }
+  //       })
+  //     }
+
+  //     this.$root.getAssemblyManageRoute = (assembly) => {
+  //       return ({
+  //         name: 'assembly_manage',
+  //         params: {
+  //           assemblyIdentifier: assembly.identifier
+  //         }
+  //       })
+  //     }
+
+  //     this.$root.gotoAssemblyManage = (assembly) => {
+  //       var route = this.$root.getAssemblyManageRoute(assembly);
+  //       this.$pushR(route)
+  //     }
+
+  //     this.$root.gotoAssemblyHome = (assembly) => {
+
+  //       var route = this.$root.getAssemblyHomeRoute(assembly);
+  //       this.$pushR(route)
+  //     }
+
   return {
+    clearSession,
+    initialize,
     assemblyIdentifier: readonly(assemblyIdentifier),
     setAssemblyIdentifier,
     stageID,
-    setStageID
+    setStageID,
   };
 }
 

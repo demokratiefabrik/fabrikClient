@@ -151,10 +151,6 @@ export default function useXHR() {
 
   const oauthEmitter = useOAuthEmitter();
 
-  // if (!authComposable) {
-  //   authComposable = useAuthComposable();
-  // }
-
   //--- Authorization Header ---
   // ---------------------------
 
@@ -179,7 +175,7 @@ export default function useXHR() {
    */
   const removeHeader = () => {
     axios.defaults.headers.common = {};
-    console.log('Remove axios header');
+    // console.log('Remove axios header');
   };
 
   /**

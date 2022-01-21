@@ -83,7 +83,6 @@ const jwt = computed(() => {
 });
 
 const brokenSession = ref<boolean>(false);
-
 const appExitState = ref<boolean>(false); // set to true, if app is shutting down (no oauth error message is sent any more...)
 
 const authorized = computed(() => {
@@ -281,17 +280,20 @@ export default function usePKCEComposable() {
       localAccessToken = (await pkce.value.getAccessToken()) as IAccessToken;
       // console.log('DEBUG: PKCE --- localAccessToken', !!localAccessToken)
     } catch (error) {
-      console.error('DEBUG: PKCE --- Not logged in, right?', error);
+      // console.log('DEBUG: PKCE --- Not logged in, right?', error);
+      Promise.resolve();
     }
 
     // NOTIFY APP That Token is available...
     // console.log('DEBUG: PKCE --- EVERYTHING LOADED, ',jwt, '---> notify');
     oauthEmitter.emit('TokenChanges', localAccessToken?.token);
     oauthEmitter.emit('AfterTokenChanged', localAccessToken?.token);
-    
+    // console.log('----------emit AfterLogin???', hasAuthCode)
     // console.log(jwt, 'DEBUG: PKCE --- ......after notificaiton...', hasAuthCode);
     if (hasAuthCode) {
       oauthEmitter.emit('AfterLogin');
+    }else{
+      oauthEmitter.emit('RecycleLogin');
     }
   };
 

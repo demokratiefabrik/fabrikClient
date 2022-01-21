@@ -86,11 +86,11 @@
     </template>
 
     <!-- ACCOUNT DROPDOWN -->
-    <button @click="loginToCurrentPage" v-if="!authorized">Login</button>
+    <!-- <button @click="loginToCurrentPage" v-if="!authorized">Login</button> -->
     
     <q-btn-dropdown stretch flat v-if="authorized">
       <template v-slot:label>
-        <UserAvatar :profile="public_profile" menu="true"></UserAvatar>
+        <UserAvatar :profile="profile" menu="true"></UserAvatar>
       </template>
       <q-list class="z-max">
         <q-item>
@@ -164,7 +164,7 @@ export default defineComponent({
       authorized,
       getUsernameDerivation,
       payload,
-      loginToCurrentPage,
+      // loginToCurrentPage,
     } = useAuthComposable();
     return {
       setHeaderOffset,
@@ -174,7 +174,7 @@ export default defineComponent({
       authorized,
       payload,
       getUsernameDerivation,
-      loginToCurrentPage,
+      // loginToCurrentPage,
     };
   },
 
@@ -218,13 +218,13 @@ export default defineComponent({
     },
 
     username_derivation: function () {
-      return this.getUsernameDerivation(this.public_profile);
+      return this.getUsernameDerivation(this.profile);
     },
 
     ...mapGetters({
-      public_profile: 'profilestore/public_profile',
-      UsersDelegateAssemblies: 'publicindexstore/UsersDelegateAssemblies',
+      profile: 'profilestore/profile',
       is_in_testing_phase: 'profilestore/is_in_testing_phase',
+      UsersDelegateAssemblies: 'publicindexstore/UsersDelegateAssemblies',
       assemblyName: 'assemblystore/assemblyName',
       assembly: 'assemblystore/assembly',
     }),

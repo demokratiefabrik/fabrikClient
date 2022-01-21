@@ -165,12 +165,12 @@ export default defineComponent({
 
   computed: {
     username_derivation(): string {
-      if (!this.public_profile) {
+      if (!this.profile) {
         return '';
       }
-      const altitude = this.public_profile.ALT;
-      const fullname = this.public_profile.FN;
-      const canton = this.public_profile.CA;
+      const altitude = this.profile.ALT;
+      const fullname = this.profile.FN;
+      const canton = this.profile.CA;
       return this.$t('auth.name_derivation', {
         fullname: fullname,
         canton: canton,
@@ -179,7 +179,7 @@ export default defineComponent({
     },
 
     ...mapGetters({
-      public_profile: 'profilestore/public_profile',
+      profile: 'profilestore/profile',
     }),
 
     isEnabledSubmitButton(): boolean {
@@ -247,7 +247,7 @@ export default defineComponent({
     },
 
     loadProfile: function () {
-      if (!this.public_profile) {
+      if (!this.profile) {
         
         // Error
         const message = this.$t('auth.profile_load_error');
@@ -262,7 +262,7 @@ export default defineComponent({
       }
 
       // Get Username from the JWT token
-      this.profile.pseudonym = this.public_profile.U;
+      this.profile.pseudonym = this.profile.U;
 
       // Get Email from oauth server
       api
@@ -341,7 +341,7 @@ export default defineComponent({
   },
 
   watch: {
-    public_profile() {
+    profile() {
       // public profile changed
       this.loadProfile();
     },

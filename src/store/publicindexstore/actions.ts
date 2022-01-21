@@ -1,7 +1,6 @@
 import api from 'src/utils/api';
 
 export const syncPublicIndex = ({ state, dispatch }) => {
-  // console.log("...is public index in sync?")
   if (state.publicIndex === null || state.publicIndex === undefined) {
     // no cached version exists: load the data from resource server...
     console.log('...public Index cache is empty');
@@ -9,6 +8,7 @@ export const syncPublicIndex = ({ state, dispatch }) => {
     return null;
   }
 
+  // console.log('...is public index in sync?', state.publicIndex)
   // renew cache all x- minutes
   const expired = api.expiredCacheDate(state.publicIndex.access_date);
   if (expired) {

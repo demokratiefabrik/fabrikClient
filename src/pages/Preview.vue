@@ -8,21 +8,23 @@
       />
 
       <!-- ASSEMBLY DESCRIPTION -->
-      <h1 class="q-mt-none">Willkommen in der Demokratiefabrik!</h1>
-      <p>Die Demokratiefabrik ist ein neuer Ort für politische Online-Beteiligung. Der nächste Event findet im August/September 2022 auf dieser Platform statt.</p>
-    
+      <span v-if="ongoing_assemblies?.length">
+        <h1 class="q-mt-none">{{ ongoing_assemblies[0].title }}</h1>
+        <p v-dompurify-html="ongoing_assemblies[0].background" />
+      </span>
+
       <br />
       <div class="justify-center center;" style="max-width: 470px">
         <!-- displayMode="all" -->
         <ArtificialModeration
-          :AM="AMs.indexpage_left"
+          :AM="AMs.indexongoing_left"
           :fixedActor="2"
           :slim="true"
           alignment="left"
           :ctx="that"
         />
         <ArtificialModeration
-          :AM="AMs.indexpage_right"
+          :AM="AMs.indexongoing_right"
           :fixedActor="1"
           alignment="right"
           :ctx="that"
@@ -31,8 +33,9 @@
       <br />
       <div class="q-mt-xl">
         <p>
-          Möchten Sie mehr über die Plattform und unsere aktuellen Projekte erfahren?
-          Dann besuchen Sie den Bereich <router-link :to="{ name: 'background' }">Hintergrund</router-link>.
+          Möchten Sie mehr über die Plattform oder das Könizer Projekt erfahren?
+          Dann besuchen Sie unsere Seite
+          <router-link :to="{ name: 'background' }">Hintergrund</router-link>.
           <!-- Mehr Informationen über die Online-Wahlhilfe smartvote finden Sie auf <a
             href='https://www.smartvote.ch/de/wiki/faq-2'
             target="_blank"
@@ -56,9 +59,10 @@ export default defineComponent({
 
   setup() {
     // console.log('DEBUG: INDEX:VUE');
-    const { authorized, profile } = useAuthComposable();
+    const { authorized, profile, loginToCurrentPage } = useAuthComposable();
     return {
       authorized,
+      loginToCurrentPage,
       profile,
       ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE,
     };
