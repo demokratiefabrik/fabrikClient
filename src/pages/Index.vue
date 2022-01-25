@@ -9,9 +9,8 @@
       <!-- ASSEMBLY DESCRIPTION -->
       <h1 class="q-mt-none">Willkommen in der Demokratiefabrik!</h1>
       <p>
-        Die Demokratiefabrik ist ein neuer Ort für politische
-        Online-Beteiligung. Der nächste Event findet im August/September 2022
-        auf dieser Platform statt.
+        Die Demokratiefabrik ist ein neuer Ort für demokratische
+        Online-Beteiligung. Der nächste Event auf dieser Plattform findet im August/September 2022 statt.
       </p>
 
       <br />
