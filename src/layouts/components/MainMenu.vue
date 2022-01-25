@@ -87,7 +87,7 @@
 
     <!-- ACCOUNT DROPDOWN -->
     <!-- <button @click="loginToCurrentPage" v-if="!authorized">Login</button> -->
-    
+
     <q-btn-dropdown stretch flat v-if="authorized">
       <template v-slot:label>
         <UserAvatar :profile="profile" menu="true"></UserAvatar>
@@ -163,7 +163,7 @@ export default defineComponent({
       logout,
       authorized,
       getUsernameDerivation,
-      payload,
+      // payload,
       // loginToCurrentPage,
     } = useAuthComposable();
     return {
@@ -172,7 +172,7 @@ export default defineComponent({
       pushR,
       gotoProfile,
       authorized,
-      payload,
+      // payload,
       getUsernameDerivation,
       // loginToCurrentPage,
     };

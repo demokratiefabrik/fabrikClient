@@ -6,11 +6,14 @@
         :src="`layout/logodemokratiefabrik.png`"
         class="q-mb-xl"
       />
-
       <!-- ASSEMBLY DESCRIPTION -->
       <h1 class="q-mt-none">Willkommen in der Demokratiefabrik!</h1>
-      <p>Die Demokratiefabrik ist ein neuer Ort für politische Online-Beteiligung. Der nächste Event findet im August/September 2022 auf dieser Platform statt.</p>
-    
+      <p>
+        Die Demokratiefabrik ist ein neuer Ort für politische
+        Online-Beteiligung. Der nächste Event findet im August/September 2022
+        auf dieser Platform statt.
+      </p>
+
       <br />
       <div class="justify-center center;" style="max-width: 470px">
         <!-- displayMode="all" -->
@@ -31,8 +34,9 @@
       <br />
       <div class="q-mt-xl">
         <p>
-          Möchten Sie mehr über die Plattform und unsere aktuellen Projekte erfahren?
-          Dann besuchen Sie den Bereich <router-link :to="{ name: 'background' }">Hintergrund</router-link>.
+          Möchten Sie mehr über die Plattform und unsere aktuellen Projekte
+          erfahren? Dann besuchen Sie den Bereich
+          <router-link :to="{ name: 'background' }">Hintergrund</router-link>.
           <!-- Mehr Informationen über die Online-Wahlhilfe smartvote finden Sie auf <a
             href='https://www.smartvote.ch/de/wiki/faq-2'
             target="_blank"

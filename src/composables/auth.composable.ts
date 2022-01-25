@@ -172,9 +172,9 @@ export default function useAuthComposable() {
   // ------------------------
 
   const profile = computed(() => {
-    return store.state.profilestore.profile
+    return store.state.profilestore.profile;
   });
-    
+
   const getUsername = (profile) => (profile ? profile.U : 'Anonymous');
   const getUsernameDerivation = (
     profile,
@@ -207,7 +207,7 @@ export default function useAuthComposable() {
     }
   };
 
-  const markEmailAsAvailable = (): void => {
+  const markIndicatedEmail = (): void => {
     emailIsAvailable.value = true;
   };
 
@@ -232,7 +232,7 @@ export default function useAuthComposable() {
 
   return {
     initialize,
-    
+
     // PKCE
     logoutState: readonly(logoutState),
     setLogoutState,
@@ -249,6 +249,6 @@ export default function useAuthComposable() {
     profile,
     getUsernameDerivation,
     getUsername,
-    markEmailAsAvailable,
+    markIndicatedEmail,
   };
 }

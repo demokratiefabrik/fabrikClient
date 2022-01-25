@@ -50,7 +50,7 @@
           text-color="primary"
           class="bg-white cursor-pointer q-mt-md"
           clickable
-          @click="authComposable.loginToCurrentPage"
+          @click="loginToCurrentPage"
         >
           {{ $t('auth.goto_authentication_form') }}
         </q-chip>
@@ -75,7 +75,7 @@
           color="primary"
           text-color="primary"
           class="bg-white cursor-pointer q-mt-md"
-          @click="authComposable.logout()"
+          @click="logout()"
           clickable
         >
           {{ $t('auth.logout') }}
@@ -123,9 +123,9 @@ export default defineComponent({
   name: 'NotificationBanner',
 
   setup() {
-    const authComposable = useAuthComposable();
-    const {gotoHome, pushR, reload } = useRouterComposable();
-    
+    const { logout, loginToCurrentPage } = useAuthComposable();
+    const { gotoHome, pushR, reload } = useRouterComposable();
+
     const emitter = useEmitter();
     const notificationBanner = ref<null | INotificationBanner>(null);
     emitter.on('notificationBannerChange', (banner) => {
@@ -136,7 +136,14 @@ export default defineComponent({
         notificationBanner.value = null;
       }
     });
-    return { notificationBanner,authComposable, pushR, gotoHome, reload };
+    return {
+      notificationBanner,
+      logout,
+      loginToCurrentPage,
+      pushR,
+      gotoHome,
+      reload,
+    };
   },
 
   /**
@@ -158,7 +165,7 @@ export default defineComponent({
       // store.dispatch('appstore/monitorReset');
       // store.dispatch('assemblystore/deleteAssemblyStore');
       // window.location.reload();
-      this.reload()
+      this.reload();
     },
 
     notificationRedirect() {

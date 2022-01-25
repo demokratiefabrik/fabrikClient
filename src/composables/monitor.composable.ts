@@ -10,21 +10,23 @@ export default function useMonitorComposable() {
   const store = useStore();
   const assemblyComposable = useAssemblyComposable();
   const { authorized } = usePKCEComposable();
-  const $q = useQuasar()   
+  const $q = useQuasar();
   // ---------
-  
+
   const initialize = () => {
-    
     // Start periodic monitorLog Trigger
     // keep this interval low (much lower than the intervall number specified in env. files)
     // (e.g. 1 Min.)
     // console.log('*** START MONITOR ENGINE ***')
-    const intervallString: string = process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS : '60'
+    const intervallString: string = process.env
+      .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+      ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+      : '60';
     const intervall = parseInt(intervallString);
     setInterval(() => {
-      monitorFire()
-    }, intervall * 1000)
-  }
+      monitorFire();
+    }, intervall * 1000);
+  };
 
   // ---------
   const monitorLog = async (
@@ -55,9 +57,10 @@ export default function useMonitorComposable() {
     extra = {},
     onlyWhenTokenValid = false
   ) => {
-    if (!authorized) {
+    if (!authorized.value) {
       return null;
     }
+
     const data: Record<string, unknown> = {
       name: currentRoute.name,
       ...currentRoute.params,
@@ -76,12 +79,12 @@ export default function useMonitorComposable() {
     });
   };
 
-  const monitorContextData= () => {
+  const monitorContextData = () => {
     //send context data
     const data: Record<string, unknown> = { extra: $q.platform.is };
-    data.screenW = screen.width
+    data.screenW = screen.width;
     monitorLog(constants.MONITOR_CONTEXT, data);
-  }
+  };
 
   return {
     initialize,

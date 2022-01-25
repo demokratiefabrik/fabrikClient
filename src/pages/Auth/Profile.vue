@@ -140,10 +140,9 @@ export default defineComponent({
   },
 
   setup() {
-    const { payload, markEmailAsAvailable } = useAuthComposable();
+    const { payload, markIndicatedEmail } = useAuthComposable();
     // const q = useQuasar()
-    return { payload, markEmailAsAvailable };
-
+    return { payload, markIndicatedEmail };
   },
   components: { AlgorithmDisclaimer },
 
@@ -248,7 +247,6 @@ export default defineComponent({
 
     loadProfile: function () {
       if (!this.profile) {
-        
         // Error
         const message = this.$t('auth.profile_load_error');
         this.$q.notify({
@@ -256,7 +254,7 @@ export default defineComponent({
           message,
         });
 
-        this.error = true
+        this.error = true;
 
         return;
       }
@@ -273,13 +271,12 @@ export default defineComponent({
             this.profile.email = this.emailToSms(response.data.email);
             // this.profile.last_name = response.data.last_name;
             this.profile.original_email = this.emailToSms(response.data.email);
-            this.error = false
-
+            this.error = false;
           } else {
             // Error
             const message = this.$t('auth.profile_load_error');
-            this.error = true
-          this.error = true;
+            this.error = true;
+            this.error = true;
             this.$q.notify({
               type: 'nFabrikError',
               message,
@@ -310,7 +307,7 @@ export default defineComponent({
         let message = '';
         if (response.data.ok) {
           message = this.$t('auth.profile_update_success');
-          this.markEmailAsAvailable();
+          this.markIndicatedEmail();
           this.profile.original_email = this.profile.email;
         } else {
           message = this.$t('auth.profile_update_error');
@@ -345,6 +342,6 @@ export default defineComponent({
       // public profile changed
       this.loadProfile();
     },
-  }
+  },
 });
 </script>

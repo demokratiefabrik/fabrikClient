@@ -1,24 +1,19 @@
 <template>
-  <div
-    class="items-center text-overline"
-    style="display: inline-flex;"
-  >
+  <div class="items-center text-overline" style="display: inline-flex">
     <q-avatar
       icon="mdi-image-filter-hdr"
-      :style="{ 'background-color': profile ? profile.CO: 'inherit'}"
+      :style="{ 'background-color': profile ? profile.CO : 'inherit' }"
       :text-color="profile ? 'white' : 'primary'"
       class="q-mr-sm"
     >
     </q-avatar>
     <q-item-section>
-      <q-item-label
-        v-if="menu"
-        caption
-      >{{ $t('auth.registered_as') }}</q-item-label>
+      <q-item-label v-if="menu" caption>{{
+        $t('auth.registered_as')
+      }}</q-item-label>
       <q-item-label>
         {{ username }} <slot name="extrainfos"></slot>
       </q-item-label>
-
     </q-item-section>
   </div>
 </template>
@@ -34,10 +29,10 @@ export default defineComponent({
   setup() {
     // console.log('DEBUG setup mainLayout')
 
-    const authComposable = useAuthComposable();
+    const { getUsernameDerivation, getUsername } = useAuthComposable();
 
     // console.log('DEBUG setup mainLayout ends')
-    return { authComposable };
+    return { getUsernameDerivation, getUsername };
   },
 
   data() {
@@ -48,17 +43,17 @@ export default defineComponent({
 
   computed: {
     username(): string {
-      // TODO: 
+      // TODO:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       // return 'H. Mönch'
       // return profile ? profile.U : 'Anonymous';
-      return this.authComposable.getUsername(this.profile);
+      return this.getUsername(this.profile);
     },
 
     username_derivation: function () {
-      return this.authComposable.getUsernameDerivation(this.profile);
+      return this.getUsernameDerivation(this.profile);
     },
   },
 });

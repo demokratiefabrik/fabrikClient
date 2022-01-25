@@ -20,7 +20,6 @@
       </q-chip>
 
       <MainMenu />
-
     </q-header>
 
     <!-- CONTENT -->
@@ -28,8 +27,8 @@
       <router-view />
 
       <q-inner-loading :showing="loadingGifVisible" style="z-index: 100">
-        <q-spinner-dots size="50px" color="primary"/>
-         <!-- LABEL does not work with customized icon: label-style="font-size: 1.1em" label="loadingGifLabel" -->
+        <q-spinner-dots size="50px" color="primary" />
+        <!-- LABEL does not work with customized icon: label-style="font-size: 1.1em" label="loadingGifLabel" -->
       </q-inner-loading>
 
       <NotificationBanner />
@@ -49,7 +48,7 @@ import NotificationBanner from './components/NotificationBanner.vue';
 import { mapGetters } from 'vuex';
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
-import useAuthComposable from 'src/composables/auth.composable';
+// import useAuthComposable from 'src/composables/auth.composable';
 import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
@@ -65,7 +64,7 @@ export default defineComponent({
 
     const emitter = useEmitter();
     const store = useStore();
-    const authComposable = useAuthComposable();
+    // const authComposable = useAuthComposable();
     const { pushR, gotoHome } = useRouterComposable();
 
     // Loading Gif
@@ -76,22 +75,21 @@ export default defineComponent({
       // loadingGifLabel.value = stack[0];
     });
 
-
     // console.log('DEBUG setup mainLayout ends')
     return {
       emitter,
       store,
       gotoHome,
-      authComposable,
+      // authComposable,
       pushR,
-      loadingGifVisible
+      loadingGifVisible,
       // loadingGifLabel
     };
   },
 
   data() {
     return {
-      menuOffset: [0, 3] as number[]
+      menuOffset: [0, 3] as number[],
     };
   },
 
@@ -105,13 +103,12 @@ export default defineComponent({
       lightProfileColor: 'profilestore/lightProfileColor',
       IsManager: 'assemblystore/IsManager',
     }),
-  }
-
+  },
 });
 </script>
 <style scoped>
-.q-spinner{
+.q-spinner {
   position: absolute !important;
-  top: 50vw  !important;
+  top: 50vw !important;
 }
 </style>
