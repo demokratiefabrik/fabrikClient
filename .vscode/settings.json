@@ -3,5 +3,13 @@
   "vetur.format.enable": false,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "vetur.experimental.templateInterpolationService": true
+  "vetur.experimental.templateInterpolationService": true,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#510C54",
+    "titleBar.activeBackground": "#721076",
+    "titleBar.activeForeground": "#FEFBFE"
+  },
+  "i18n-ally.localesPaths": [
+    "src/i18n"
+  ]
 }
