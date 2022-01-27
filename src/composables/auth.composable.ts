@@ -23,7 +23,7 @@ const oauthEmitter = useOAuthEmitter();
 export default function useAuthComposable() {
   const router = useRouter();
   const currentRoute = useRoute();
-  const routerComposable = useRouterComposable();
+  const {pushR, gotoHome} = useRouterComposable();
   const monitorComposable = useMonitorComposable();
   const store = useStore();
   const { t } = useI18n();
@@ -39,12 +39,19 @@ export default function useAuthComposable() {
     oauthEmitter.on('RecycleLogin', () => {
       loadProfile();
     });
+    // oauthEmitter.on('AfterPayloadChanges', (_payload) => {
+    //   const payload = _payload  as IPayload | null
+    //   if (payload) {
+    //     console.log('!!!!!PAYLOAD CHANGES', payload?.roles)
+    //     store.dispatch('profilestore/storeOauthAcls', payload?.roles)
+    //   }
+    // });
 
     addRoutePermisionWatcher();
     const response = await pkce.initialize();
     return response;
   };
-
+  // oauthAcls
   const afterLogin = () => {
     // console.log('AFTER LOGIN, OAUTH EMITTER')
 
@@ -61,11 +68,11 @@ export default function useAuthComposable() {
       const destination_route = JSON.parse(desitionationRouteJson);
       if (destination_route) {
         localStorage.removeItem('oauth2authcodepkce-destination');
-        routerComposable.pushR(destination_route);
+        pushR(destination_route);
         return;
       }
     }
-    routerComposable.gotoHome();
+    gotoHome();
     setLogoutState(false);
   };
   // -------
@@ -93,6 +100,10 @@ export default function useAuthComposable() {
       onlyWhenTokenValid: true,
     });
 
+    // clear user data...
+    store.dispatch('clearUserData')
+
+    // logout pkce
     pkce.logout(silent);
   };
 
@@ -166,13 +177,13 @@ export default function useAuthComposable() {
       }
     }
   };
-  // -------
 
+
+  // -------
   // PROFILE METHODS
   // ------------------------
-
   const profile = computed(() => {
-    return store.state.profilestore.profile;
+    return store.state.profilestore.profile.user;
   });
 
   const getUsername = (profile) => (profile ? profile.U : 'Anonymous');
@@ -221,13 +232,6 @@ export default function useAuthComposable() {
         oauthUserEmail: payload.value.userEmail,
       });
     }
-    // NOT NEEDED, RIGHT?
-    //       // console.log("on ProfileLoaded")
-    // // is email already set: if not => redirect to userprofile...
-    // store.dispatch('profilestore/setUsernameDerivate', {
-    //   usernameDerivate: usernameDerivate()
-    // })
-    // }
   };
 
   return {

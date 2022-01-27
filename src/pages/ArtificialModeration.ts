@@ -1,5 +1,4 @@
 const AMs = {
-
   indexpage_left: {
     id: 'indexpage_left',
     prosa: ' Erster AM: Begrüsst die Leute auf der Webseite.',
@@ -33,34 +32,9 @@ const AMs = {
       },
     ],
 
-    buttons: [
-      {
-        condition: (ctx) =>
-          ctx.authorized && ctx.IsUserDelegateOfOngoingAssembly,
-        action: (ctx) =>
-          ctx.$root.gotoAssemblyHome(ctx.UsersDelegateAssemblies[0]),
-        label: () => 'Zur Könizer Demokratiefabrik, bitte!',
-      },
-      {
-        condition: (ctx) =>
-          ctx.authorized &&
-          ctx.IsUserObserverOfOngoingAssembly &&
-          !ctx.IsUserDelegateOfOngoingAssembly &&
-          !ctx.UsersManagerAssemblies?.length,
-        action: (ctx) =>
-          ctx.$root.gotoAssemblyHome(ctx.UsersObserverAssemblies[0]),
-        label: () => 'Eintreten als Beobachter',
-      },
-      {
-        condition: (ctx) =>
-          ctx.authorized && ctx.UsersManagerAssemblies?.length > 0,
-        action: (ctx) =>
-          ctx.$root.gotoAssemblyManage(ctx.UsersManagerAssemblies[0]),
-        label: () => 'Verwaltung',
-      },
-    ],
   },
 
+  // PREVIEW PAGE
   indexongoing_left: {
     id: 'indexpage_left',
     prosa: ' Erster AM: Begrüsst die Leute auf der Webseite.',
@@ -83,9 +57,9 @@ const AMs = {
         id: 4,
         prosa: 'ctx.authorized: LONGTERM!',
         condition: (ctx) =>
-          ctx.authorized && ctx.profile && 
-          ctx.$filters.minutesSince(ctx.profile.date_created) >
-            60,
+          ctx.authorized &&
+          ctx.profile &&
+          ctx.$filters.minutesSince(ctx.profile.date_created) > 60,
         body: (ctx) =>
           `Herzlich willkommen zurück, ${ctx.profile.U}! Es freut uns, dass Sie wieder hier sind!`,
       },
@@ -93,9 +67,9 @@ const AMs = {
         id: 5,
         prosa: 'ctx.authorized: FIRST HOUR!',
         condition: (ctx) =>
-          ctx.authorized && ctx.profile &&
-          ctx.$filters.minutesSince(ctx.profile.date_created) <=
-            60,
+          ctx.authorized &&
+          ctx.profile &&
+          ctx.$filters.minutesSince(ctx.profile.date_created) <= 60,
         body: (ctx) => {
           return [
             'Herzlich willkommen!',
@@ -124,7 +98,6 @@ const AMs = {
       //   condition: (ctx) => !ctx.authorized && ctx.IsThereAnAssemblyOngoing,
       //   body: (ctx) => {
       //     return [
-      //       // `Es findet in diesen Tagen die Könizer Online-Versammlung statt.`,
       //       `Am 14. Juni geht es los. Wir halten Sie hier auf dem Laufenden.`
       //     ]
       //   }
@@ -147,8 +120,8 @@ const AMs = {
           {
             condition: (ctx) => !ctx.authorized && ctx.IsThereAnAssemblyOngoing,
             action: (ctx) => ctx.loginToCurrentPage(),
-            // action: (ctx) => ctx.login(ctx.$root.getAssemblyHomeRoute(ctx.ongoing_assemblies[0])),
-            label: () => 'Zum login der Könizer Demokratiefabrik',
+            // action: (ctx) => ctx.login(ctx.getAssemblyHomeRoute(ctx.ongoing_assemblies[0])),
+            label: () => 'Zum Login der Demokratiefabrik',
           },
         ],
       },
@@ -158,10 +131,9 @@ const AMs = {
           ctx.authorized && ctx.IsUserDelegateOfOngoingAssembly,
         body: (ctx) => {
           const firstDay =
-            ctx.profile && ctx.profile &&
-            ctx.$filters.minutesSince(
-              ctx.profile.date_created
-            ) <= 60;
+            ctx.profile &&
+            ctx.profile &&
+            ctx.$filters.minutesSince(ctx.profile.date_created) <= 60;
           return [
             firstDay
               ? 'Wir freuen uns sehr, dass Sie hier sind! Ist es für Sie in Ordnung, wenn wir gleich starten?'
@@ -202,8 +174,13 @@ const AMs = {
         condition: (ctx) =>
           ctx.authorized && ctx.IsUserDelegateOfOngoingAssembly,
         action: (ctx) =>
-          ctx.$root.gotoAssemblyHome(ctx.UsersDelegateAssemblies[0]),
-        label: () => 'Zur Könizer Demokratiefabrik, bitte!',
+          ctx.gotoAssemblyHome(ctx.UsersDelegateAssemblies[0]),
+        label: (ctx) =>
+          ctx.$t('assembly.goto_button_label_f', {
+            label: ctx.UsersDelegateAssemblies[0].title,
+          }),
+
+        // label: () => 'Zur Könizer Demokratiefabrik, bitte!',
       },
       {
         condition: (ctx) =>
@@ -212,7 +189,7 @@ const AMs = {
           !ctx.IsUserDelegateOfOngoingAssembly &&
           !ctx.UsersManagerAssemblies?.length,
         action: (ctx) =>
-          ctx.$root.gotoAssemblyHome(ctx.UsersObserverAssemblies[0]),
+          ctx.gotoAssemblyHome(ctx.UsersObserverAssemblies[0]),
         label: () => 'Eintreten als Beobachter',
       },
       {
@@ -255,7 +232,7 @@ const AMs = {
     //   },
     //   {
     //     condition: (ctx) => ctx.authorized && ctx.IsUserDelegateOfOngoingAssembly,
-    //     action: (ctx) => ctx.$root.gotoAssemblyHome(ctx.UsersDelegateAssemblies[0]),
+    //     action: (ctx) => ctx.gotoAssemblyHome(ctx.UsersDelegateAssemblies[0]),
     //     label: () => 'Zur Könizer Demokratiefabrik, bitte!'
     //   },
 

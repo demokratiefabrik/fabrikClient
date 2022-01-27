@@ -1,17 +1,19 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
+import { RouteRecordRaw, LocationAsRelativeRaw} from 'vue-router';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { ref, readonly } from 'vue';
 import { useStore } from 'vuex';
+import useRouterComposable from './router.composable';
 
 const oauthEmitter = useOAuthEmitter();
 const { userid } = usePKCEComposable();
 const assemblyIdentifier = ref<string | null>(null);
 const stageID = ref<number | null>(null);
 
-
 export default function useAssemblyComposable() {
   const store = useStore();
+  const { pushR } = useRouterComposable();
 
   const initialize = () => {
     oauthEmitter.on('AfterLogin', () => {
@@ -70,26 +72,44 @@ export default function useAssemblyComposable() {
     setAssemblyIdentifier(null);
   };
 
+  const getAssemblyHomeRoute = (assembly): RouteRecordRaw | LocationAsRelativeRaw => {
+    if (!assembly) {
+      return {
+        name: 'home',
+      } as RouteRecordRaw;
+    }
+
+    return {
+      name: assembly.type,
+      params: { assemblyIdentifier: assembly.identifier}
+    } as LocationAsRelativeRaw;
+  };
+
+
+  const gotoAssemblyHome = (assembly) => {
+    const route = getAssemblyHomeRoute(assembly);
+    pushR(route);
+  };
+
+  return {
+    clearSession,
+    gotoAssemblyHome,
+    initialize,
+    assemblyIdentifier: readonly(assemblyIdentifier),
+    setAssemblyIdentifier,
+    stageID,
+    setStageID,
+  };
+}
+
+
+
   //     /**
   //      * Clear all the data, that is linked to a certain user. => performed at logout
   //      */
   //     this.$root.clearUserData = () => {
   //       this.$root.clearSession()
   //       this.clearUserData()
-  //     }
-
-  //     this.$root.getAssemblyHomeRoute = (assembly) => {
-  //       // console.log("get assembly route ", assembly)
-  //       if (!assembly) {
-  //         return ({
-  //           name: 'home',
-  //         })
-
-  //       }
-  //       return ({
-  //         name: assembly.type,
-  //         params: { assemblyIdentifier: assembly.identifier }
-  //       })
   //     }
 
   //     this.$root.getAssemblyManageRoute = (assembly) => {
@@ -106,21 +126,6 @@ export default function useAssemblyComposable() {
   //       this.$pushR(route)
   //     }
 
-  //     this.$root.gotoAssemblyHome = (assembly) => {
-
-  //       var route = this.$root.getAssemblyHomeRoute(assembly);
-  //       this.$pushR(route)
-  //     }
-
-  return {
-    clearSession,
-    initialize,
-    assemblyIdentifier: readonly(assemblyIdentifier),
-    setAssemblyIdentifier,
-    stageID,
-    setStageID,
-  };
-}
 
 // applyCssVarProfileColor(): Record<string, unknown> {
 //   // This code apply writes the profile color into the css variable profilecolor.
@@ -204,7 +209,7 @@ export default function useAssemblyComposable() {
 // <!-- Left-Align: Small PAges -->
 // <!-- <q-toolbar-title
 //   v-if="$q.screen.lt.md && assemblyName"
-//   @click="$root.gotoAssemblyHome(assembly)"
+//   @click="gotoAssemblyHome(assembly)"
 //   class="cursor-pointer"
 //   style=" font-weight:400"
 // >

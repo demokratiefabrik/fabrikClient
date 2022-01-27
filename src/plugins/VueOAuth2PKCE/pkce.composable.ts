@@ -146,8 +146,9 @@ export default function usePKCEComposable() {
     // TOKEN REFRESH ENDS: Notify the computed properties
     const accessTokenPartial = pkce.value.state
       ?.accessToken as IAccessTokenPartial;
-    oauthEmitter.emit('TokenChanges', accessTokenPartial);
-    oauthEmitter.emit('AfterTokenChanged', accessTokenPartial);
+    oauthEmitter.emit('AccessTokenChanges', accessTokenPartial);
+    // console.log('accessTokenChanges', accessTokenPartial)
+    // oauthEmitter.emit('AfterPayloadChanges', payload.value);
     setOngoingTokenRefresh(false);
   };
 
@@ -235,7 +236,8 @@ export default function usePKCEComposable() {
       pkce.value.reset();
       pkce.value.setState({});
       accessToken.value = null;
-      oauthEmitter.emit('AfterTokenChanged', null);
+      oauthEmitter.emit('AccessTokenChanged', null);
+      // oauthEmitter.emit('AfterPayloadChanges', null);
       if (!silent) {
         oauthEmitter.emit('AfterLogout');
       }
@@ -245,7 +247,7 @@ export default function usePKCEComposable() {
   // SHOULD BE RUN ONLY ONCE...
   const initialize = async (): Promise<void> => {
     // Subsribe Event Listener(s)
-    oauthEmitter.on('TokenChanges', (localAccessTokenPartial) => {
+    oauthEmitter.on('AccessTokenChanges', (localAccessTokenPartial) => {
       if (localAccessTokenPartial && accessToken.value) {
         accessToken.value.token =
           localAccessTokenPartial as IAccessTokenPartial;
@@ -287,11 +289,7 @@ export default function usePKCEComposable() {
     }
 
     // NOTIFY APP That Token is available...
-    // console.log('DEBUG: PKCE --- EVERYTHING LOADED, ',jwt, '---> notify');
-    oauthEmitter.emit('TokenChanges', localAccessToken?.token);
-    oauthEmitter.emit('AfterTokenChanged', localAccessToken?.token);
-    // console.log('----------emit AfterLogin???', hasAuthCode)
-    // console.log(jwt, 'DEBUG: PKCE --- ......after notificaiton...', hasAuthCode);
+    oauthEmitter.emit('AccessTokenChanges', localAccessToken?.token);
     if (hasAuthCode) {
       oauthEmitter.emit('AfterLogin');
     }else{

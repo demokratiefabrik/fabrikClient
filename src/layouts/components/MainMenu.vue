@@ -17,7 +17,7 @@
     <!-- Left-Align: Small PAges -->
     <!-- <q-toolbar-title
       v-if="$q.screen.lt.md && assemblyName"
-      @click="$root.gotoAssemblyHome(assembly)"
+      @click="gotoAssemblyHome(assembly)"
       class="cursor-pointer"
       style=" font-weight:400"
     >
@@ -31,7 +31,7 @@
     <!-- v-if="$q.screen.gt.sm && assemblyName" -->
 
     <!-- TODO uncomment-->
-    <!-- @click="$root.gotoAssemblyHome(assembly)" -->
+    <!-- @click="gotoAssemblyHome(assembly)" -->
     <q-toolbar-title
       shrink
       v-if="$q.screen.gt.sm && assemblyName"
@@ -113,19 +113,6 @@
           </q-item-section>
         </q-item>
 
-        <!-- <q-item
-          clickable
-          v-if="authorized && UsersDelegateAssemblies"
-          :class="'profile'==currentRoute ? 'dropdownSelected' : ''"
-          @click="$root.gotoAssemblyHome(UsersDelegateAssemblies[0])"
-          v-close-popup
-        >
-          <q-item-section>
-            <q-item-label>Eingang</q-item-label>
-            <q-item-label caption>Zur Könizer Demokratiefabrik</q-item-label>
-          </q-item-section>
-        </q-item> -->
-
         <q-item @click="logout()" clickable class="" v-close-popup>
           <q-item-section v-if="authorized">
             <q-item-label>{{ $t('auth.logout') }}</q-item-label>
@@ -145,7 +132,7 @@ import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
 import Notifications from './Notifications.vue';
 import UserAvatar from 'src/components/UserAvatar.vue';
-import { RouteRecordRaw } from 'vue-router';
+import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'MainMenu',
@@ -188,15 +175,15 @@ export default defineComponent({
       menu: [
         {
           text: 'Startseite',
-          to: { name: 'home' } as RouteRecordRaw,
+          to: { name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw,
         },
         {
           text: 'News',
-          to: { name: 'news' } as RouteRecordRaw,
+          to: { name: 'news' } as RouteRecordRaw | LocationAsRelativeRaw,
         },
         {
           text: 'Hintergrund',
-          to: { name: 'background' } as RouteRecordRaw,
+          to: { name: 'background' } as RouteRecordRaw | LocationAsRelativeRaw,
         },
       ],
     };

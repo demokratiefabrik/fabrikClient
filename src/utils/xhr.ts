@@ -304,7 +304,7 @@ export default function useXHR() {
   };
 
   // Subscribe to token changes...
-  oauthEmitter.on('TokenChanges', (localAccessTokenPartial) => {
+  oauthEmitter.on('AccessTokenChanges', (localAccessTokenPartial) => {
     const accessTokenPartial = localAccessTokenPartial as IAccessTokenPartial
     const jwt = accessTokenPartial?.value
     if (jwt && typeof jwt === 'string') {

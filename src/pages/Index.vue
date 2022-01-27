@@ -53,6 +53,7 @@ import useAuthComposable from 'src/composables/auth.composable';
 import AMs from 'src/pages/ArtificialModeration';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import { mapGetters } from 'vuex';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   name: 'PageIndex',
@@ -60,9 +61,11 @@ export default defineComponent({
   setup() {
     // console.log('DEBUG: INDEX:VUE');
     const { authorized, profile } = useAuthComposable();
+    const { gotoAssemblyHome } = useAssemblyComposable();
     return {
       authorized,
       profile,
+      gotoAssemblyHome,
       ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE,
     };
   },

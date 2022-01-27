@@ -39,14 +39,14 @@ export const  randomLocalStorageSeed = (state) => {
   }
 
  export const  oauthAcls = (state: any) => {
-    console.log('get acls transmitted via JWT token')
     return (state.oauthAcls)
   }
 
- export const translateOauthAcls = (state, getters) => (assemblyIdentifier) => {
+ export const translateOauthAcls = () => (assemblyIdentifier) => {
 
-    const roles = getters.oauthAcls
-    if (!roles) {
+    const {payload} = usePKCEComposable()
+    const roles = payload.value?.roles
+    if (!roles || !roles.length) {
       return []
     }
 
@@ -75,7 +75,6 @@ export const  randomLocalStorageSeed = (state) => {
       assemblyAcls.push('expert', 'observe')
     }
 
-    // TODO: Are visitors welcome within this assembly???
     const {authorized}  = usePKCEComposable()
     if (authorized) {
       assemblyAcls.push('observe')

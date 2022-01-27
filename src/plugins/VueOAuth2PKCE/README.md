@@ -67,15 +67,14 @@ Note: this ensures that not multiple renew-processes run simultaniously
 
 Lifecycle
 
-- **TokenChanges**: Is emitted eveytime, when token changes
-- **AfterTokenChanged**: Is emitted eveytime, after token has changed
+- **AccessTokenChanges**: Is emitted eveytime, when access token changes
 - **AfterLogin**: Is emitted after successfull Login processes
 - **AfterLogout**: Is emitted after the Logout processes
 
 **Hooking Example**
 
 ```
-useAuthEmitter.on('TokenChanges', jwt => {
+useAuthEmitter.on('AccessTokenChanges', jwt => {
   // Set Axios Authentication Header as soon as token is available
   if (jwt) {
     ApiService.setHeader(jwt)

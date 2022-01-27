@@ -4,13 +4,14 @@ import { date } from 'quasar'
 const { getDateDiff } = date
 const emitter = useEmitter()
 
-export const clearUserData = ({ dispatch, commit }) => {
+export const clearUserData = ({ dispatch }) => {
   /* resets the counter to zero */
+
   dispatch('monitorExit');
-  dispatch('profilestore/deleteProfile', { commit });
-  dispatch('contentstore/deleteContentStore', { commit });
-  dispatch('peerreviewstore/deletePeerreviewStore', { commit });
-  dispatch('assemblystore/deleteAssemblyStore', { commit });
+  dispatch('profilestore/deleteProfile',   null, { root: true });
+  dispatch('contenttreestore/deleteContentStore',  null, { root: true });
+  // dispatch('peerreviewstore/deletePeerreviewStore',  null,  { root: true });
+  dispatch('assemblystore/deleteAssemblyStore', null,   { root: true });
 };
 
 export const monitorSetup = ({ commit }) => {

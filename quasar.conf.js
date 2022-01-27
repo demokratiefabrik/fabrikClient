@@ -35,7 +35,6 @@ module.exports = configure(function (ctx) {
     boot: [
       'i18n',
       'quasar',
-      'events',
       'main',
       // 'auth',
     ],

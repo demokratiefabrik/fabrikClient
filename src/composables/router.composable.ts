@@ -1,7 +1,7 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
 // import { computed } from 'vue';
 import useEmitter from 'src/utils/emitter';
-import { useRouter, useRoute, RouteRecordRaw } from 'vue-router';
+import { useRouter, useRoute, RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
 import { ref } from 'vue';
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
@@ -22,7 +22,7 @@ export default function useRouterComposable() {
   // };
 
   /* Reload the page when redirecting to the same page */
-  const pushR = (route: RouteRecordRaw) => {
+  const pushR = (route: RouteRecordRaw | LocationAsRelativeRaw) => {
     // console.log(route, 'ROUTE in RESOLVE PUSHR');
     const target = router.resolve(route).href;
     // const currentRouteCleaned = ({ name: currentRoute.name, params: currentRoute.params }) as RouteLocationRaw;
@@ -38,7 +38,7 @@ export default function useRouterComposable() {
   };
 
   /* Dont do anything when redirecting to the same page */
-  const pushI = (route: RouteRecordRaw) => {
+  const pushI = (route: RouteRecordRaw | LocationAsRelativeRaw) => {
     const target = router.resolve(route).href;
     const current = router.resolve(currentRoute).href;
     if (target !== current) {
@@ -49,7 +49,7 @@ export default function useRouterComposable() {
   };
 
   const gotoHome = () => {
-    pushR({ name: 'home' } as RouteRecordRaw);
+    pushR({ name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw);
   };
 
   const gotoProfile = () => {
@@ -68,7 +68,7 @@ export default function useRouterComposable() {
     //   });
     // }
 
-    pushR({ name: 'profile' } as RouteRecordRaw);
+    pushR({ name: 'profile' } as RouteRecordRaw | LocationAsRelativeRaw);
   };
 
   //     // TODO: Monitor Route change

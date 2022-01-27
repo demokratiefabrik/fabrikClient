@@ -13,7 +13,6 @@
         <p v-dompurify-html="ongoing_assemblies[0].background" />
       </span>
 
-      <br />
       <div class="justify-center center;" style="max-width: 470px">
         <!-- displayMode="all" -->
         <ArtificialModeration
@@ -53,17 +52,21 @@ import useAuthComposable from 'src/composables/auth.composable';
 import AMs from 'src/pages/ArtificialModeration';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import { mapGetters } from 'vuex';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   name: 'PageIndex',
 
   setup() {
     // console.log('DEBUG: INDEX:VUE');
-    const { authorized, profile, loginToCurrentPage } = useAuthComposable();
+    const { authorized, profile, loginToCurrentPage, payload } = useAuthComposable();
+    const { gotoAssemblyHome } = useAssemblyComposable();
     return {
       authorized,
       loginToCurrentPage,
+      gotoAssemblyHome,
       profile,
+      payload,
       ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE,
     };
   },

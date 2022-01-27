@@ -64,6 +64,11 @@
       },
     },
   },
+  assembly: {
+    goto_button_label_f: 'Zur {label}',
+    goto_button_label_m: 'Zum {label}',
+    goto_button_label_n: 'Zum {label}',
+  },
   auth: {
     name_derivation: 'Ihr Namensgeber ist der {altitude} Meter hohe Berg "{fullname}" ({canton})',
     name_derivation_3rd_party: 'Der Namensgeber ist der {altitude} Meter hohe Berg "{fullname}" ({canton})',

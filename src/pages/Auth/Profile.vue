@@ -13,7 +13,7 @@
             Teilnehmende werden Sie unter diesem Namen ansprechen können.
             {{ username_derivation }}. <br />
             <br />
-            <q-input disable outlined v-model="profile.pseudonym" :dense="true">
+            <q-input disable outlined v-model="localprofile.pseudonym" :dense="true">
               <template v-slot:prepend>
                 <q-icon name="mdi-account" />
               </template>
@@ -23,7 +23,7 @@
           <p v-if="!loading && !error">
             <b>Kontaktangabe: </b>
             {{
-              this.profile.original_email
+              this.localprofile.original_email
                 ? 'Sie können hier Ihre Kontaktdaten ändern:'
                 : 'Bitte geben Sie Ihre E-Mail-Adresse ein:'
             }}
@@ -32,7 +32,7 @@
               :bg-color="isValidContact ? 'lime' : 'yellow'"
               outlined
               class="q-ma-sm"
-              v-model="profile.email"
+              v-model="localprofile.email"
               :dense="true"
             >
               <template v-slot:prepend>
@@ -62,8 +62,8 @@
 
       <q-btn
         color="primary"
-        :disabled="!profile.original_email"
-        v-if="!!this.profile.original_email"
+        :disabled="!localprofile.original_email"
+        v-if="!!this.localprofile.original_email"
         outline
         :label="$t('app.btn_close')"
         @click="skipProfile"
@@ -96,7 +96,7 @@
             dense
             input-style="font-size:1.5em"
             readonly
-            v-model="profile.email"
+            v-model="localprofile.email"
             autofocus
           />
           <!-- @keyup.enter="prompt = false" -->
@@ -128,20 +128,19 @@ import { mapGetters } from 'vuex';
 import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
 import useAuthComposable from 'src/composables/auth.composable';
 import { PropType, defineComponent } from 'vue';
-import { RouteRecordRaw } from 'vue-router';
+import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'Profile',
   props: {
     destination_route: {
       // right, left, center
-      type: Object as PropType<RouteRecordRaw>,
+      type: Object as PropType<RouteRecordRaw | LocationAsRelativeRaw>,
     },
   },
 
   setup() {
     const { payload, markIndicatedEmail } = useAuthComposable();
-    // const q = useQuasar()
     return { payload, markIndicatedEmail };
   },
   components: { AlgorithmDisclaimer },
@@ -149,7 +148,7 @@ export default defineComponent({
   data() {
     return {
       confirmation: false,
-      profile: {
+      localprofile: {
         pseudonym: '',
         email: '',
         original_email: '',
@@ -192,37 +191,37 @@ export default defineComponent({
     isPhone(): boolean {
       // does not contain any alphas
       const emailPattern = /^[^a-zA-Z]+$/;
-      if (this.profile.email) {
+      if (this.localprofile.email) {
         return false;
       }
-      return emailPattern.test(this.profile.email);
+      return emailPattern.test(this.localprofile.email);
     },
 
     isValidEmail(): boolean {
       const emailPattern =
         /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-      if (this.profile.email) {
+      if (this.localprofile.email) {
         return false;
       }
-      return emailPattern.test(this.profile.email.trim());
+      return emailPattern.test(this.localprofile.email.trim());
     },
 
     isValidPhone(): boolean {
       const phonePatternSwiss =
         /(\b(0041|0)|\B\+41)(\s?\(0\))?(\s)?([1-9]{2}|77[1-9]{1})(\s)?[0-9]{3}(\s)?[0-9]{2}(\s)?[0-9]{2}\b$/;
-      if (this.profile.email) {
+      if (this.localprofile.email) {
         return false;
       }
-      return phonePatternSwiss.test(this.profile.email.trim());
+      return phonePatternSwiss.test(this.localprofile.email.trim());
     },
 
     completedEmailOrSMS(): string | null {
       if (this.isValidEmail) {
-        return this.profile.email.trim();
+        return this.localprofile.email.trim();
       }
       // @${process.env.ENV_SMS_EMAIL_PROVIDER}
       if (this.isValidPhone) {
-        return `${this.profile.email.trim()}@${
+        return `${this.localprofile.email.trim()}@${
           process.env.ENV_SMS_EMAIL_PROVIDER
         }`;
       }
@@ -241,7 +240,7 @@ export default defineComponent({
     skipProfile: function () {
       const route = this.destination_route
         ? this.destination_route
-        : ({ name: 'home' } as RouteRecordRaw);
+        : ({ name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw);
       this.$router.push(route);
     },
 
@@ -260,7 +259,7 @@ export default defineComponent({
       }
 
       // Get Username from the JWT token
-      this.profile.pseudonym = this.profile.U;
+      this.localprofile.pseudonym = this.profile.U;
 
       // Get Email from oauth server
       api
@@ -268,9 +267,9 @@ export default defineComponent({
         .then((response) => {
           if (response.data) {
             // Okay
-            this.profile.email = this.emailToSms(response.data.email);
+            this.localprofile.email = this.emailToSms(response.data.email);
             // this.profile.last_name = response.data.last_name;
-            this.profile.original_email = this.emailToSms(response.data.email);
+            this.localprofile.original_email = this.emailToSms(response.data.email);
             this.error = false;
           } else {
             // Error
@@ -291,7 +290,7 @@ export default defineComponent({
         });
     },
     saveProfile: function () {
-      const changed = this.profile.original_email != this.profile.email;
+      const changed = this.localprofile.original_email != this.localprofile.email;
       console.log('nothing changed... ');
       if (!changed) {
         this.confirmation = true;
@@ -300,7 +299,7 @@ export default defineComponent({
 
       this.loading = true;
       console.log('Save profile !!!');
-      console.log(this.profile);
+      console.log(this.localprofile);
 
       api.authProfile({ email: this.completedEmailOrSMS }).then((response) => {
         // ERROR RESPONSE
@@ -308,7 +307,7 @@ export default defineComponent({
         if (response.data.ok) {
           message = this.$t('auth.profile_update_success');
           this.markIndicatedEmail();
-          this.profile.original_email = this.profile.email;
+          this.localprofile.original_email = this.localprofile.email;
         } else {
           message = this.$t('auth.profile_update_error');
         }

@@ -95,8 +95,11 @@ export const UsersDelegateAssemblies = (
 
   // Check permissions:
   const compare_func = rootGetters['profilestore/translateOauthAcls'];
+
+  console.log(getters.ongoing_assemblies)
   const accessibleAssemblies = filter(getters.ongoing_assemblies, (x) => {
     const acls = compare_func(x.identifier);
+    console.log(x.identifier, acls, 'acls');
     return acls.includes('delegate');
   });
   return Object.values(accessibleAssemblies);
