@@ -165,43 +165,18 @@
         <q-tab-panel name="history">
           <q-card-section>
             <q-list v-if="history">
-              <q-item v-for="version in history" :key="version.id">
-                <q-item-section avatar>
-                  <q-avatar
-                    icon="mdi-image-filter-hdr"
-                    :style="{
-                      'background-color': profile ? profile.CO : 'inherit',
-                    }"
-                    :text-color="profile ? 'white' : 'primary'"
-                    class="q-mr-sm"
-                  >
-                    <q-tooltip
 
-                      >{{ version.user_profile.username_formatted) }}
-{{version.user_profile.username_derivation_formatted}}</q-tooltip
-                    >
-                  </q-avatar>
-                  <span class="text-bold">{{
-                    version.user_profile)
-                  }}</span>
-                </q-item-section>
 
-                <q-item-section>
-                  <q-item-label>
-                    Änderung vom {{ version.date_formatted }}
-                  </q-item-label>
-                  <div
-                    v-for="(change, index) in humanReadable(
-                      Object.entries(version.changeset)
-                    )"
-                    :key="`change_${version.id}_${index}`"
-                  >
-                    <q-tooltip>Ursprünglich: {{ change[1][0] }}</q-tooltip>
-                    {{ change[0] }}: <i>{{ change[1][1] }}</i>
-                  </div>
-                </q-item-section>
-              </q-item>
 
+              <ContentVersionItem 
+                v-for="version in history"
+                :key="version.id"
+                :profile="version.user_profile" :changeset="version.changeset" />
+              <ContentVersionItem :profile="profile" :customText="`Erstellt am ${obj.content.date_created_formatted}`" />
+                
+
+              <!-- <q-item v-for="version in history" :key="version.id"> -->
+<!-- 
               <q-item>
                 <q-item-section avatar>
                   <q-avatar
@@ -226,13 +201,7 @@
                   </q-item-label>
                 </q-item-section>
 
-                <!-- <q-item-section side>
-                  <div>
-                    <q-tooltip>Erstellt: {{change[1][0]}}</q-tooltip>
-                    <i>{{change[0]}}:</i> {{change[1][1]}}
-                  </div>
-                </q-item-section> -->
-              </q-item>
+              </q-item> -->
             </q-list>
           </q-card-section>
         </q-tab-panel>

@@ -234,11 +234,11 @@
 <script lang="ts">
 // import constants from "src/utils/constants";
 import NewsletterForm from 'src/components/NewsletterForm.vue';
-
-export default {
+import { defineComponent } from 'vue';
+export default defineComponent({
   name: 'Footer',
   components: {
     NewsletterForm
   }
-};
+});
 </script>

@@ -295,6 +295,9 @@ export default function usePKCEComposable() {
     }else{
       oauthEmitter.emit('RecycleLogin');
     }
+
+    // // TODO: what is this???     // used to be in afterRoute.... 
+    // setBrokenSession(false);
   };
 
   return {

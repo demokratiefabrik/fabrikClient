@@ -206,9 +206,7 @@ export const assembly_sorted_stages = (_state, getters) => {
 };
 
 /** Which stage is  the next scheduled stage (if empty, no stages available or no scheduled stage available) */
-export const next_scheduled_stage = (state, getters) => {
-  // console.log(">> next_scheduled_stage")
-  // console.log(getters.assembly_sorted_stages)
+export const next_scheduled_stage = (_state, getters) => {
   const stages = getters.assembly_sorted_stages;
   if (!stages) {
     console.log('assemmbly is not yet loaded');

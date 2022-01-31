@@ -83,7 +83,8 @@ Das schweizerische Datenschutzgesetz bildet die ausschliessliche rechtliche Grun
 
 
 <script  lang="ts">
-export default {
+import { defineComponent } from 'vue';
+export default defineComponent({
   name: 'Impressum',
-};
+});
 </script>

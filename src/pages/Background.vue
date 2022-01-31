@@ -151,8 +151,9 @@
 import { mapGetters } from 'vuex';
 import AMs from 'src/pages/ArtificialModeration';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'PageBackground',
   components: { ArtificialModeration },
 
@@ -193,5 +194,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

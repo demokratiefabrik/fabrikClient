@@ -1,5 +1,4 @@
 <style>
-
 /* @import 'https://sibforms.com/forms/end-form/build/sib-styles.css';
 
   @font-face {
@@ -35,27 +34,31 @@
   } */
 </style>
 
-
 <template>
-<div>
-  <b>Newsletter</b> <br>Möchten Sie über die Demokratiefabrik informiert bleiben? Dann melden Sie sich zum Newsletter an: <br>
-  <br><a href="https://41b4d1a2.sibforms.com/serve/MUIEALtZ0tbJUdnbW6ml1EOJEi6-GVTwt8TQOQDOH_7-Uz2XSsrJTzb5FWqz7uR9jbRyWMUke45Y1ZUaT9Ckw4KzzG4aQ2FM-R6akCrwWKr9_KqSXGQg5B0gXZTn1PXhzYWb-bJsCpGN20EmFuXXmhlVKgqD4INCKAZpsTfyqK9dPa3FDyoox8Z2Ey6yrizGtLJZzVoL45NWTPpc" target="_blank">Newsletter-Anmeldung</a>
-</div>  
+  <div>
+    <b>Newsletter</b> <br />Möchten Sie über die Demokratiefabrik informiert
+    bleiben? Dann melden Sie sich zum Newsletter an: <br />
+    <br /><a
+      href="https://41b4d1a2.sibforms.com/serve/MUIEALtZ0tbJUdnbW6ml1EOJEi6-GVTwt8TQOQDOH_7-Uz2XSsrJTzb5FWqz7uR9jbRyWMUke45Y1ZUaT9Ckw4KzzG4aQ2FM-R6akCrwWKr9_KqSXGQg5B0gXZTn1PXhzYWb-bJsCpGN20EmFuXXmhlVKgqD4INCKAZpsTfyqK9dPa3FDyoox8Z2Ey6yrizGtLJZzVoL45NWTPpc"
+      target="_blank"
+      >Newsletter-Anmeldung</a
+    >
+  </div>
 </template>
 
-  
 <script lang="ts">
-  export default {
-    name: 'NewsletterForm',
-    // props: ["profile", "menu"],
+import { defineComponent } from 'vue';
+export default defineComponent({
+  name: 'NewsletterForm',
+  // props: ["profile", "menu"],
 
-    // data() {
-    //   return {
-    //     toolbar: false,
-    //   };
-    // },
+  // data() {
+  //   return {
+  //     toolbar: false,
+  //   };
+  // },
 
-    // computed: {
-    // },
-  };
+  // computed: {
+  // },
+});
 </script>

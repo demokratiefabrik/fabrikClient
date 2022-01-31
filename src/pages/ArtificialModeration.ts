@@ -1,4 +1,4 @@
-const AMs = {
+export default {
   indexpage_left: {
     id: 'indexpage_left',
     prosa: ' Erster AM: Begrüsst die Leute auf der Webseite.',
@@ -263,4 +263,4 @@ const AMs = {
   },
 };
 
-export default AMs;
+// export default AMs;

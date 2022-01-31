@@ -8,7 +8,7 @@
 
 
 <script lang="ts">
-export default {
+export default defineComponent({
   computed: {
     bookmarkKeys() {
       return (
@@ -18,5 +18,5 @@ export default {
       );
     },
   },
-};
+});
 </script>

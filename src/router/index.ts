@@ -1,19 +1,16 @@
-
-
 import { route } from 'quasar/wrappers';
 import {
-  // NavigationFailure,
-  // RouteLocationRaw,
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-// import { StateInterface } from '../store';
 import routes from './routes';
-import useEmitter from 'src/utils/emitter';
-import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import useAssemblyComposable from 'src/composables/assembly.composable';
+
+// import { StateInterface } from '../store';
+// import useEmitter from 'src/utils/emitter';
+// import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+// import useAssemblyComposable from 'src/composables/assembly.composable';
 
 /*
  * If not building with SSR mode, you can
@@ -24,10 +21,8 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
  * with the Router instance.
  */
 
-const emitter = useEmitter();
-const {setBrokenSession} = usePKCEComposable()
-
-
+// const emitter = useEmitter();
+// const {setBrokenSession} = usePKCEComposable()
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -35,7 +30,6 @@ export default route(function (/* { store, ssrContext } */) {
     : process.env.VUE_ROUTER_MODE === 'history'
     ? createWebHistory
     : createWebHashHistory;
-
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -49,7 +43,6 @@ export default route(function (/* { store, ssrContext } */) {
     ),
   });
 
-
   Router.beforeEach((to, from, next) => {
     // Under Construction
     if (to.params?.assemblyIdentifier) {
@@ -59,25 +52,6 @@ export default route(function (/* { store, ssrContext } */) {
       }
     }
     return next();
-  });
-
-  Router.afterEach((to) => { 
-
-    if (to.params?.assemblyIdentifier) {
-      const {setAssemblyIdentifier, setStageID} = useAssemblyComposable();
-      setAssemblyIdentifier(to?.params?.assemblyIdentifier as string | null);
-
-      if (to.params?.stageID !== null && to.params?.stageID !== undefined) {
-        // TODO: redirect to asembly home, when stage is invalid
-        setStageID(parseInt(to.params.stageID as string));
-        emitter.emit('showLoading');
-      }
-    }
-
-    setBrokenSession(false);
-    // TODO: should this be uncommented?
-    // console.log(to, from, store, Vue)
-    // store.dispatch('assemblystore/monitor_route_changes', { to, from })
   });
 
   return Router;

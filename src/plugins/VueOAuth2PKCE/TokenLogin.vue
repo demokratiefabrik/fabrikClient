@@ -3,8 +3,8 @@
 </template>
 
 <script lang='ts'>
-
-export default {
+import { defineComponent } from 'vue';
+export default defineComponent({
   name: 'TokenLogin',
   // mounted() {
   //   // Add token to extraAuthorizationParams config param of PKCE Plugin (It is transmitted to the oAuth Server...)
@@ -27,5 +27,5 @@ export default {
   //   this.pkce.config.extraAuthorizationParams = extraParams;
   //   this.oauth.login();
   // },
-};
+});
 </script>
