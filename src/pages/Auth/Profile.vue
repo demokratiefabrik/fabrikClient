@@ -140,7 +140,7 @@ export default defineComponent({
   },
 
   setup() {
-    const { payload, markIndicatedEmail } = useAuthComposable();
+    const { username_derivation, payload, markIndicatedEmail } = useAuthComposable();
     return { payload, markIndicatedEmail };
   },
   components: { AlgorithmDisclaimer },
@@ -162,19 +162,19 @@ export default defineComponent({
   },
 
   computed: {
-    username_derivation(): string {
-      if (!this.profile) {
-        return '';
-      }
-      const altitude = this.profile.ALT;
-      const fullname = this.profile.FN;
-      const canton = this.profile.CA;
-      return this.$t('auth.name_derivation', {
-        fullname: fullname,
-        canton: canton,
-        altitude: altitude,
-      });
-    },
+    // username_derivation(): string {
+    //   if (!this.profile) {
+    //     return '';
+    //   }
+    //   const altitude = this.profile.ALT;
+    //   const fullname = this.profile.FN;
+    //   const canton = this.profile.CA;
+    //   return this.$t('auth.name_derivation', {
+    //     fullname: fullname,
+    //     canton: canton,
+    //     altitude: altitude,
+    //   });
+    // },
 
     ...mapGetters({
       profile: 'profilestore/profile',

@@ -34,7 +34,7 @@ export default function useLibraryComposable() {
     return array[Math.floor(Math.random() * array.length)];
   };
 
-  const pushSorted = (children, toAdd) => {
+  const pushSorted = (children, toAdd): any[] => {
     if (!toAdd.content.order_position) {
       children.push(toAdd);
       return children;

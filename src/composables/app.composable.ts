@@ -36,7 +36,6 @@ export interface INotificationBanner {
 }
 
 // APP State
-const stageID = ref<number | null>(null);
 const appExitState = ref<boolean>(false);
 const emitter = useEmitter();
 
@@ -52,6 +51,7 @@ export default function useAppComposable() {
   const monitorComposable = useMonitorComposable();
   const routerComposable = useRouterComposable();
   const currentRoute = useRoute();
+  const {getOffsetTop} = useLibraryComposable()
   const { t } = useI18n();
   const exitApp = () => (appExitState.value = true);
 
@@ -82,14 +82,14 @@ export default function useAppComposable() {
 
   /* SCROLLING */
   // ----------------------
-  const getOffsetTop = (element) => {
-    let offsetTop = 0;
-    while (element) {
-      offsetTop += element.offsetTop;
-      element = element.offsetParent;
-    }
-    return offsetTop;
-  };
+  // const getOffsetTop = (element) => {
+  //   let offsetTop = 0;
+  //   while (element) {
+  //     offsetTop += element.offsetTop;
+  //     element = element.offsetParent;
+  //   }
+  //   return offsetTop;
+  // };
 
   const scrollToAnchor = (anchor, duration = 300, lag = 0) => {
     const dom = document.getElementsByName(anchor);
@@ -346,11 +346,14 @@ export default function useAppComposable() {
     /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
     watch(currentRoute, () => {
       notificationBanner.value = null;
+      // TODO: should we indeed watch each route?
+      // store.dispatch('assemblystore/monitor_route_changes', { to, from })
     });
+    
   };
 
   return {
-    stageID: readonly(stageID),
+    // stageID: readonly(stageID),
     appExitState: readonly(appExitState),
     headerOffset: readonly(headerOffset),
     scrollToAnchorIfNecessary,
