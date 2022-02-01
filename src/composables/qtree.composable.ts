@@ -35,6 +35,7 @@ export interface ITreeFilter {
 }
 
 export default function useQtreeComposable(props) {
+  console.log('DEBUG: useQtreeComposable::SETUP')
   const store = useStore();
   const { getOffsetTop, loaded } = useLibraryComposable();
   const { contenttree, markRead, isRead } = useContenttreeComposable();

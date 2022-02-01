@@ -26,6 +26,7 @@ export interface INode {
 }
 
 export default function useContenttreeComposable() {
+  console.log('DEBUG: useContenttreeComposable::SETUP')
   const store = useStore();
   const emitter = useEmitter();
   // const { gotoAssemblyHome } = useAssemblyComposable();

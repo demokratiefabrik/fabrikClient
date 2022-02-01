@@ -21,6 +21,8 @@ const emitter = useEmitter();
 const oauthEmitter = useOAuthEmitter();
 
 export default function useAuthComposable() {
+  console.log('DEBUG: useAuthComposable::SETUP')
+
   const router = useRouter();
   const currentRoute = useRoute();
   const {pushR, gotoHome} = useRouterComposable();
@@ -127,6 +129,11 @@ export default function useAuthComposable() {
   const currentUsernameDerivation = computed(() => {
     // set userEmail<boolean> = true, if email has been added shortly
     return getUsernameDerivation(profile);
+  });
+
+  const currentUsername = computed(() => {
+    // set userEmail<boolean> = true, if email has been added shortly
+    return getUsername(profile);
   });
 
 
@@ -259,6 +266,7 @@ export default function useAuthComposable() {
     profile,
     getUsernameDerivation,
     currentUsernameDerivation,
+    currentUsername,
     getUsername,
     markIndicatedEmail,
   };

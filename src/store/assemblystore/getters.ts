@@ -1,9 +1,9 @@
 import { date } from 'quasar';
-import useAssemblyComposable from 'src/composables/assembly.composable';
+import useRouterComposable from 'src/composables/router.composable';
 const { isSameDate } = date;
 
 export const assemblyTuple = (state) => {
-  const { assemblyIdentifier } = useAssemblyComposable();
+  const { assemblyIdentifier } = useRouterComposable();
   if (!assemblyIdentifier.value) {
     return null;
   }
@@ -84,7 +84,7 @@ export const assembly_stages = (state, getters) => {
  * => such as  ['delegate', 'modify', 'observe']
  */
 export const assemblyAcls = (state, getters, rootState, rootGetters) => {
-  const { assemblyIdentifier } = useAssemblyComposable();
+  const { assemblyIdentifier } = useRouterComposable();
   if (!assemblyIdentifier) {
     return null;
   }
@@ -127,7 +127,7 @@ export const IsDelegate = (_state, getters) => {
 export const stageMilestones = (state, getters) => {
   console.log('>> NOTE: stageMilestones');
 
-  const { stageID } = useAssemblyComposable();
+  const { stageID } = useRouterComposable();
   if (!stageID.value) {
     console.log('...stageID not ready');
     return null;
@@ -179,7 +179,7 @@ export const stageMilestonesCompleted = (state, getters) => {
 export const stage = (_state, getters) => {
   const stages = getters.assembly_stages;
 
-  const { stageID } = useAssemblyComposable();
+  const { stageID } = useRouterComposable();
   if (stageID.value) {
     return stages[stageID.value];
   }

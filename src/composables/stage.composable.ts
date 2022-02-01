@@ -2,9 +2,9 @@
 // import { RouteRecordRaw, LocationAsRelativeRaw, useRoute} from 'vue-router';
 // import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 // import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-import { useRoute} from 'vue-router';
+// import { useRoute} from 'vue-router';
 // import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
@@ -19,14 +19,16 @@ const assemblyIdentifier = ref<string | null>(null);
 
 
 export default function useStageComposable() {
+  console.log('DEBUG: useStageComposable::SETUP')
+
   const store = useStore();
   const emitter = useEmitter();
-    const currentRoute = useRoute();
+    // const currentRoute = useRoute();
 
   // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable();
   const { loaded } = useLibraryComposable();
   const {userid} = usePKCEComposable();
-  const { gotoAssemblyHome, setStageID, setAssemblyIdentifier, stageID} = useAssemblyComposable();
+  const { gotoAssemblyHome, stageID} = useAssemblyComposable();
 
   // const currentRoute = useRoute();
   // const { pushR } = useRouterComposable();
@@ -70,19 +72,6 @@ export default function useStageComposable() {
   });
 
   
-  /* Set runtime variables: currently selected assembly and stage */
-  watch(currentRoute, () => {
-
-    if (currentRoute.params?.assemblyIdentifier) {
-      setAssemblyIdentifier(currentRoute?.params?.assemblyIdentifier as string | null);
-
-      if (currentRoute.params?.stageID !== null && currentRoute.params?.stageID !== undefined) {
-        // TODO: redirect to asembly home, when stage is invalid
-        setStageID(parseInt(currentRoute.params.stageID as string));
-        emitter.emit('showLoading');
-      }
-    }
-  });
 
   //TODO add watcher... to sync data..
   // watch: {

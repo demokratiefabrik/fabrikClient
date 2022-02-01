@@ -6,6 +6,7 @@ import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { useQuasar } from 'quasar';
 
 export default function useMonitorComposable() {
+  console.log('DEBUG: useMonitorComposable::SETUP')
   const currentRoute = useRoute();
   const store = useStore();
   const assemblyComposable = useAssemblyComposable();

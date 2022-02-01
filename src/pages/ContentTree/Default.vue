@@ -9,10 +9,9 @@
 </template>
 
 <script lang="ts">
-// import ContentTreeMixin from 'src/mixins/stage.contenttree';
+import { defineComponent } from 'vue';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import ComponentContentTree from './components/ContentTree.vue';
-// const {  } = useContenttreeComposable();
 
 export default defineComponent({
   setup() {

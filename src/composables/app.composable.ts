@@ -44,11 +44,13 @@ const notificationBanner = ref<INotificationBanner | null>(null);
 const loadingGifStack = ref<string[]>([]);
 
 export default function useAppComposable() {
-  // console.log('DEBUG: APP COMPOSABLE - START');
+  console.log('DEBUG: APP COMPOSABLE - START');
 
   const assemblyComposable = useAssemblyComposable();
+  console.log('DEBUG: APP COMPOSABLE - START');
   const authComposable = useAuthComposable();
   const monitorComposable = useMonitorComposable();
+  console.log('DEBUG: APP COMPOSABLE - START');
   const routerComposable = useRouterComposable();
   const currentRoute = useRoute();
   const {getOffsetTop} = useLibraryComposable()

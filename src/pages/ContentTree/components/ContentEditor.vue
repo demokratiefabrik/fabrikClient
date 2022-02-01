@@ -655,7 +655,7 @@ export default defineComponent({
 
               this.store.dispatch(
                 'assemblystore/incrementAssemblyActivityCounter',
-                { counterName: 'number_of_comments_today' }
+                { assemblyIdentifier: this.assemblyIdentifier, counterName: 'number_of_comments_today' }
               );
 
               // Zoom to content if needed.

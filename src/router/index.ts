@@ -7,10 +7,6 @@ import {
 } from 'vue-router';
 import routes from './routes';
 
-// import { StateInterface } from '../store';
-// import useEmitter from 'src/utils/emitter';
-// import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-// import useAssemblyComposable from 'src/composables/assembly.composable';
 
 /*
  * If not building with SSR mode, you can

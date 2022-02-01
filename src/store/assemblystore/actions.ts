@@ -1,8 +1,8 @@
 import useEmitter from 'src/utils/emitter';
 const emitter = useEmitter();
 import api from 'src/utils/api';
-import useAppComposable from 'src/composables/app.composable';
-import useAssemblyComposable from 'src/composables/assembly.composable';
+// import useAppComposable from 'src/composables/app.composable';
+// import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export const syncAssembly = (
   { state, dispatch },
@@ -67,9 +67,9 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
     });
 };
 
-export const addOrUpdateStage = ({ commit }, { stage }) => {
+export const addOrUpdateStage = ({ commit }, { assemblyIdentifier, stage }) => {
   // const appComposable = useAppComposable();
-  const {assemblyIdentifier} = useAssemblyComposable();
+  // const {assemblyIdentifier} = useAssemblyComposable();
   console.log('stage: ', stage, assemblyIdentifier);
   api
     .addOrUpdateStage(assemblyIdentifier, stage)
@@ -128,7 +128,7 @@ export const updateAssembly = ({ commit }, { assembly }) => {
     });
 };
 
-export const addMilestone = ({ getters, commit }, { label, weight, key }) => {
+export const addMilestone = ({ getters, commit }, { stageID, label, weight, key }) => {
   console.assert(weight);
   console.assert(label);
   if (!key) {
@@ -137,9 +137,9 @@ export const addMilestone = ({ getters, commit }, { label, weight, key }) => {
   console.log('ADD MILESTONE', label, ' WEIGHT:', weight, ' KEY:', key);
 
   const day = getters.assemblyProgression?.number_of_day_sessions;
-  const appComposable = useAppComposable();
-  const stageID = appComposable.stageID.value;
-  console.assert(stageID);
+  // const {stageID} = useAssemblyComposable();
+  // const stageID = stageID.value;
+  // console.assert(stageID.value);
 
   const milestones = getters.stageMilestones;
   console.assert(milestones !== null);
@@ -161,16 +161,16 @@ export const addMilestone = ({ getters, commit }, { label, weight, key }) => {
 
 export const incrementAssemblyActivityCounter = (
   { commit },
-  { counterName }
+  { assemblyIdentifier, counterName }
 ) => {
   console.assert(
     ['number_of_proposals_today', 'number_of_comments_today'].includes(
       counterName
     )
   );
-  const { assemblyIdentifier } = useAssemblyComposable();
+  // const { assemblyIdentifier } = useAssemblyComposable();
   commit('incrementAssemblyActivityCounter', {
-    assemblyIdentifier: assemblyIdentifier.value,
+    assemblyIdentifier,
     counterName,
   });
 };

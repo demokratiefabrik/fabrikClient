@@ -111,6 +111,8 @@ export default defineComponent({
   },
   data() {
     return {
+      prompt: true, 
+      // TODO: what is that for?
       confirm_deletion: false,
       confirm_deletion_content: null,
       confirm_deletion_justification: '',

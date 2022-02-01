@@ -1,8 +1,8 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { RouteRecordRaw, LocationAsRelativeRaw, useRoute } from 'vue-router';
+import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { ref, Ref, readonly, watch, computed } from 'vue';
+import { Ref, readonly, computed } from 'vue';
 import { useStore } from 'vuex';
 import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
@@ -26,14 +26,13 @@ export interface IContributionLimits {
 
 const oauthEmitter = useOAuthEmitter();
 const { userid } = usePKCEComposable();
-const assemblyIdentifier = ref<string | null>(null);
-const stageID = ref<number | null>(null);
 
 export default function useAssemblyComposable() {
+  console.log('DEBUG: useAssemblyComposable::SETUP')
   const store = useStore();
-  const currentRoute = useRoute();
+  // const currentRoute = useRoute();
   const emitter = useEmitter();
-  const { pushR } = useRouterComposable();
+  const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } = useRouterComposable();
   const get_stage_number_by_stage_id =
     store.getters['assemblystore/get_stage_number_by_stage_id'];
   const get_stage_number_by_stage =
@@ -52,9 +51,12 @@ export default function useAssemblyComposable() {
     store.getters['assemblystore/find_next_accessible_stage'];
 
   const { loaded } = useLibraryComposable();
+
   const { push } = useRouter();
 
+
   const initialize = () => {
+
     oauthEmitter.on('AfterLogin', () => {
       clearSession();
       syncUserAssembly();
@@ -68,23 +70,6 @@ export default function useAssemblyComposable() {
     // INITIAL SYNC of Public Assembly (no authentication needed)
     syncPublicAssembly();
 
-    /* Set runtime variables: currently selected assembly and stage */
-    watch(currentRoute, () => {
-      if (currentRoute.params?.assemblyIdentifier) {
-        setAssemblyIdentifier(
-          currentRoute?.params?.assemblyIdentifier as string | null
-        );
-
-        if (
-          currentRoute.params?.stageID !== null &&
-          currentRoute.params?.stageID !== undefined
-        ) {
-          // TODO: redirect to asembly home, when stage is invalid
-          setStageID(parseInt(currentRoute.params.stageID as string));
-          emitter.emit('showLoading');
-        }
-      }
-    });
   };
 
   const syncPublicAssembly = () => {
@@ -119,15 +104,6 @@ export default function useAssemblyComposable() {
     }, intervall);
   };
 
-  const setAssemblyIdentifier = (identifier: string | null) =>
-    (assemblyIdentifier.value = identifier);
-
-  const setStageID = (id: number | null) => (stageID.value = id);
-
-  const clearSession = () => {
-    setStageID(null);
-    setAssemblyIdentifier(null);
-  };
 
   const getAssemblyHomeRoute = (
     assembly
@@ -154,6 +130,10 @@ export default function useAssemblyComposable() {
       if (stageID.value === null || isNaN(stageID.value)) {
         return null;
       }
+      console.log(
+        'DEBUG: stage_nr_last_visited => vuex::get_stage_number_by_stage_id',
+        stageID.value
+      );
       return get_stage_number_by_stage_id(stageID.value);
     },
     set(stageNr) {
@@ -226,7 +206,7 @@ export default function useAssemblyComposable() {
   });
 
   const clickBackToAssemblyListButton = () => {
-    setAssemblyIdentifier(null);
+    // setAssemblyIdentifier(null);
     push({ name: 'assemblies' });
   };
 
@@ -286,6 +266,10 @@ export default function useAssemblyComposable() {
   const gotoDefaultStageTeaser = () => {
     console.log('goto default stage teaser');
     if (stageID.value !== null && stageID.value !== undefined) {
+      console.log(
+        'DEBUG: gotoDefaultStageTeaser => vuex::get_stage_number_by_stage_id',
+        stageID.value
+      );
       stage_nr_last_visited.value = get_stage_number_by_stage_id(stageID.value);
     } else if (last_accessible_stage.value) {
       stage_nr_last_visited.value = get_stage_number_by_stage(
@@ -336,6 +320,9 @@ export default function useAssemblyComposable() {
     assemblyIdentifier: assemblyIdentifier,
   });
 
+
+  console.log('DEBUG: end of assembly composable')
+
   return {
     clearSession,
     gotoAssemblyHome,
@@ -344,10 +331,10 @@ export default function useAssemblyComposable() {
     // next_scheduled_stage,
     // getFirstOrRoutedStageIDByGroup,
     assemblyIdentifier: readonly(assemblyIdentifier),
-    setAssemblyIdentifier,
+    // setAssemblyIdentifier,
     stageID,
     assembly,
-    setStageID,
+    // setStageID,
     daySessions,
     ready,
     stage_last_visited,

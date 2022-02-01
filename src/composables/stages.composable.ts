@@ -30,6 +30,8 @@ export interface IStageGroup{
 
 
 export default function useStagesComposable() {
+  console.log('DEBUG: useStagesComposable::SETUP')
+
   const store = useStore();
   const emitter = useEmitter();
   const { gotoAssemblyHome, stageID } = useAssemblyComposable();

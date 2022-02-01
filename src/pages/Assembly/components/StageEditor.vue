@@ -272,6 +272,7 @@
 </template>
 
 <script lang="ts">
+import useAssemblyComposable from 'src/composables/assembly.composable';
 import { defineComponent } from 'vue';
 // import ApiService from "src/utils/xhr";
 // import AssemblyMixin from "src/mixins/assembly";
@@ -280,6 +281,10 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default defineComponent({
   name: 'StageEditor',
+  setup() {
+    const {assemblyIdentifier} = useAssemblyComposable()
+    return {assemblyIdentifier}
+  },
   props: {
     persistent: {
       type: Boolean,
@@ -452,48 +457,10 @@ export default defineComponent({
         localmodel.order_position = this.stage_count + 1;
       }
 
-      this.addOrUpdateStage({ stage: localmodel });
+      this.addOrUpdateStage({ assemblyIdentifier: this.assemblyIdentifier, stage: localmodel });
     },
 
-    // confirm_delete: function () {
-    //   this.$q
-    //     .dialog({
-    //       title: "Confirm Deletion",
-    //       message:
-    //         "Would you like to delete this stage? Only Administrators can restore the data.",
-    //       cancel: true,
-    //       persistent: true,
-    //     })
-    //     .onOk(() => {
-    //       this.delete();
-    //       // console.log('I am triggered on both OK and Cancel')
-    //     });
-    // },
-
-    // delete: function (localmodel) {
-    //   console.log("DELETE Stage");
-    //   console.assert(this.assembly.identifier);
-    //   let url = `${process.env.ENV_APISERVER_URL}/assembly/${this.assembly.identifier}/stage`;
-    //   url += `/{this.localmodel.id}`;
-
-    //   ApiService.delete(url).then((response) => {
-    //     // we have to update the assembly. (it contains a list of stages)
-    //     this.add_or_update_assembly(response.data.assembly);
-    //     this.$refs["popupeditor"].cancel();
-    //   });
-    // },
-
-    ...mapActions({
-      addOrUpdateStage: 'assemblystore/addOrUpdateStage',
-      // addOrUpdateStage: "assemblystore/addOrUpdateStage",
-    }),
-  },
-
-  mounted() {
-    // model default value
-    // if (!this.model.order_position === null) {
-    //   this.model.order_position = this.stage_count;
-    // }
-  },
+    ...mapActions({addOrUpdateStage: 'assemblystore/addOrUpdateStage'}),
+  }
 });
 </script>
