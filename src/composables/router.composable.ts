@@ -2,7 +2,7 @@
 // import { computed } from 'vue';
 import useEmitter from 'src/utils/emitter';
 import { useRouter, useRoute, RouteLocationRaw } from 'vue-router';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
 
@@ -19,12 +19,6 @@ export default function useRouterComposable() {
   const reload = () => {
     instanceNr.value += 1;
   };
-
-  // const routeParams = () =>{ return currentRoute.params}
-  // const fullPath = computed(() => currentRoute.fullPath)
-  // const routeParams = (): any => {
-  //   return currentRoute.params
-  // };
 
   /* Reload the page when redirecting to the same page */
   const pushR = (route: RouteLocationRaw) => {
@@ -58,21 +52,6 @@ export default function useRouterComposable() {
   };
 
   const gotoProfile = () => {
-    // console.log(` goto public profile`)
-    // const current = router.currentRoute;
-    // const destination_route = { name: current.value.name, params: current.value.params };
-    // // console.log(destination_route)
-
-    // if (destination_route.name == 'profile') {
-    //   // LayoutEventBus.$emit('reload');
-    //   emitter.emit('reload')
-    // } else {
-    //   router.push({
-    //     name: 'profile',
-    //     params: { destination_route },
-    //   });
-    // }
-
     pushR({ name: 'profile' } as RouteLocationRaw);
   };
 
@@ -87,48 +66,6 @@ export default function useRouterComposable() {
     setAssemblyIdentifier(null);
   };
 
-  // TODO: move watch outside of setup, right?
-  /* Set runtime variables: currently selected assembly and stage */
-  watch(currentRoute, () => {
-    if (currentRoute.params?.assemblyIdentifier) {
-      setAssemblyIdentifier(
-        currentRoute?.params?.assemblyIdentifier as string | null
-      );
-
-      if (
-        currentRoute.params?.stageID !== null &&
-        currentRoute.params?.stageID !== undefined
-      ) {
-        // TODO: redirect to asembly home, when stage is invalid
-        setStageID(parseInt(currentRoute.params.stageID as string));
-        emitter.emit('showLoading');
-      }
-    }
-  });
-
-  // /* Set runtime variables: currently selected assembly and stage */
-  // watch(currentRoute, () => {
-
-  //   if (currentRoute.params?.assemblyIdentifier) {
-  //     setAssemblyIdentifier(currentRoute?.params?.assemblyIdentifier as string | null);
-
-  //     if (currentRoute.params?.stageID !== null && currentRoute.params?.stageID !== undefined) {
-  //       // TODO: redirect to asembly home, when stage is invalid
-  //       setStageID(parseInt(currentRoute.params.stageID as string));
-  //       emitter.emit('showLoading');
-  //     }
-  //   }
-  // });
-
-  //     // TODO: Monitor Route change
-  // watch(
-  //   () => currentRoute, (currentRoute) => {
-  //     console.log('route change in APP.vue')
-  //     // Page Permission
-  //     checkPagePermission(currentRoute)
-  //     // this.$root.monitorLog(constants.MONITOR_ROUTE_CHANGE)
-  //     },
-  //   { deep: true });
 
   console.log('DEBUG: end of router composable');
   return {
@@ -141,9 +78,7 @@ export default function useRouterComposable() {
     instanceNr,
     assemblyIdentifier,
     stageID,
-    setStageID,
-
-    // fullPath,
-    // anchor
+    setAssemblyIdentifier,
+    setStageID
   };
 }

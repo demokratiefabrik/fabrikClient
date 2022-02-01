@@ -2,391 +2,365 @@
 import { RouteLocationRaw } from 'vue-router';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { readonly, Ref, computed } from 'vue';
+import { readonly, Ref, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
 import useLibraryComposable from 'src/utils/library';
 import { useRouter } from 'vue-router';
 import { IStageTuple } from 'src/models/stage';
-// import { RouteLocation } from 'src/models/layout';
-
-// import { get_stage_number_by_stage_id } from 'src/store/assemblystore/getters';
-
-export interface IContributionLimits {
-  number_of_proposals: {
-    daylimit: number;
-    overalllimit: number;
-    overallCurrent: number;
-    current: number;
-  };
-  number_of_comments: {
-    daylimit: number;
-    current: number;
-  };
-}
+import { IContributionLimits } from 'src/models/layout';
 
 const oauthEmitter = useOAuthEmitter();
 const { userid } = usePKCEComposable();
 
-// ADD ASSEMBLY TYPES
-// export const installedAssemblyPlugins = ref<string[]>([])
+const output = ref<null | any>(null);
 
+export default function useAssemblyComposable(caller = '') {
+  const setup = () => {
+    console.log('DEBUG: useAssemblyComposable::SETUPPP', caller);
 
-export default function useAssemblyComposable(caller='') {
-
-  console.log('DEBUG: useAssemblyComposable::SETUP', caller);
-
-  // const installAssemblyPlugin = (plugin: string): void => {
-  //   installedAssemblyPlugins.value.push(plugin)
-  // }
-  
-  
-  const store = useStore();
-  // const currentRoute = useRoute();
-  const emitter = useEmitter();
-  const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
-    useRouterComposable();
+    const emitter = useEmitter();
+    const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
+      useRouterComposable();
     console.log('DEBUG: useAssemblyComposable::SETUP !!');
+    const { loaded } = useLibraryComposable();
+    const { push } = useRouter();
 
-  const get_stage_number_by_stage_id = store.getters['assemblystore/get_stage_number_by_stage_id']
-  const get_stage_number_by_stage = store.getters['assemblystore/get_stage_number_by_stage']
-  const assemblyStages = computed(() => store.getters['assemblystore/assemblyStages']);
-  const last_accessible_stage = computed(() => store.getters['assemblystore/last_accessible_stage']);
-  const IsManager = computed(() => store.getters['assemblystore/IsManager'])
-  const assembly_sorted_stages = computed(() => store.getters['assemblystore/assembly_sorted_stages'])
-  const assemblyProgression = computed(() => store.getters['assemblystore/assemblyProgression'])
-  const assemblyConfiguration = computed(() => store.getters['assemblystore/assemblyConfiguration'])
-  const assembly = computed(() => store.getters['assemblystore/assembly'])
-  const find_next_accessible_stage = computed(() => store.getters['assemblystore/find_next_accessible_stage'])
+    const store = useStore();
+    const get_stage_number_by_stage_id =
+      store.getters['assemblystore/get_stage_number_by_stage_id'];
+    const get_stage_number_by_stage =
+      store.getters['assemblystore/get_stage_number_by_stage'];
+    const assemblyStages = computed(
+      () => store.getters['assemblystore/assemblyStages']
+    );
+    const last_accessible_stage = computed(
+      () => store.getters['assemblystore/last_accessible_stage']
+    );
+    const IsManager = computed(() => store.getters['assemblystore/IsManager']);
+    const assembly_sorted_stages = computed(
+      () => store.getters['assemblystore/assembly_sorted_stages']
+    );
+    const assemblyProgression = computed(
+      () => store.getters['assemblystore/assemblyProgression']
+    );
+    const assemblyConfiguration = computed(
+      () => store.getters['assemblystore/assemblyConfiguration']
+    );
+    const assembly = computed(() => store.getters['assemblystore/assembly']);
+    const find_next_accessible_stage = computed(
+      () => store.getters['assemblystore/find_next_accessible_stage']
+    );
 
-  const { loaded } = useLibraryComposable();
+    const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
 
-  const { push } = useRouter();
-
-  const initialize = () => {
-    console.log('DEBUG: INITIALIZE ASSEMBLY.COMP')
-    oauthEmitter.on('AfterLogin', () => {
-      clearSession();
-      syncUserAssembly();
-      setSyncIntervall();
-    });
-    oauthEmitter.on('RecycleLogin', () => {
-      syncUserAssembly();
-      setSyncIntervall();
-    });
-
-    // INITIAL SYNC of Public Assembly (no authentication needed)
-    syncPublicAssembly();
-    syncUserAssembly();
-
-
-      // // WHEN MOUNTED
-  // store.dispatch('assemblystore/syncAssembly', {
-  //   oauthUserID: userid,
-  //   assemblyIdentifier: assemblyIdentifier.value,
-  // });
-
-
-  };
-
-  const syncPublicAssembly = () => {
-    // console.log('syncAssembliesSync...')
-    // sync public assembly...
-    store.dispatch('publicindexstore/syncPublicIndex');
-  };
-
-  const syncUserAssembly = () => {
-    // console.log('syncAssembliesSync...')
-    // sync public assembly...
-    if (assemblyIdentifier.value && userid.value) {
-      store.dispatch('assemblystore/syncAssembly', {
-        oauthUserID: userid.value,
-        assemblyIdentifier: assemblyIdentifier.value,
-      });
-    }
-  };
-
-  const setSyncIntervall = () => {
-    // CREATE INTERVALL TO KEEP IN SYNC ASSEMBLY
-    const intervallString: string = process.env
-      .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
-      ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
-      : '60';
-    const intervall = (parseInt(intervallString) + 5) * 1000;
-    // console.log(intervall);
-    setInterval(() => {
-      // INTERVALL SYNC
-      syncPublicAssembly();
-      syncUserAssembly();
-    }, intervall);
-  };
-
-  const getAssemblyHomeRoute = (
-    assembly
-  ): RouteLocationRaw => {
-    if (!assembly) {
       return {
-        name: 'home',
+        name: assembly.type,
+        params: { assemblyIdentifier: assembly.identifier },
       } as RouteLocationRaw;
-    }
+    };
 
-    return {
-      name: assembly.type,
-      params: { assemblyIdentifier: assembly.identifier },
-    } as RouteLocationRaw
-  };
+    const getAssemblyManageRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
 
-
-  
-  const getAssemblyManageRoute = (
-    assembly
-  ): RouteLocationRaw => {
-    if (!assembly) {
       return {
-        name: 'home',
+        name: 'assembly_manage',
+        params: { assemblyIdentifier: assembly.identifier },
       } as RouteLocationRaw;
-    }
+    };
 
-    return {
-      name: 'assembly_manage',
-      params: { assemblyIdentifier: assembly.identifier },
-    } as RouteLocationRaw
-  };
+    const syncPublicAssembly = () => {
+      // console.log('syncAssembliesSync...')
+      // sync public assembly...
+      store.dispatch('publicindexstore/syncPublicIndex');
+    };
 
-  
-  const gotoAssemblyHome = (assembly) => {
-    const route = getAssemblyHomeRoute(assembly);
-    pushR(route);
-  };
+    const syncUserAssembly = () => {
+      // console.log('syncAssembliesSync...')
+      // sync public assembly...
+      if (assemblyIdentifier.value && userid.value) {
+        store.dispatch('assemblystore/syncAssembly', {
+          oauthUserID: userid.value,
+          assemblyIdentifier: assemblyIdentifier.value,
+        });
+      }
+    };
 
+    const setSyncIntervall = () => {
+      // CREATE INTERVALL TO KEEP IN SYNC ASSEMBLY
+      const intervallString: string = process.env
+        .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+        ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+        : '60';
+      const intervall = (parseInt(intervallString) + 5) * 1000;
+      // console.log(intervall);
+      setInterval(() => {
+        // INTERVALL SYNC
+        syncPublicAssembly();
+        syncUserAssembly();
+      }, intervall);
+    };
 
-  const gotoAssemblyManage = (assembly) => {
-    const route = getAssemblyManageRoute(assembly);
-    pushR(route)
-  }
+    const gotoAssemblyHome = (assembly) => {
+      const route = getAssemblyHomeRoute(assembly);
+      pushR(route);
+    };
 
-  const stage_nr_last_visited: Ref<number | null>  = computed({
-    get() {
-      if (stageID.value === null || isNaN(stageID.value)) {
+    const gotoAssemblyManage = (assembly) => {
+      const route = getAssemblyManageRoute(assembly);
+      pushR(route);
+    };
+
+    const stage_nr_last_visited: Ref<number | null> = computed({
+      get() {
+        if (stageID.value === null || isNaN(stageID.value)) {
+          return null;
+        }
+        console.log(
+          'DEBUG: stage_nr_last_visited => vuex::get_stage_number_by_stage_id',
+          stageID.value
+        );
+        return get_stage_number_by_stage_id(stageID.value) as number;
+      },
+      set(stageNr: number | null) {
+        if (stageNr === null || stageNr === undefined) {
+          setStageID(null);
+        } else {
+          const stageID = assembly_sorted_stages[stageNr as number].stage.id;
+          // console.log("set stageID by stageNR", stageNr, stageID)
+          setStageID(stageID);
+        }
+      },
+    });
+
+    // CONTENTTREE
+    const daySessions = computed((): number => {
+      return assemblyProgression.value?.number_of_day_sessions;
+    });
+
+    const ready = computed((): boolean => {
+      const ready = loaded(assembly);
+      if (ready) {
+        emitter.emit('hideLoading');
+      }
+      return ready;
+    });
+
+    const stage_last_visited = computed((): IStageTuple | null => {
+      if (stage_nr_last_visited.value === null) {
         return null;
       }
-      console.log(
-        'DEBUG: stage_nr_last_visited => vuex::get_stage_number_by_stage_id',
-        stageID.value
-      );
-      return get_stage_number_by_stage_id(stageID.value) as number;
-    },
-    set(stageNr: number | null) {
-      if (stageNr === null || stageNr === undefined) {
-        setStageID(null);
-      } else {
-        const stageID = assembly_sorted_stages[stageNr as number].stage.id;
-        // console.log("set stageID by stageNR", stageNr, stageID)
-        setStageID(stageID);
+      return assembly_sorted_stages[stage_nr_last_visited.value];
+    });
+
+    const overallLimitForAddingProposalsReached = computed(
+      (): boolean | null => {
+        const dailyContributionLimits = getDailyContributionLimits();
+        if (!dailyContributionLimits) {
+          return null;
+        }
+        const numberOfProposalLimits =
+          dailyContributionLimits.number_of_proposals;
+        const limitReached =
+          numberOfProposalLimits.overallCurrent >=
+          numberOfProposalLimits.overalllimit;
+        return limitReached;
       }
-    }
-  });
+    );
 
-  // CONTENTTREE
-  const daySessions = computed((): number => {
-    return assemblyProgression.value?.number_of_day_sessions;
-  });
+    const limitForAddingProposalsReached = computed((): boolean | null => {
+      const dailyAddingLimits = getDailyContributionLimits();
+      if (!dailyAddingLimits) {
+        return null;
+      }
+      const numberOfProposalLimits = dailyAddingLimits.number_of_proposals;
+      const limitReached =
+        numberOfProposalLimits.current >= numberOfProposalLimits.daylimit;
+      return limitReached;
+    });
 
-  const ready = computed((): boolean => {
-    const ready = loaded(assembly);
-    if (ready) {
-      emitter.emit('hideLoading');
-    }
-    return ready;
-  });
+    const limitForAddingCommentsReached = computed((): boolean | null => {
+      if (IsManager.value) {
+        return false;
+      }
 
-  const stage_last_visited = computed((): IStageTuple | null => {
-    if (stage_nr_last_visited.value === null) {
-      return null;
-    }
-    return assembly_sorted_stages[stage_nr_last_visited.value];
-  });
+      const dailyAddingLimits = getDailyContributionLimits();
+      if (!dailyAddingLimits) {
+        return null;
+      }
+      const numberOfCommentsLimits = dailyAddingLimits.number_of_comments;
+      const limitReached =
+        numberOfCommentsLimits.current >= numberOfCommentsLimits.daylimit;
+      return limitReached;
+    });
 
-  const overallLimitForAddingProposalsReached = computed((): boolean | null => {
-    const dailyContributionLimits = getDailyContributionLimits();
-    if (!dailyContributionLimits) {
-      return null;
-    }
-    const numberOfProposalLimits = dailyContributionLimits.number_of_proposals;
-    const limitReached =
-      numberOfProposalLimits.overallCurrent >=
-      numberOfProposalLimits.overalllimit;
-    return limitReached;
-  });
+    const clickBackToAssemblyListButton = (): void => {
+      // setAssemblyIdentifier(null);
+      push({ name: 'assemblies' });
+    };
 
-  const limitForAddingProposalsReached = computed((): boolean | null => {
-    const dailyAddingLimits = getDailyContributionLimits();
-    if (!dailyAddingLimits) {
-      return null;
-    }
-    const numberOfProposalLimits = dailyAddingLimits.number_of_proposals;
-    const limitReached =
-      numberOfProposalLimits.current >= numberOfProposalLimits.daylimit;
-    return limitReached;
-  });
+    // const stageTransition = (newVal, oldVal) => {
+    //   // this.scrollToStage()
+    // }
+    //
+    // const laggedScrollToStage = () => {
+    //   setTimeout(() => {
+    //     scrollToStage();
+    //   }, 200);
+    // };
 
-  const limitForAddingCommentsReached = computed((): boolean | null => {
-    if (IsManager.value) {
-      return false;
-    }
+    const gotoNextStageNr = (stage): void => {
+      console.assert(stage);
+      // console.log('gotoNextStageNr');
+      const currentStageGroup = stage.stage.group;
 
-    const dailyAddingLimits = getDailyContributionLimits();
-    if (!dailyAddingLimits) {
-      return null;
-    }
-    const numberOfCommentsLimits = dailyAddingLimits.number_of_comments;
-    const limitReached =
-      numberOfCommentsLimits.current >= numberOfCommentsLimits.daylimit;
-    return limitReached;
-  });
+      const nextStage = find_next_accessible_stage.value(stage);
+      if (!nextStage) {
+        // console.log('NOTE: Assembly seems to be completed!');
+        return;
+      }
+      const nextStageGroup = stage.stage.group;
+      if (nextStageGroup !== currentStageGroup) {
+        // different group: so make a new route...
+        // console.log('ROUTERROUTE');
+        push(`${nextStage.stage.id}/${nextStage.stage.group}`);
+      } else {
+        // just update , the "stage_nr_last_visited"
+        // console.log(this.stage_nr_last_visited, "old stage")
+        stage_nr_last_visited.value = get_stage_number_by_stage(nextStage);
+        // console.log(stage_nr_last_visited.value, 'new stage');
+      }
+    };
 
-  const clickBackToAssemblyListButton = (): void => {
-    // setAssemblyIdentifier(null);
-    push({ name: 'assemblies' });
-  };
+    const gotoStage = (stage): void => {
+      console.assert(stage);
+      push(getStageRoute(stage));
+    };
 
+    const getStageRoute = (stage): RouteLocationRaw => {
+      console.assert(stage);
+      const params = {
+        assemblyIdentifier: assemblyIdentifier.value,
+        stageID: stage.stage.id,
+        contenttreeID: stage.stage.contenttree_id,
+      };
 
-  // const stageTransition = (newVal, oldVal) => {
-  //   // this.scrollToStage()
-  // }
-  //
-  // const laggedScrollToStage = () => {
-  //   setTimeout(() => {
-  //     scrollToStage();
-  //   }, 200);
-  // };
+      return {
+        name: stage.stage.type,
+        params,
+      };
+    };
 
-  const gotoNextStageNr = (stage): void => {
-    console.assert(stage);
-    // console.log('gotoNextStageNr');
-    const currentStageGroup = stage.stage.group;
+    // TODO: what is that for?
+    const gotoDefaultStageTeaser = (): void => {
+      console.log('goto default stage teaser');
+      if (stageID.value !== null && stageID.value !== undefined) {
+        console.log(
+          'DEBUG: gotoDefaultStageTeaser => vuex::get_stage_number_by_stage_id',
+          stageID.value
+        );
+        stage_nr_last_visited.value = get_stage_number_by_stage_id(
+          stageID.value
+        );
+      } else if (last_accessible_stage.value) {
+        stage_nr_last_visited.value = get_stage_number_by_stage(
+          last_accessible_stage.value
+        );
+      } else {
+        stage_nr_last_visited.value = null;
+      }
+    };
 
-    const nextStage = find_next_accessible_stage.value(stage);
-    if (!nextStage) {
-      // console.log('NOTE: Assembly seems to be completed!');
-      return;
-    }
-    const nextStageGroup = stage.stage.group;
-    if (nextStageGroup !== currentStageGroup) {
-      // different group: so make a new route...
-      // console.log('ROUTERROUTE');
-      push(`${nextStage.stage.id}/${nextStage.stage.group}`);
-    } else {
-      // just update , the "stage_nr_last_visited"
-      // console.log(this.stage_nr_last_visited, "old stage")
-      stage_nr_last_visited.value = get_stage_number_by_stage(nextStage);
-      // console.log(stage_nr_last_visited.value, 'new stage');
-    }
-  };
+    const getDailyContributionLimits = (): IContributionLimits | undefined => {
+      const progression = assemblyProgression;
+      const configuration = assemblyConfiguration;
+      if (!configuration || !progression) {
+        // can happen when logout
+        return undefined;
+      }
 
-  const gotoStage = (stage): void => {
-    console.assert(stage);
-    push(getStageRoute(stage));
-  };
+      return {
+        number_of_proposals: {
+          daylimit: configuration.value.MAX_DAILY_USER_PROPOSALS,
+          overalllimit: configuration.value.MAX_OVERALL_USER_PROPOSALS,
+          overallCurrent:
+            progression.value.number_of_proposals === null
+              ? 0
+              : progression.value.number_of_proposals,
+          current:
+            progression.value.number_of_proposals_today === null
+              ? 0
+              : progression.value.number_of_proposals_today,
+        },
+        number_of_comments: {
+          daylimit: configuration.value.MAX_DAILY_USER_COMMENTS,
+          current:
+            progression.value.number_of_comments_today === null
+              ? 0
+              : progression.value.number_of_comments_today,
+        },
+      };
+    };
 
-  const getStageRoute = (stage): RouteLocationRaw => {
-    console.assert(stage);
-    const params = {
-      assemblyIdentifier: assemblyIdentifier.value,
-      stageID: stage.stage.id,
-      contenttreeID: stage.stage.contenttree_id,
+    const initialize = () => {
+      console.log('DEBUG: INITIALIZE ASSEMBLY.COMP');
+      oauthEmitter.on('AfterLogin', () => {
+        clearSession();
+        syncUserAssembly();
+        setSyncIntervall();
+      });
+      oauthEmitter.on('RecycleLogin', () => {
+        syncUserAssembly();
+        setSyncIntervall();
+      });
+
+      syncPublicAssembly();
+      syncUserAssembly();
     };
 
     return {
-      name: stage.stage.type,
-      params,
+      clearSession,
+      gotoAssemblyHome,
+      initialize,
+      gotoDefaultStageTeaser,
+      assemblyIdentifier: readonly(assemblyIdentifier),
+      assembly_sorted_stages,
+      stageID,
+      gotoAssemblyManage,
+      assembly,
+      assemblyStages,
+      daySessions,
+      ready,
+      stage_last_visited,
+      getDailyContributionLimits,
+      overallLimitForAddingProposalsReached,
+      limitForAddingProposalsReached,
+      limitForAddingCommentsReached,
+      clickBackToAssemblyListButton,
+      gotoNextStageNr,
+      gotoStage,
+      // testt,
     };
   };
 
-  // TODO: what is that for?
-  const gotoDefaultStageTeaser = (): void => {
-    console.log('goto default stage teaser');
-    if (stageID.value !== null && stageID.value !== undefined) {
-      console.log(
-        'DEBUG: gotoDefaultStageTeaser => vuex::get_stage_number_by_stage_id',
-        stageID.value
-      );
-      stage_nr_last_visited.value = get_stage_number_by_stage_id(stageID.value);
-    } else if (last_accessible_stage.value) {
-      stage_nr_last_visited.value = get_stage_number_by_stage(
-        last_accessible_stage.value
-      );
-    } else {
-      stage_nr_last_visited.value = null;
-    }
-  };
+  if (output.value === null) {
+    output.value = setup();
+    // testt.value = 2;
+  }
 
-  const getDailyContributionLimits = (): IContributionLimits | undefined => {
-    const progression = assemblyProgression;
-    const configuration = assemblyConfiguration;
-    // console.log("Assembly PROG", progression)
-    // console.log("Configuration", configuration)
+  // console.log(output.value.testt);
 
-    if (!configuration || !progression) {
-      // can happen when logout
-      return undefined;
-    }
-
-    return {
-      number_of_proposals: {
-        daylimit: configuration.value.MAX_DAILY_USER_PROPOSALS,
-        overalllimit: configuration.value.MAX_OVERALL_USER_PROPOSALS,
-        overallCurrent:
-          progression.value.number_of_proposals === null
-            ? 0
-            : progression.value.number_of_proposals,
-        current:
-          progression.value.number_of_proposals_today === null
-            ? 0
-            : progression.value.number_of_proposals_today,
-      },
-      number_of_comments: {
-        daylimit: configuration.value.MAX_DAILY_USER_COMMENTS,
-        current:
-          progression.value.number_of_comments_today === null
-            ? 0
-            : progression.value.number_of_comments_today,
-      },
-    };
-  };
-
-
-
-  console.log('DEBUG: end of assembly composable');
-
-  return {
-    clearSession,
-    gotoAssemblyHome,
-    initialize,
-    gotoDefaultStageTeaser,
-    // next_scheduled_stage,
-    // getFirstOrRoutedStageIDByGroup,
-    assemblyIdentifier: readonly(assemblyIdentifier),
-    assembly_sorted_stages,
-    // setAssemblyIdentifier,
-    stageID,
-    gotoAssemblyManage,
-    assembly,
-    assemblyStages,
-    // setStageID,
-    daySessions,
-    ready,
-    stage_last_visited,
-    getDailyContributionLimits,
-    overallLimitForAddingProposalsReached,
-    limitForAddingProposalsReached,
-    limitForAddingCommentsReached,
-    clickBackToAssemblyListButton,
-    // laggedScrollToStage,
-    gotoNextStageNr,
-    gotoStage
-  };
+  return output.value;
 }
 
 //     /**
@@ -405,7 +379,6 @@ export default function useAssemblyComposable(caller='') {
 //         }
 //       })
 //     }
-
 
 // applyCssVarProfileColor(): Record<string, unknown> {
 //   // This code apply writes the profile color into the css variable profilecolor.

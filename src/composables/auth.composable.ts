@@ -20,7 +20,11 @@ const emailIsAvailable = ref<boolean>(false);
 const emitter = useEmitter();
 const oauthEmitter = useOAuthEmitter();
 
+// const output = ref<null | any>(null);
+
 export default function useAuthComposable() {
+// const setup = () => {
+
   console.log('DEBUG: useAuthComposable::SETUP');
 
   const router = useRouter();
@@ -268,4 +272,11 @@ export default function useAuthComposable() {
     getUsername,
     markIndicatedEmail,
   };
-}
+  }
+
+//   if (output.value === null) {
+//     output.value = setup();
+//   }
+  
+//   return output.value;
+// }

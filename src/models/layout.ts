@@ -13,3 +13,17 @@ export interface INotificationBanner {
   }
 
 
+
+  
+export interface IContributionLimits {
+  number_of_proposals: {
+    daylimit: number;
+    overalllimit: number;
+    overallCurrent: number;
+    current: number;
+  };
+  number_of_comments: {
+    daylimit: number;
+    current: number;
+  };
+}
