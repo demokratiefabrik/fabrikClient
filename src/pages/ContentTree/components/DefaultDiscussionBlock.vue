@@ -83,9 +83,8 @@ import useAppComposable from 'src/composables/app.composable';
 import useMonitorComposable from 'src/composables/monitor.composable';
 import useLibraryComposable from 'src/utils/library';
 // import useAssemblyComposable from 'src/composables/assembly.composable';
-import useContenttreeComposable, {
-  INode,
-} from 'src/composables/contenttree.composable';
+import useContenttreeComposable from 'src/composables/contenttree.composable';
+import { INodeTuple } from 'src/models/content';
 // import useMonitorComposable from './monitor.composable';
 
 type IPath = number[]; //array of cells
@@ -146,7 +145,7 @@ export default defineComponent({
       default: true,
     },
     node: {
-      type: Object as PropType<INode | null>,
+      type: Object as PropType<INodeTuple | null>,
       default: () => null, // TODO: used to be {}
     },
     filterTypes: {
@@ -183,16 +182,16 @@ export default defineComponent({
       const paths = [] as IPath[];
       const filteredBranches = [] as number[];
       for (const [id, tuple] of Object.entries(
-        this.contenttree.entries as Record<string, INode>
+        this.contenttree.entries as Record<string, INodeTuple>
       )) {
         const withinPath =
-          !this.node?.content.id ||
+          !this.node?.content?.id ||
           (tuple.path &&
             tuple.path.includes(this.node.content.id) &&
-            this.node?.content.id !== tuple.content.id);
+            this.node?.content.id !== tuple.content?.id);
+        const type = tuple.content?.type;
         const withinTypeFilter =
-          !this.filterTypes || this.filterTypes.includes(tuple.content.type);
-
+          !this.filterTypes || (type && this.filterTypes.includes(type));
         if (!withinTypeFilter && withinPath) {
           filteredBranches.push(parseInt(id));
         } else if (withinTypeFilter && withinPath) {
@@ -211,7 +210,7 @@ export default defineComponent({
 
     // collect all tree entries to include into this dicussion tree..
     rawEntries() {
-      if (this.filterTypes?.length || this.node?.content.id) {
+      if (this.filterTypes?.length || this.node?.content?.id) {
         // fetch all content entries
         const entries = Object.keys(this.contenttree.entries)
           .filter((key) => this.entrieIds.includes(parseInt(key)))
@@ -229,12 +228,14 @@ export default defineComponent({
     // Finalize Discussion TREE STRUCTURE
     tree() {
       // empty entries vessel
-      const structure = this.getEmptyNode(this.node?.content.id);
+      const structure = this.getEmptyNode(this.node?.content?.id);
       const entries = {};
       const rootLevel = this.node?.path ? this.node.path.length : 0;
       const rootId = this.node?.content ? this.node.content.id : null;
 
-      for (let [id, original] of Object.entries(this.rawEntries as INode)) {
+      for (let [id, original] of Object.entries(
+        this.rawEntries as INodeTuple
+      )) {
         if (parseInt(id) === rootId) {
           continue;
         }
@@ -317,7 +318,7 @@ export default defineComponent({
       if (scroll) {
         this.scrollToAnchor(
           `CONTENTTREE${this.contenttree.id}CONTENT${
-            this.node ? this.node.content.id : ''
+            this.node ? this.node.content?.id : ''
           }`,
           50
         );
@@ -329,7 +330,7 @@ export default defineComponent({
       // Monitor action
       const data = {} as any;
       if (this.node) {
-        data.content_id = this.node.content.id;
+        data.content_id = this.node.content?.id;
       }
       // this.monitorLog(constants.MONITOR_DISCUSSION_HIDE, data);
 
@@ -349,7 +350,7 @@ export default defineComponent({
       // Monitor action
       const data = {} as any;
       if (this.node) {
-        data.content_id = this.node.content.id;
+        data.content_id = this.node.content?.id;
       }
       this.monitorLog(constants.MONITOR_DISCUSSION_SHOW, data);
     },

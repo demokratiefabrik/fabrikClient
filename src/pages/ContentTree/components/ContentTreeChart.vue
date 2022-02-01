@@ -64,7 +64,7 @@ import ChartBar from 'src/components/charts/ChartBar.vue';
 import ChartRadar from 'src/components/charts/ChartRadar.vue';
 import ChartPie from 'src/components/charts/ChartPie.vue';
 import useLibraryComposable from 'src/utils/library';
-import { INode } from 'src/composables/contenttree.composable';
+import { INodeTuple } from 'src/models/content';
 
 export default defineComponent({
   setup() {
@@ -94,25 +94,29 @@ export default defineComponent({
   },
 
   computed: {
-    // chartEntries() {
-    //   return this.rootElements.map(
-    //     (child) => this.contenttree.entries[child.id]
-    //   );
-    // },
-
     isBarChart() {
       return this.chartType == 'chartBar';
     },
     sortedChartEntries() {
       // deep copy
       // console.log(this.nodes, "all population")
-      const tmp_nodes = [...(this.nodes as INode[])];
+      const tmp_nodes = [...(this.nodes as INodeTuple[])];
 
       if (this.sortByPopulation && this.hasPopulationData) {
-        return tmp_nodes.sort((a, b) => b.content?.S?.SA - a.content?.S?.SA);
+        return tmp_nodes.sort(
+          (a: INodeTuple, b: INodeTuple) =>
+            (typeof b.content?.S?.SA === 'number' ? b.content?.S?.SA : 50) -
+            (typeof a.content?.S?.SA === 'number' ? a.content?.S?.SA : 50)
+        );
       } else {
         return tmp_nodes.sort(
-          (a, b) => b.progression?.salience - a.progression?.salience
+          (a: INodeTuple, b: INodeTuple) =>
+            (typeof b.progression?.salience === 'number'
+              ? b.progression?.salience
+              : 50) -
+            (typeof a.progression?.salience === 'number'
+              ? a.progression?.salience
+              : 50)
         );
       }
     },
@@ -140,7 +144,7 @@ export default defineComponent({
       return this.sortedChartEntries.map((entry) => entry.content?.S?.SA);
     },
     hasPopulationData() {
-      return !!(this.nodes as INode[]).find((entry) =>
+      return !!(this.nodes as INodeTuple[]).find((entry) =>
         this.loaded(entry.content?.S?.SA)
       );
     },

@@ -204,6 +204,8 @@ export default defineComponent({
       this.scrollSelectedItemAnchor = this.items[0].anchor;
       this.enabledAnchors = this.getEnabledAnchors();
     }
+
+    // console.log(this.highlightedItem, 'll' )
   },
 });
 </script>

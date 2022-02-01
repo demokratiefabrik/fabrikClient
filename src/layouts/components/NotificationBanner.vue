@@ -114,10 +114,11 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import useEmitter from 'src/utils/emitter';
-import { RouteRecordRaw,LocationAsRelativeRaw } from 'vue-router';
-import { INotificationBanner } from 'src/composables/app.composable';
+import { RouteLocationRaw } from 'vue-router';
+// import { INotificationBanner } from 'src/composables/app.composable';
 import useAuthComposable from 'src/composables/auth.composable';
 import useRouterComposable from 'src/composables/router.composable';
+import { INotificationBanner } from 'src/models/layout';
 
 export default defineComponent({
   name: 'NotificationBanner',
@@ -170,7 +171,7 @@ export default defineComponent({
 
     notificationRedirect() {
       if (this.notificationBanner?.redirectRoute) {
-        this.pushR(this.notificationBanner.redirectRoute as RouteRecordRaw | LocationAsRelativeRaw);
+        this.pushR(this.notificationBanner.redirectRoute as RouteLocationRaw);
       }
     },
   },

@@ -100,14 +100,15 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   setup() {
-    const emitter = useEmitter()
-    const {gotoAssemblyHome, assembly, gotoDefaultStageTeaser} = useAssemblyComposable()
+    const emitter = useEmitter();
+    const { gotoAssemblyHome, assembly, gotoDefaultStageTeaser } =
+      useAssemblyComposable();
     return {
       emitter,
       assembly,
       gotoAssemblyHome,
-      gotoDefaultStageTeaser
-    }
+      gotoDefaultStageTeaser,
+    };
   },
   name: 'PageAssemblyHome',
   // mixins: [AssemblyMixin],
@@ -212,7 +213,7 @@ export default defineComponent({
     this.gotoAssemblyHome(this.assembly);
 
     // Catch all authentication status changes
-    this.emitter.once('AssemblyLoaded', () => {
+    this.emitter.on('AssemblyLoaded', () => {
       // console.log("LayoutEventBus on AssemblyLoaded")
       // this.gotoDefaultStageTeaser();
       this.gotoAssemblyHome(this.assembly);

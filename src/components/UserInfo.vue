@@ -76,8 +76,8 @@
                       :maxlength="300"
                       v-model="notificationMessage"
                       autofocus
-                      @keyup.enter="prompt = false"
                     />
+                    <!-- @keyup.enter="prompt = false" -->
                   </q-card-section>
 
                   <q-card-actions align="right">
@@ -181,14 +181,13 @@
   </div>
 </template>
 
-
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import api from 'src/utils/api';
 import useLibraryComposable from 'src/utils/library';
 import useAuthComposable from 'src/composables/auth.composable';
+import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   name: 'UserInfo',
@@ -196,17 +195,25 @@ export default defineComponent({
 
   setup() {
     // console.log('DEBUG setup mainLayout')
-    const {loaded} = useLibraryComposable()
-    const {currentUsername, currentUsernameDerivation} = useAuthComposable();
+    const { loaded } = useLibraryComposable();
+    const { currentUsername, currentUsernameDerivation } = useAuthComposable();
+    const { assemblyIdentifier } = useAssemblyComposable();
+    // const {loading} = useLibraryComposable()
 
     // const { getUsernameDerivation, getUsername } = useAuthComposable();
 
     // console.log('DEBUG setup mainLayout ends')
-    return {  loaded, currentUsername, currentUsernameDerivation };
+    return {
+      loaded,
+      currentUsername,
+      currentUsernameDerivation,
+      assemblyIdentifier,
+    };
   },
 
   data() {
     return {
+      loading: true,
       toolbar: false,
       showNotificationMessageDialog: false,
       dialogType: '',
@@ -229,9 +236,8 @@ export default defineComponent({
         return;
       }
 
-      const assemblyIdentifier = runtimeStore.assemblyIdentifier;
+      const assemblyIdentifier = this.assemblyIdentifier;
       const userID = this.profile.id;
-      console.assert(assemblyIdentifier);
       console.assert(userID);
 
       if (this.dialogType == 'MESSAGE') {
@@ -289,6 +295,8 @@ export default defineComponent({
                 message:
                   'Der User wurde gesperrt. die Nachricht wird beim nächsten Besuch des Users angezeigt.',
               });
+
+              this.loading = false;
             } else {
               if (
                 response.data.error &&
@@ -301,11 +309,10 @@ export default defineComponent({
                     'Der User hat sich noch nie zu der Assembly eingeloggt. Er kann daher auch nicht gesperrt werden.',
                 });
               }
+              this.loading = false;
             }
           });
       }
-
-      this.loading = false;
     },
   },
 });

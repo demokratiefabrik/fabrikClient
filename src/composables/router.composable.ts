@@ -1,7 +1,7 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
 // import { computed } from 'vue';
 import useEmitter from 'src/utils/emitter';
-import { useRouter, useRoute, RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
+import { useRouter, useRoute, RouteLocationRaw } from 'vue-router';
 import { ref, watch } from 'vue';
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
@@ -9,10 +9,8 @@ const instanceNr = ref<number>(0);
 const assemblyIdentifier = ref<string | null>(null);
 const stageID = ref<number | null>(null);
 
-
-
 export default function useRouterComposable() {
-  console.log('DEBUG: useRouterComposable::SETUP')
+  console.log('DEBUG: useRouterComposable::SETUP');
 
   const router = useRouter();
   const currentRoute = useRoute();
@@ -29,7 +27,7 @@ export default function useRouterComposable() {
   // };
 
   /* Reload the page when redirecting to the same page */
-  const pushR = (route: RouteRecordRaw | LocationAsRelativeRaw) => {
+  const pushR = (route: RouteLocationRaw) => {
     // console.log(route, 'ROUTE in RESOLVE PUSHR');
     const target = router.resolve(route).href;
     // const currentRouteCleaned = ({ name: currentRoute.name, params: currentRoute.params }) as RouteLocationRaw;
@@ -38,14 +36,14 @@ export default function useRouterComposable() {
       // Reload
       emitter.emit('reload');
     } else {
-      const newRoute = { ...route };
+      // const newRoute = { ...route };
       // Push
-      router.push(newRoute);
+      router.push(route);
     }
   };
 
   /* Dont do anything when redirecting to the same page */
-  const pushI = (route: RouteRecordRaw | LocationAsRelativeRaw) => {
+  const pushI = (route: RouteLocationRaw) => {
     const target = router.resolve(route).href;
     const current = router.resolve(currentRoute).href;
     if (target !== current) {
@@ -56,7 +54,7 @@ export default function useRouterComposable() {
   };
 
   const gotoHome = () => {
-    pushR({ name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw);
+    pushR({ name: 'home' } as RouteLocationRaw);
   };
 
   const gotoProfile = () => {
@@ -75,10 +73,9 @@ export default function useRouterComposable() {
     //   });
     // }
 
-    pushR({ name: 'profile' } as RouteRecordRaw | LocationAsRelativeRaw);
+    pushR({ name: 'profile' } as RouteLocationRaw);
   };
 
-  
   const setAssemblyIdentifier = (identifier: string | null) =>
     (assemblyIdentifier.value = identifier);
 
@@ -89,7 +86,6 @@ export default function useRouterComposable() {
     setStageID(null);
     setAssemblyIdentifier(null);
   };
-
 
   // TODO: move watch outside of setup, right?
   /* Set runtime variables: currently selected assembly and stage */
@@ -110,8 +106,6 @@ export default function useRouterComposable() {
     }
   });
 
-
-    
   // /* Set runtime variables: currently selected assembly and stage */
   // watch(currentRoute, () => {
 
@@ -126,9 +120,6 @@ export default function useRouterComposable() {
   //   }
   // });
 
-    
-
-
   //     // TODO: Monitor Route change
   // watch(
   //   () => currentRoute, (currentRoute) => {
@@ -139,8 +130,7 @@ export default function useRouterComposable() {
   //     },
   //   { deep: true });
 
-
-  console.log('DEBUG: end of router composable')
+  console.log('DEBUG: end of router composable');
   return {
     pushR,
     pushI,
@@ -151,7 +141,7 @@ export default function useRouterComposable() {
     instanceNr,
     assemblyIdentifier,
     stageID,
-    setStageID
+    setStageID,
 
     // fullPath,
     // anchor

@@ -126,7 +126,7 @@ export default defineComponent({
 
   setup() {
     // console.log('DEBUG setup notifications')
-    const {assemblyIdentifier} = useAssemblyComposable();
+    const { assemblyIdentifier } = useAssemblyComposable();
     const { authorized, userid } = useAuthComposable();
     const { formatTimeLeft } = filters;
     const store = useStore();

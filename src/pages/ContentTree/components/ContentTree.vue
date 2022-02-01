@@ -175,7 +175,7 @@ body.screen--xs .q-gutter-x-sm > *,
           ref="content_editor"
           @expand-node="qtree.focus_on_branch"
           :parent_id="node.id"
-        /> 
+        />
       </div>
 
       <div class="full-width" align="right">

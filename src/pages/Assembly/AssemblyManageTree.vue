@@ -30,19 +30,21 @@
 import { defineComponent } from 'vue';
 // import ContentTreeMixin from 'src/mixins/stage.contenttree';
 import DefaultDiscussionBlock from 'src/pages/ContentTree/components/DefaultDiscussionBlock.vue';
+import useAssemblyComposable from 'src/composables/assembly.composable';
+import useStageComposable from 'src/composables/stage.composable';
+import useContenttreeComposable from 'src/composables/contenttree.composable';
 // const {  } = useContenttreeComposable();
 export default defineComponent({
+  setup() {
+    const { ready, gotoAssemblyManage, assembly } = useAssemblyComposable();
+    const { contenttree } = useContenttreeComposable();
+    const { routed_stage } = useStageComposable();
+    return { ready, routed_stage, gotoAssemblyManage, contenttree, assembly };
+  },
   name: 'VAATopics',
   // mixins: [ContentTreeMixin],
   components: {
     DefaultDiscussionBlock,
   },
-  data() {
-    return {};
-  },
-
-  computed: {},
-
-  methods: {},
 });
 </script>

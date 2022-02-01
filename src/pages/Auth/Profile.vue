@@ -13,7 +13,12 @@
             Teilnehmende werden Sie unter diesem Namen ansprechen können.
             {{ currentUsernameDerivation }}. <br />
             <br />
-            <q-input disable outlined v-model="localprofile.pseudonym" :dense="true">
+            <q-input
+              disable
+              outlined
+              v-model="localprofile.pseudonym"
+              :dense="true"
+            >
               <template v-slot:prepend>
                 <q-icon name="mdi-account" />
               </template>
@@ -128,20 +133,20 @@ import { mapGetters } from 'vuex';
 import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
 import useAuthComposable from 'src/composables/auth.composable';
 import { PropType, defineComponent } from 'vue';
-import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
+import { RouteLocationRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'Profile',
   props: {
     destination_route: {
       // right, left, center
-      type: Object as PropType<RouteRecordRaw | LocationAsRelativeRaw>,
+      type: Object as PropType<RouteLocationRaw>,
     },
   },
 
-
   setup() {
-    const { currentUsernameDerivation, payload, markIndicatedEmail } = useAuthComposable();
+    const { currentUsernameDerivation, payload, markIndicatedEmail } =
+      useAuthComposable();
     return { payload, markIndicatedEmail, currentUsernameDerivation };
   },
   components: { AlgorithmDisclaimer },
@@ -241,7 +246,7 @@ export default defineComponent({
     skipProfile: function () {
       const route = this.destination_route
         ? this.destination_route
-        : ({ name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw);
+        : ({ name: 'home' } as RouteLocationRaw);
       this.$router.push(route);
     },
 
@@ -270,7 +275,9 @@ export default defineComponent({
             // Okay
             this.localprofile.email = this.emailToSms(response.data.email);
             // this.profile.last_name = response.data.last_name;
-            this.localprofile.original_email = this.emailToSms(response.data.email);
+            this.localprofile.original_email = this.emailToSms(
+              response.data.email
+            );
             this.error = false;
           } else {
             // Error
@@ -291,7 +298,8 @@ export default defineComponent({
         });
     },
     saveProfile: function () {
-      const changed = this.localprofile.original_email != this.localprofile.email;
+      const changed =
+        this.localprofile.original_email != this.localprofile.email;
       console.log('nothing changed... ');
       if (!changed) {
         this.confirmation = true;

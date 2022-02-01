@@ -14,12 +14,12 @@ import useLibraryComposable from 'src/utils/library';
 // const assemblyIdentifier = ref<string | null>(null);
 // const stageID = ref<number | null>(null);
 
-export interface IStageGroup{
+export interface IStageGroup {
   name: string;
   disabled?: boolean;
   label: string;
   toc_label?: string;
-  description:string;
+  description: string;
   icon: string;
   tooltip?: string;
   expanded?: (item) => boolean;
@@ -28,9 +28,8 @@ export interface IStageGroup{
   to: () => any; // TODO. add route interface
 }
 
-
 export default function useStagesComposable() {
-  console.log('DEBUG: useStagesComposable::SETUP')
+  console.log('DEBUG: useStagesComposable::SETUP');
 
   const store = useStore();
   const emitter = useEmitter();
@@ -42,7 +41,7 @@ export default function useStagesComposable() {
 
   const assembly_sorted_stages =
     store.getters['assemblystore/assembly_sorted_stages'];
-  const assembly_stages = store.getters['assemblystore/assembly_stages'];
+  const assemblyStages = store.getters['assemblystore/assemblyStages'];
   const is_stage_accessible =
     store.getters['assemblystore/is_stage_accessible'];
   const assembly_accessible_stages =
@@ -52,19 +51,18 @@ export default function useStagesComposable() {
   const IsManager = store.getters['assemblystore/IsManager'];
   const assembly = store.getters['assemblystore/assembly'];
 
-
   const routed_stage = computed(() => {
     if (!stageID.value) {
       return null;
     }
-    if (!assembly_stages) {
+    if (!assemblyStages) {
       return null;
     }
-    return assembly_stages[stageID.value];
+    return assemblyStages[stageID.value];
   });
 
   const ready = computed(() => {
-    const ready = loaded(assembly_stages);
+    const ready = loaded(assemblyStages);
     if (ready) {
       emitter.emit('hideLoading');
     }
@@ -84,7 +82,7 @@ export default function useStagesComposable() {
 
   const stages_by_groups = computed(() => {
     const stages_by_groups = {};
-    if (!assembly_stages) {
+    if (!assemblyStages) {
       return null;
     }
 
@@ -124,7 +122,7 @@ export default function useStagesComposable() {
 
   const is_stage_first_shown = (stage) => {
     console.assert(stage);
-    console.assert(assembly_sorted_stages)
+    console.assert(assembly_sorted_stages);
     return stage === assembly_sorted_stages[assembly_sorted_stages.length - 1];
   };
 
@@ -149,8 +147,8 @@ export default function useStagesComposable() {
     return stages_by_groups[group][0].stage.id;
   };
 
-
-  const next_scheduled_stage = store.getters['assemblystore/next_scheduled_stage']
+  const next_scheduled_stage =
+    store.getters['assemblystore/next_scheduled_stage'];
 
   // const next_scheduled_stage = computed(() => {
   //   return  store.getters['assemblystore/next_scheduled_stage'];

@@ -13,17 +13,9 @@ import { computed } from 'vue';
 import useMonitorComposable from './monitor.composable';
 import { useStore } from 'vuex';
 import useStagesComposable from './stages.composable';
+import { INodeTuple } from 'src/models/content';
 
 
-export interface INode {
-  id: number | null;
-  path: number[];
-  children: INode[];
-  nof_descendants?: number;
-  progression?: any;
-  creator?: any;
-  content?: any;
-}
 
 export default function useContenttreeComposable() {
   console.log('DEBUG: useContenttreeComposable::SETUP')
@@ -84,12 +76,12 @@ export default function useContenttreeComposable() {
       id: null,
       path: [],
       children: rootElements.value,
-    } as INode;
+    } as INodeTuple;
   });
 
-  const rootElements = computed((): INode[] | null => {
+  const rootElements = computed((): INodeTuple[] | null => {
     if (contenttree.value?.rootElementIds) {
-      let elements: INode[] = [];
+      let elements: INodeTuple[] = [];
       contenttree.value.rootElementIds.forEach((x: any) => {
         const el = contenttree.value.entries[x];
         elements = pushSorted(elements, el);
@@ -141,7 +133,7 @@ export default function useContenttreeComposable() {
   // })
 
   /** Filter nodes by type (positive list) */
-  const filter_entries = (nodes, TYPES): INode[] | null => {
+  const filter_entries = (nodes, TYPES): INodeTuple[] | null => {
     if (!nodes) {
       return null;
     }
@@ -178,7 +170,7 @@ export default function useContenttreeComposable() {
     });
   };
 
-  const getDescendantsOf = (node): INode[] => {
+  const getDescendantsOf = (node): INodeTuple[] => {
     console.assert(node);
     const nodePathLength = node.path.length;
     const nodeID = node.content.id;

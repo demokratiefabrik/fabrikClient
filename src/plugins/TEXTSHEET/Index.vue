@@ -90,13 +90,14 @@ import useLibraryComposable from 'src/utils/library';
 import useStagesComposable from 'src/composables/stages.composable';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useEmitter from 'src/utils/emitter';
+import { INodeTuple } from 'src/models/content';
 
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
     const { routed_stage } = useStagesComposable();
     const { contenttree } = useContenttreeComposable();
-    const { emitter } = useEmitter();
+    const emitter = useEmitter()
 
     // extend i18n
     const i18n = useI18n();
@@ -202,7 +203,7 @@ export default defineComponent({
   },
 
   methods: {
-    textChildrenEntries(node = null): null | any[] {
+    textChildrenEntries(node: INodeTuple | null = null): null | any[] {
       const node_id = node ? node.content.id : null;
       console.log('look for children of ', node_id);
       let children = this.textEntries.filter(

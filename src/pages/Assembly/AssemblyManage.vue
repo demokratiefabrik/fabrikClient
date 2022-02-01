@@ -28,7 +28,7 @@
     <h1>Assembly-Inhalte</h1>
     <p>Hier können Sie die laufenden Diskussionen moderieren.</p>
     <!-- CITIZEN ASSEMBLIES -->
-    <q-list>
+    <q-list v-if="stagesWithContenttree">
       <q-expansion-item
         popup
         icon="mdi-account-supervisor-circle"
@@ -78,27 +78,27 @@
     <h2>Stage-Konfiguration (Etappen-Programmierung)</h2>
     <p>Möchtest du die Stages dieser Assembly bearbeiten?</p>
 
-    <q-list>
+    <q-list v-if="assembly_sorted_stages">
       <q-expansion-item
         icon="mdi-account-supervisor-circle"
         v-for="stage of assembly_sorted_stages"
         group="samegroup"
-        :key="stage.stage.id"
-        :label="`${stage.stage.disabled ? '[[[DEAKTIVIERT]]] - ' : ''}${
-          stage.stage.order_position
-        }. ${stage.stage.title}`"
-        :caption="`Gruppe: ${stage.stage.group}; Typ: ${stage.stage.type}; `"
+        :key="stage?.stage.id"
+        :label="`${stage?.stage.disabled ? '[[[DEAKTIVIERT]]] - ' : ''}${
+          stage?.stage.order_position
+        }. ${stage?.stage.title}`"
+        :caption="`Gruppe: ${stage?.stage.group}; Typ: ${stage?.stage.type}; `"
         header-class="text-secondary"
       >
         <q-card style="border-left: 1px solid blue" class="q-ml-xl">
           <q-card-section>
             <b> {{ stage.stage.title }}</b
             ><br />
-            <i>Beschreibung:</i> {{ stage.stage.info }}<br />
+            <i>Beschreibung:</i> {{ stage?.stage.info }}<br />
             <br />
-            Zuletzt Bearbeitet: {{ formatDate_stage_stage_date_modified  }}
+            Zuletzt Bearbeitet: {{ formatDate_stage_stage_date_modified }}
 
-            <StageEditor :model="stage.stage"></StageEditor>
+            <StageEditor :model="stage?.stage"></StageEditor>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -141,27 +141,49 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import AssemblyMixin from 'src/mixins/assembly';
+// import { RouteRecordRaw, LocationAsRelativeRaw} from 'vue-router';
+// import AssemblyMixin from 'src/mixins/assembly';
 // import DefaultDiscussionBlock from 'src/pages/ContentTree/components/DefaultDiscussionBlock';
 import SideMenu from 'src/components/SideMenu.vue';
 import { mapGetters } from 'vuex';
-import StageEditor from 'src/pages/Assembly/components/StageEditor';
-import AssemblyEditor from 'src/pages/Assembly/components/AssemblyEditor';
+import { IContentTree } from 'src/models/contenttree';
+import { IStageTuple } from 'src/models/stage';
+
+import StageEditor from 'src/pages/Assembly/components/StageEditor.vue';
+import AssemblyEditor from 'src/pages/Assembly/components/AssemblyEditor.vue';
+import useLibraryComposable from 'src/utils/library';
+import useAssemblyComposable from 'src/composables/assembly.composable';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import { useStore } from 'vuex';
+// import useContenttreeComposable from 'src/composables/contenttree.composable';
+// import useContenttreeComposable from './contenttree.composable';
 // import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { assemblyIdentifier } = useAssemblyComposable();
-    return { assemblyIdentifier, loaded };
+    const { assemblyIdentifier, assembly_sorted_stages, assembly, ready } =
+      useAssemblyComposable();
+    // const { contenttree } = useContenttreeComposable();
+    const store = useStore();
+    const { userid } = usePKCEComposable();
+    return {
+      assemblyIdentifier,
+      assembly,
+      ready,
+      loaded,
+      store,
+      // contenttree,
+      assembly_sorted_stages: assembly_sorted_stages as IStageTuple[],
+      userid,
+    };
   },
   name: 'PageAssemblyHome',
-  mixins: [AssemblyMixin],
+  // mixins: [AssemblyMixin],
 
   data() {
     return {
-      stage: null,
-
+      stage: null as IStageTuple | null,
       sideMenuItems: [
         {
           label: 'Inhalte',
@@ -188,20 +210,26 @@ export default defineComponent({
   },
 
   computed: {
+    formatDate_contenttree_date_last_tree_modification(): string {
+      return this.$filters.formatDate(
+        this.contenttree?.date_last_tree_modification
+      );
+    },
 
-    formatDate_contenttree_date_last_tree_modification(){
-      return this.$filters.formatDate(this.contenttree.date_last_tree_modification)
+    formatDate_stage_stage_date_modified(): string {
+      const date = this.stage?.stage.date_modified;
+      return this.$filters.formatDate(date);
     },
-    
-    formatDate_stage_stage_date_modified(){
-      return this.$filters.formatDate(this.stage?.stage.date_modified)
-    },
-    
-    stagesWithContenttree() {
-      const stages = [];
-      const previousContenttrees = [];
-      this.assembly_sorted_stages.forEach(stage => {
-        const contenttreeID = stage.stage.contenttree_id;
+
+    stagesWithContenttree(): IStageTuple[] | null {
+      const stages = [] as IStageTuple[];
+      const previousContenttrees: number[] = [];
+
+      this.assembly_sorted_stages.forEach((stage: IStageTuple) => {
+        const contenttreeID = stage.stage.contenttree_id as number;
+        if (!contenttreeID) {
+          return null;
+        }
         if (contenttreeID && !previousContenttrees.includes(contenttreeID)) {
           previousContenttrees.push(stage.stage.contenttree_id);
           stages.push(stage);
@@ -211,16 +239,16 @@ export default defineComponent({
       return stages;
     },
 
-    contenttreeID() {
-      return this.stage?.stage?.contenttree_id;
+    contenttreeID(): number | undefined {
+      return this.stage?.stage.contenttree_id;
     },
 
-    contenttree() {
+    contenttree(): IContentTree | null {
       if (this.contenttreeID) {
-        this.$store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contentstore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID: this.contenttreeID,
-          oauthUserID: this.oauth.userid,
+          oauthUserID: this.userid,
         });
         return this.get_contenttree({ contenttreeID: this.contenttreeID });
       }
@@ -228,17 +256,19 @@ export default defineComponent({
       return null;
     },
 
-    toSummary() {
-      // TODO: this is a hack...
-      return {
-        name: 'assembly_manage_summary',
-        params: {
-          assemblyIdentifier: this.assemblyIdentifier,
-          stageID: 8,
-          contenttreeID: 5,
-        },
-      };
-    },
+    // toSummary(): RouteRecordRaw | LocationAsRelativeRaw {
+    //   // TODO: this is a hack...
+    //   alert('ddddddddddddddd')
+    //   return {
+    //     name: 'assembly_manage_summary',
+    //     params: {
+    //       assemblyIdentifier: this.assemblyIdentifier,
+    //       stageID: 8,
+    //       contenttreeID: 5,
+    //     },
+    //   };
+    // },
+
     ...mapGetters({
       assemblystore: 'contentstore/assembly_sorted_stages',
       get_contenttree: 'contentstore/get_contenttree',

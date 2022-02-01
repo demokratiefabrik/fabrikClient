@@ -31,7 +31,7 @@
       <div class="row items-center no-wrap">
         <div class="col">
           <!-- SHOW USER INFOS FOR PRIVATE CONTENT -->
-          <div v-if="node.content.private_property">
+          <div v-if="node.content?.private_property">
             <UserAvatar
               v-if="node.creator"
               :profile="node.creator"
@@ -61,21 +61,21 @@
           </div>
 
           <div v-else class="text-h5 q-pt-sm q-pl-none">
-            <q-chip>
+            <q-chip v-if="node.content?.type">
               <q-avatar color="grey" text-color="white">
-                <q-icon :name="ICONS[node.content.type]"></q-icon>
+                <q-icon :name="ICONS[node.content?.type]"></q-icon>
               </q-avatar>
-              {{ TYPE_LABELS[node.content.type] }}
+              {{ TYPE_LABELS[node.content?.type] }}
             </q-chip>
 
-            <span v-if="node.content.type == 'UPDATEPROPOSAL'">
+            <span v-if="node.content?.type == 'UPDATEPROPOSAL'">
               <!-- <q-icon :name="ICONS[node.content.type]"></q-icon> -->
               vom {{ formatDate_node_content_date_created }}
               {{ node.nof_descendants ? `(${node.nof_descendants})` : '' }}
             </span>
             <span v-else>
               <!-- <q-icon :name="ICONS[node.content.type]"></q-icon> -->
-              {{ node.content.title }}
+              {{ node.content?.title }}
               {{
                 node.nof_descendants ? `(${node.nof_descendants})` : ''
               }} </span
@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <div class="col-auto vertical-top">
+        <div class="col-auto vertical-top" v-if="node.content">
           <q-badge
             color="purple"
             v-if="node.content.disabled"
@@ -98,7 +98,7 @@
           </q-badge>
           <q-badge
             color="grey"
-            v-if="node.content.rejected"
+            v-if="node.content?.rejected"
             size="lg"
             style="position: relative; top: -1em"
           >
@@ -108,7 +108,7 @@
             >
             Abgelehnt
           </q-badge>
-          <span v-if="IsManager"> #{{ node.content.id }} | </span>
+          <span v-if="IsManager"> #{{ node.content?.id }} | </span>
 
           <span class="q-mr-xs">
             <span v-if="$q.screen.gt.md">
@@ -142,13 +142,13 @@ import { defineComponent, PropType } from 'vue';
 import { mapGetters } from 'vuex';
 import UserAvatar from 'src/components/UserAvatar.vue';
 import constants from 'src/utils/constants';
-import { INode } from 'src/composables/contenttree.composable';
+import { INodeTuple } from 'src/models/content';
 
 export default defineComponent({
   // setup() {},
   name: 'ContentTreeQTreeHead',
   props: {
-    node: { type: Object as PropType<INode> },
+    node: { type: Object as PropType<INodeTuple> },
     highlightedNode: { type: Boolean },
     isRead: { type: Boolean },
     isExpanded: { type: Boolean },
@@ -166,7 +166,7 @@ export default defineComponent({
   emits: ['is-currently-expanded', 'popup-content-form', 'toggle-node'],
   computed: {
     formatDate_node_content_date_created(): string {
-      return this.$filters.formatDate(this.node?.content.date_created);
+      return this.$filters.formatDate(this.node?.content?.date_created);
     },
 
     // isExpanded() {

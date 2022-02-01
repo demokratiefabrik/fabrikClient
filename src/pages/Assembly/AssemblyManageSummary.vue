@@ -42,12 +42,12 @@
         :nodes="topics"
       />
 
-      <p v-if="topicHighestSalience && topicHighestSaliencePercent">
+      <!-- <p v-if="topicHighestSalience && topicHighestSaliencePercent">
         Wenn die Beteiligungswochen bereits beendet wären, dann würde das Thema
         "{{ topicHighestSalience.content.title }}" im smartvote-Fragebogen am
         meisten Platz eingeräumt werden. Nämlich ungefähr
         {{ topicHighestSaliencePercent }}%.
-      </p>
+      </p> -->
     </div>
     <div v-else>
       <Skeleton h2="Zwischenstand:  smartvote-Themen"></Skeleton>
@@ -58,7 +58,7 @@
     <!-- FRAGEN -->
     <a name="QUESTIONS" />
 
-    <div v-if="loaded(questions)">
+    <div v-if="questions && questions.length">
       <h2>Zwischenstand: smartvote-Fragen</h2>
       <p>
         Im Moment sind {{ questions.length }} Fragen im Fragenkatalog der
@@ -75,10 +75,14 @@
           Form, im smartvote-Fragebogen aufgeführt zu werden.
         </p>
         <br />
-        <ul>
-          <li v-for="node in questionsHighestSalience" :key="node.content.id">
-            {{ node.content.title }} (Bewertung:
-            {{ Math.round(node.content.S.SA) }}/100)
+        <ul v-if="questionsHighestSalience.length">
+          <li v-for="node in questionsHighestSalience" :key="node.content?.id">
+            {{ node.content?.title }} (Bewertung:
+            {{
+              node?.content?.S?.SA !== undefined
+                ? Math.round(node.content?.S.SA)
+                : '-'
+            }}/100)
           </li>
         </ul>
       </div>
@@ -167,27 +171,49 @@
 import { defineComponent } from 'vue';
 import ContentTreeChart from 'src/pages/ContentTree/components/ContentTreeChart.vue';
 import SideMenu from 'src/components/SideMenu.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, useStore } from 'vuex';
 import Skeleton from 'src/components/Skeleton.vue';
 // import AMs from './ArtificialModeration';
 // import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useLibraryComposable from 'src/utils/library';
+import { IStageTuple } from 'src/models/stage';
+import { IContentTree } from 'src/models/contenttree';
+import { INodeTuple } from 'src/models/content';
+import useStageComposable from 'src/composables/stage.composable';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import useEmitter from 'src/utils/emitter';
 
 export interface ISideMenuItem {
-  label: string,
-  anchor: string,
-  caption?: string,
-  visible?: () => boolean
+  label: string;
+  anchor: string;
+  caption?: string;
+  visible?: () => boolean;
 }
 
 export type ISideMenuItems = ISideMenuItem[];
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { assemblyIdentifier } = useAssemblyComposable();
-    // const { assemblyIdentifier } = useContenttreeComposable();
-    return { assemblyIdentifier, loaded };
+    const { assemblyIdentifier, assembly, assemblyStages, ready } =
+      useAssemblyComposable();
+    const { routed_stage, markUnAlert } = useStageComposable();
+    const store = useStore();
+    const { userid } = usePKCEComposable();
+    const emitter = useEmitter();
+
+    return {
+      assemblyIdentifier,
+      loaded,
+      assemblyStages,
+      markUnAlert,
+      store,
+      userid,
+      routed_stage,
+      emitter,
+      ready,
+      assembly,
+    };
   },
   name: 'VAATopics',
   mixins: [],
@@ -236,7 +262,7 @@ export default defineComponent({
     topicContentTree(): any {
       // TODO interface
       const contenttreeID = this.topicContentTreeID;
-      // const topicStage = Object.values(this.assembly_stages).find(
+      // const topicStage = Object.values(this.assemblyStages).find(
       //   (stageTuple) => stageTuple.stage.type == "VAA_TOPICS"
       // );
       // console.assert(topicStage);
@@ -247,97 +273,114 @@ export default defineComponent({
     },
 
     topicContentTreeID(): number {
-      const topicStage = Object.values(this.assembly_stages).find(
-        (stageTuple) => stageTuple.stage.type == 'VAA_TOPICS'
+      const topicStage = Object.values(this.assemblyStages).find(
+        (stageTuple) => (stageTuple as IStageTuple).stage?.type === 'VAA_TOPICS'
       );
       console.assert(topicStage);
-      return topicStage.stage.contenttree_id;
-      // return this.get_contenttree({
-      //   contenttreeID: topicStage.stage.contenttree_id,
-      // });
+      return (topicStage as IStageTuple).stage.contenttree_id;
     },
 
-    topics(): any {
+    topics(): INodeTuple[] | undefined {
       // TODO interface
       if (!this.topicContentTree) {
         return;
       }
-      if (this.topicContentTree?.rootElementIds) {
-        return this.topicContentTree.rootElementIds.map(
-          (x) => this.topicContentTree.entries[x]
-        );
+
+      if (!this.topicContentTree?.rootElementIds) {
+        return;
       }
 
-      return null
+      return this.topicContentTree.rootElementIds.map(
+        (x) => this.topicContentTree.entries[x]
+      );
     },
 
-    topicHighestSalience(): any {
+    topicHighestSalience(): INodeTuple | undefined {
       // TODO: interface
       // const sorted = this.topics.sort((a, b) => b?.S?.SA - a.S?.SA);
       const sorted = this.topics;
-      // TODO: is this sort correct? (was a problem of unexpected sideeffects...)
-      // const sorted =
-      sorted.sort(function (first, second) {
-        const firstS = first.content.S?.SA !== null ? first.content?.S?.SA : 50;
+
+      if (!sorted) {
+        return undefined;
+      }
+
+      sorted.sort(function (first: INodeTuple, second: INodeTuple) {
+        const firstS =
+          first.content?.S?.SA !== undefined ? first.content?.S?.SA : 50;
         const secondS =
-          second.content.S?.SA !== null ? second.content?.S?.SA : 50;
+          second.content?.S?.SA !== undefined ? second.content?.S?.SA : 50;
         return secondS - firstS;
       });
 
       return sorted[0];
     },
 
-    topicHighestSaliencePercent(): any {
-      // TODO: interface
-      if (!this.topicHighestSalience.content?.S?.SA) {
-        return;
-      }
-      const cumulative = this.topics.reduce(
-        (a, b) => a.content?.S?.SA + b.content?.S?.SA,
-        0
-      );
-      if (!cumulative) {
-        return;
-      }
-      const highest = this.topicHighestSalience.content?.S?.SA;
-      return Math.round((100 / cumulative) * highest);
-    },
+    // topicHighestSaliencePercent(): INodeTuple | undefined {
+    //   const reduced = this.topics as INodeTuple[];
 
-    questionsContentTree(): any {
-      // TODO: interface
-      const questionStage = Object.values(this.assembly_stages).find(
-        (stageTuple) => stageTuple.stage.type == 'VAA_QUESTIONS'
+    //   if (!this.topicHighestSalience?.content?.S?.SA || !reduced) {
+    //     return;
+    //   }
+
+    //   const cumulative = reduced.reduce(
+    //     (a: INodeTuple, b: INodeTuple) => a.content?.S?.SA + b.content?.S?.SA,
+    //     0
+    //   );
+    //   if (!cumulative) {
+    //     return;
+    //   }
+    //   const highest = this.topicHighestSalience.content?.S?.SA;
+
+    //   return Math.round((100 / cumulative) * highest);
+    // },
+
+    questionsContentTree(): IContentTree | null {
+      if (!this.assemblyStages) {
+        return null;
+      }
+
+      const stages: IStageTuple[] = Object.values(this.assemblyStages);
+
+      const questionStage = stages.find(
+        (stageTuple: IStageTuple) => stageTuple?.stage?.type === 'VAA_QUESTIONS'
       );
       console.assert(questionStage);
-      console.assert(questionStage.stage.contenttree_id);
+      console.assert(questionStage?.stage.contenttree_id);
       return this.get_contenttree({
-        contenttreeID: questionStage.stage.contenttree_id,
+        contenttreeID: questionStage?.stage.contenttree_id,
       });
     },
 
-    questions(): any {
-      // TODO: interface
+    questions(): INodeTuple[] | undefined {
       if (!this.questionsContentTree) {
-        return;
+        return undefined;
       }
-      return Object.values(
-        Object.filter(
-          this.questionsContentTree.entries,
-          (x) => x.content.type === 'VAA_QUESTION' && !x.content.rejected
-        )
+      const nodes: INodeTuple[] = Object.values(
+        this.questionsContentTree.entries
+      );
+      return nodes.filter(
+        (x: INodeTuple) =>
+          x.content?.type === 'VAA_QUESTION' && !x.content.rejected
       );
     },
 
-    questionsHighestSalience(): any {
+    questionsHighestSalience(): INodeTuple[] | null {
       // TODO: interface
+      if (!this.questions) {
+        return null;
+      }
+
       const questions = [
-        ...this.questions.filter((x) => this.loaded(x.content.S?.SA)),
+        ...this.questions.filter((x) => this.loaded(x.content?.S?.SA)),
       ];
-      const sorted = questions.sort(function (first, second) {
+      const sorted = questions.sort(function (
+        first: INodeTuple,
+        second: INodeTuple
+      ) {
         const firstS =
-          first.content?.S?.SA !== null ? first.content?.S?.SA : 50;
+          first.content?.S?.SA !== undefined ? first.content?.S?.SA : 50;
         const secondS =
-          second.content?.S?.SA !== null ? second.content?.S?.SA : 50;
+          second.content?.S?.SA !== undefined ? second.content?.S?.SA : 50;
         return secondS - firstS;
       });
 
@@ -355,15 +398,6 @@ export default defineComponent({
           !this.loaded(x.peereview.approved)
       );
     },
-
-    // peerreviewsOngoing() {
-    //   if (!this.loaded(this.peerreviews)) {
-    //     return;
-    //   }
-    //   return this.peerreviews.filter(
-    //     (x) => !x.peerreview.rejected && !x.peerreview.approved
-    //   );
-    // },
 
     peerreviewsRejected(): any {
       // TODO: interface
@@ -397,10 +431,10 @@ export default defineComponent({
     // LOAD TOPICS
     topicContentTreeID(to) {
       if (to) {
-        this.$store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contentstore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID: to,
-          oauthUserID: this.oauth.userid,
+          oauthUserID: this.userid,
         });
       }
     },
@@ -414,25 +448,26 @@ export default defineComponent({
 
   mounted() {
     // when stage has been loaded already
-    this.$store.dispatch('contentstore/syncContenttree', {
+    this.store.dispatch('contentstore/syncContenttree', {
       assemblyIdentifier: this.assemblyIdentifier,
       contenttreeID: this.topicContentTreeID,
-      oauthUserID: this.oauth.userid,
+      oauthUserID: this.userid,
     });
 
-    if (this.routed_stage?.stage.contenttree_id && this.oauth.userid) {
-      this.$store.dispatch('peerreviewstore/syncPeerreviews', {
+    if (this.routed_stage?.stage.contenttree_id && this.userid) {
+      this.store.dispatch('peerreviewstore/syncPeerreviews', {
         assemblyIdentifier: this.assemblyIdentifier,
         contenttreeID: this.routed_stage.stage.contenttree_id,
-        oauthUserID: this.oauth.userid,
+        oauthUserID: this.userid,
       });
     } else {
       // Stage is not yet loaded: so wait until it is...
-      LayoutEventBus.$once('EventStageLoaded', (stage) => {
-        this.$store.dispatch('peerreviewstore/syncPeerreviews', {
+      this.emitter.on('EventStageLoaded', (stage) => {
+        // this.emitter.off('EventStageLoaded', onFoo)  // unlisten
+        this.store.dispatch('peerreviewstore/syncPeerreviews', {
           assemblyIdentifier: this.assemblyIdentifier,
-          contenttreeID: stage.stage.contenttree_id,
-          oauthUserID: this.oauth.userid,
+          contenttreeID: (stage as IStageTuple)?.stage.contenttree_id,
+          oauthUserID: this.userid,
         });
       });
     }

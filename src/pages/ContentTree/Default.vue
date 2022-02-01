@@ -12,11 +12,13 @@
 import { defineComponent } from 'vue';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import ComponentContentTree from './components/ContentTree.vue';
+import useStageComposable from 'src/composables/stage.composable';
 
 export default defineComponent({
   setup() {
+    const {routed_stage} = useStageComposable()
     const { contenttree } = useContenttreeComposable();
-    return { contenttree };
+    return { contenttree, routed_stage };
   },
   name: 'UserContentDefault',
   components: {

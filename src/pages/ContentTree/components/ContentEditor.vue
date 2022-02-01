@@ -30,10 +30,7 @@
 
     <div
       class="q-pa-md"
-      v-if="
-        localmodel && 
-        (!limitForAddingCommentsReached || isAModification)
-      "
+      v-if="localmodel && (!limitForAddingCommentsReached || isAModification)"
     >
       <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="$refs['popupeditor'].cancel()" /> -->
       <div style="float: right">
@@ -193,7 +190,7 @@
             input-debounce="0"
             label="Eltern-Beitrag"
             :display-value="`Beitrag: ${
-              currentParent
+              currentParent?.content?.id
                 ? `#${currentParent.content.id} ${currentParent.content.title}`
                 : '*Oberste Ebene*'
             }`"
@@ -262,7 +259,8 @@ import api from 'src/utils/api';
 import { defineComponent, ref } from 'vue';
 import useLibraryComposable from 'src/utils/library';
 import useAssemblyComposable from 'src/composables/assembly.composable';
-import useContenttreeComposable, { INode } from 'src/composables/contenttree.composable';
+import useContenttreeComposable from 'src/composables/contenttree.composable';
+import { INodeTuple } from 'src/models/content';
 
 export interface IError {
   title?: string;
@@ -277,17 +275,21 @@ export interface IData {
   type: string;
   text: string;
   parent_id: number | null;
-};
-
+}
 
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { getDailyContributionLimits, limitForAddingCommentsReached, assemblyIdentifier } = useAssemblyComposable();
-    const {getContentReference, contenttree, markDiscussed} = useContenttreeComposable();
+    const {
+      getDailyContributionLimits,
+      limitForAddingCommentsReached,
+      assemblyIdentifier,
+    } = useAssemblyComposable();
+    const { getContentReference, contenttree, markDiscussed } =
+      useContenttreeComposable();
     const popup_content_formor = ref();
-    const store = useStore()
-    
+    const store = useStore();
+
     return {
       loaded,
       popup_content_formor,
@@ -297,7 +299,7 @@ export default defineComponent({
       store,
       markDiscussed,
       contenttree,
-      assemblyIdentifier
+      assemblyIdentifier,
     };
   },
 
@@ -326,7 +328,6 @@ export default defineComponent({
   },
 
   computed: {
-
     dailyContributionLimits(): Record<string, number> | undefined {
       const limits = this.getDailyContributionLimits();
       return limits?.number_of_comments;
@@ -391,7 +392,7 @@ export default defineComponent({
       return 'Speichern';
     },
 
-    contextNodeTypes (): string[] {
+    contextNodeTypes(): string[] {
       if (this.localmodel && !('id' in this.localmodel)) {
         return [];
       }
@@ -400,8 +401,7 @@ export default defineComponent({
       var parentType = null;
       if (this.localmodel?.parent_id) {
         const parentNode =
-          this.contenttree.entries[this.localmodel.parent_id]
-            .content;
+          this.contenttree.entries[this.localmodel.parent_id].content;
         parentType = parentNode.type;
       }
 
@@ -433,7 +433,7 @@ export default defineComponent({
       return context_node_types;
     },
 
-    contextNodeTypesOptions (): any {
+    contextNodeTypesOptions(): any {
       const options = Object.values(
         this.contextNodeTypes.reduce((prev, cur, i) => {
           return {
@@ -448,11 +448,11 @@ export default defineComponent({
       return options;
     },
 
-    currentParent(): INode | null {
+    currentParent(): INodeTuple | null {
       if (this.localmodel?.parent_id) {
         return this.contenttree.entries[this.localmodel.parent_id];
       }
-      return null
+      return null;
     },
 
     ...mapGetters({
@@ -467,8 +467,7 @@ export default defineComponent({
   },
 
   methods: {
-
-    initialize (action, model: IData) {
+    initialize(action, model: IData) {
       console.log('Initialize popup action ' + action);
       this.originalmodel = model;
       this.action = action;
@@ -512,18 +511,16 @@ export default defineComponent({
         return;
       }
 
-      const tmpParentOptions = Object.values(
-        this.contenttree.entries
-      );
+      const tmpParentOptions = Object.values(this.contenttree.entries);
       // console.log(tmpParentOptions);
-      const nodeId = this.localmodel?.id
-      if (nodeId){
-        this.parentOptions = tmpParentOptions.filter(v => {
-          const noCyclying = !(v as INode).path.includes(nodeId);
+      const nodeId = this.localmodel?.id;
+      if (nodeId) {
+        this.parentOptions = tmpParentOptions.filter((v) => {
+          const noCyclying = !(v as INodeTuple).path.includes(nodeId);
           return noCyclying;
         });
-      } else{
-        console.log('warning: nodeID not defined..973..')
+      } else {
+        console.log('warning: nodeID not defined..973..');
       }
       // console.log(this.parentOptions);
 
@@ -555,8 +552,8 @@ export default defineComponent({
       var has_error = false;
       this.errors = {};
 
-      if (!this.localmodel){
-        return false
+      if (!this.localmodel) {
+        return false;
       }
 
       if (
@@ -581,7 +578,8 @@ export default defineComponent({
         !this.localmodel?.text &&
         !this.TYPES_WITHOUT_REQUIRED_TEXTS.includes(this.localmodel.type)
       ) {
-        this.errors['text'] = 'Bitte fügen Sie einen Text für diesen Beitrag ein.';
+        this.errors['text'] =
+          'Bitte fügen Sie einen Text für diesen Beitrag ein.';
         has_error = true;
       } else if (this.localmodel.text.length > this.maxTextLength) {
         this.errors[
@@ -594,7 +592,7 @@ export default defineComponent({
     },
 
     getTopicID: function () {
-      if (!this.localmodel){
+      if (!this.localmodel) {
         return;
       }
 
@@ -622,11 +620,13 @@ export default defineComponent({
         this.markDiscussed(this.contenttree.entries[topicID]);
       }
 
-      let submitApiFunction = null as null | ((
-        assemblyIdentifier: string | null,
-        contenttreeID: number,
-        localmodel: IData | null
-      ) => Promise<any>);
+      let submitApiFunction = null as
+        | null
+        | ((
+            assemblyIdentifier: string | null,
+            contenttreeID: number,
+            localmodel: IData | null
+          ) => Promise<any>);
       if (this.reviewNeeded) {
         submitApiFunction = api.proposeContent;
       } else {
@@ -655,7 +655,10 @@ export default defineComponent({
 
               this.store.dispatch(
                 'assemblystore/incrementAssemblyActivityCounter',
-                { assemblyIdentifier: this.assemblyIdentifier, counterName: 'number_of_comments_today' }
+                {
+                  assemblyIdentifier: this.assemblyIdentifier,
+                  counterName: 'number_of_comments_today',
+                }
               );
 
               // Zoom to content if needed.

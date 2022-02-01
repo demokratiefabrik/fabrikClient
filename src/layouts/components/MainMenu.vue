@@ -53,7 +53,7 @@
         clickable
         :label="item.text"
         :class="
-          item.to.name == currentRoute ? 'topmenuSelected' : 'topmenuDefault'
+          item.to.name == currentRouteName ? 'topmenuSelected' : 'topmenuDefault'
         "
         @click="pushR(item.to)"
         :key="item.text"
@@ -71,7 +71,7 @@
               clickable
               :key="item.text"
               :class="
-                item.to.name == currentRoute
+                item.to.name == currentRouteName
                   ? 'topmenuSelected'
                   : 'topmenuDefault'
               "
@@ -102,7 +102,7 @@
         </q-item>
         <q-item
           clickable
-          :class="'profile' == currentRoute ? 'dropdownSelected' : ''"
+          :class="'profile' == currentRouteName ? 'dropdownSelected' : ''"
           @click="gotoProfile()"
           v-if="authorized"
           v-close-popup
@@ -132,7 +132,7 @@ import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
 import Notifications from './Notifications.vue';
 import UserAvatar from 'src/components/UserAvatar.vue';
-import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
+import { RouteLocationRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'MainMenu',
@@ -175,22 +175,22 @@ export default defineComponent({
       menu: [
         {
           text: 'Startseite',
-          to: { name: 'home' } as RouteRecordRaw | LocationAsRelativeRaw,
+          to: { name: 'home' },
         },
         {
           text: 'News',
-          to: { name: 'news' } as RouteRecordRaw | LocationAsRelativeRaw,
+          to: { name: 'news' },
         },
         {
           text: 'Hintergrund',
-          to: { name: 'background' } as RouteRecordRaw | LocationAsRelativeRaw,
+          to: { name: 'background' },
         },
       ],
     };
   },
   computed: {
-    currentRoute: function () {
-      return this.$route.name;
+    currentRouteName: function (): string {
+      return this.$route?.name as string;
     },
     // frontpage: function () {
     //   return this.$route.name == 'home';

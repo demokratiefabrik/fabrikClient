@@ -1,14 +1,14 @@
 <template>
   <span class="cursor-pointer" style="margin-top: 1em">
     <q-banner dense inline-actions class="text-white bg-green">
-      <div v-if="model['id']">
+      <div v-if="model.id">
         <q-icon
           name="mdi-circle-edit-outline"
           color="white"
           style="font-size: 1.3rem"
         />Willst du diese "Stage" bearbeiten? Dann klicke auf "Ja, Bearbeiten".
       </div>
-      <div v-if="!model['id']">
+      <div v-if="!model.id">
         <q-icon
           name="mdi-shape-circle-plus"
           color="white"
@@ -20,7 +20,7 @@
         <q-btn
           flat
           color="white"
-          :label="model['id'] ? 'Bearbeiten' : 'Hinzufügen'"
+          :label="model.id ? 'Bearbeiten' : 'Hinzufügen'"
         />
       </template>
     </q-banner>
@@ -32,7 +32,7 @@
       :label-set="localmodel.id ? 'Speichern' : 'Hinzufügen'"
       :validate="validate"
     >
-      <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="$refs['popupeditor'].cancel()" /> -->
+      <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="popupeditor.cancel()" /> -->
       <div style="float: right">
         <q-btn
           flat
@@ -40,7 +40,7 @@
           dense
           size="lg"
           icon="mdi-close"
-          @click.stop="$refs['popupeditor'].cancel()"
+          @click.stop="popupeditor.cancel()"
         />
         <q-btn
           flat
@@ -48,7 +48,7 @@
           dense
           size="lg"
           icon="mdi-check"
-          @click.stop="$refs['popupeditor'].set()"
+          @click.stop="popupeditor.set()"
         />
       </div>
 
@@ -236,7 +236,7 @@
           </div>
         </div>
 
-        <div style="float: left">
+        <!-- <div style="float: left">
           <q-btn
             flat
             label="delete"
@@ -245,8 +245,8 @@
             icon="mdi-delete"
             @click.stop="confirm_delete"
           />
-          <!-- <q-btn label="Confirm" color="primary" @click="confirm" /> -->
-        </div>
+          <q-btn label="Confirm" color="primary" @click="confirm" />
+        </div> -->
 
         <div style="float: right">
           <q-btn
@@ -255,7 +255,7 @@
             dense
             size="lg"
             icon="mdi-close"
-            @click.stop="$refs['popupeditor'].cancel()"
+            @click.stop="popupeditor.cancel()"
           />
           <q-btn
             flat
@@ -263,7 +263,7 @@
             dense
             size="lg"
             icon="mdi-check"
-            @click.stop="$refs['popupeditor'].set()"
+            @click.stop="popupeditor.set()"
           />
         </div>
       </div>
@@ -273,7 +273,7 @@
 
 <script lang="ts">
 import useAssemblyComposable from 'src/composables/assembly.composable';
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 // import ApiService from "src/utils/xhr";
 // import AssemblyMixin from "src/mixins/assembly";
 import { mapGetters, mapActions } from 'vuex';
@@ -282,19 +282,20 @@ import { mapGetters, mapActions } from 'vuex';
 export default defineComponent({
   name: 'StageEditor',
   setup() {
-    const {assemblyIdentifier} = useAssemblyComposable()
-    return {assemblyIdentifier}
+    const popupeditor = ref();
+    const { assemblyIdentifier } = useAssemblyComposable();
+    return { assemblyIdentifier, popupeditor };
   },
   props: {
     persistent: {
       type: Boolean,
-      default: function () {
+      default: () => {
         return true;
       },
     },
     model: {
       type: Object,
-      default () {
+      default: () => {
         // EMPTY CONTAINER MODEL as default value
         return {
           id: null,
@@ -333,16 +334,20 @@ export default defineComponent({
     };
   },
   computed: {
-    formatDate_localmodel_date_start(): string {
-      return this.formatDate(this.localmodel?.date_start);
+    formatDate_localmodel_date_start(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_start);
     },
 
-    formatDate_localmodel_date_end(): string {
-      return this.formatDate(this.localmodel?.date_end);
+    formatDate_localmodel_date_end(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_end);
     },
 
-    formatDate_localmodel_date_modifieid(): string {
-      return this.formatDate(this.localmodel?.date_modifieid);
+    formatDate_localmodel_date_modified(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_modifieid);
+    },
+
+    formatDate_localmodel_date_created(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_created);
     },
 
     localmodel_custom_data: {
@@ -350,13 +355,13 @@ export default defineComponent({
         const isObject = typeof this.localmodel.custom_data === 'object';
         if (isObject) {
           return JSON.stringify(this.localmodel.custom_data);
-        } else if (!this.localmodel.custom_data?.length === 0) {
+        } else if (!(this.localmodel?.custom_data?.length === 0)) {
           return 'null';
         } else {
           return this.localmodel.custom_data;
         }
       },
-      set: function (value): void {
+      set: function (value: any): void {
         const isObject = typeof this.localmodel.custom_data === 'object';
         if (this.validateJSON(value) && !isObject) {
           this.localmodel.custom_data = JSON.parse(value);
@@ -368,8 +373,8 @@ export default defineComponent({
     },
 
     stage_count(): number {
-      return this.assembly_stages
-        ? Object.keys(this.assembly_stages).length + 1
+      return this.assemblyStages
+        ? Object.keys(this.assemblyStages).length + 1
         : 0;
     },
 
@@ -379,10 +384,7 @@ export default defineComponent({
       return options;
     },
 
-    ...mapGetters('assemblystore', [
-      'assemblyConfiguration',
-      'assembly_stages',
-    ]),
+    ...mapGetters('assemblystore', ['assemblyConfiguration', 'assemblyStages']),
   },
 
   methods: {
@@ -406,7 +408,7 @@ export default defineComponent({
       var has_error = false;
       this.errorInfo = false;
       this.errorMessageInfo = '';
-      this.errorIcon = false;
+      this.errorIcon = '';
       this.errorMessageIcon = '';
       this.errorStageType = false;
       this.errorMessageStageType = '';
@@ -457,10 +459,13 @@ export default defineComponent({
         localmodel.order_position = this.stage_count + 1;
       }
 
-      this.addOrUpdateStage({ assemblyIdentifier: this.assemblyIdentifier, stage: localmodel });
+      this.addOrUpdateStage({
+        assemblyIdentifier: this.assemblyIdentifier,
+        stage: localmodel,
+      });
     },
 
-    ...mapActions({addOrUpdateStage: 'assemblystore/addOrUpdateStage'}),
-  }
+    ...mapActions({ addOrUpdateStage: 'assemblystore/addOrUpdateStage' }),
+  },
 });
 </script>

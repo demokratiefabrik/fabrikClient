@@ -60,19 +60,12 @@ export default defineComponent({
   },
 
   setup() {
-    // console.log('DEBUG setup mainLayout')
-
     const emitter = useEmitter();
     const store = useStore();
-    // const authComposable = useAuthComposable();
     const { pushR, gotoHome } = useRouterComposable();
-
-    // Loading Gif
     const loadingGifVisible = ref<boolean>(false);
-    // const loadingGifLabel = ref<string>('');
     emitter.on('loadingGifStackChange', (stack: any) => {
       loadingGifVisible.value = stack.length > 0;
-      // loadingGifLabel.value = stack[0];
     });
 
     // console.log('DEBUG setup mainLayout ends')
@@ -80,10 +73,8 @@ export default defineComponent({
       emitter,
       store,
       gotoHome,
-      // authComposable,
       pushR,
-      loadingGifVisible,
-      // loadingGifLabel
+      loadingGifVisible
     };
   },
 

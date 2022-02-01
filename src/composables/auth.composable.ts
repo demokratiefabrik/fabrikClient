@@ -21,11 +21,11 @@ const emitter = useEmitter();
 const oauthEmitter = useOAuthEmitter();
 
 export default function useAuthComposable() {
-  console.log('DEBUG: useAuthComposable::SETUP')
+  console.log('DEBUG: useAuthComposable::SETUP');
 
   const router = useRouter();
   const currentRoute = useRoute();
-  const {pushR, gotoHome} = useRouterComposable();
+  const { pushR, gotoHome } = useRouterComposable();
   const monitorComposable = useMonitorComposable();
   const store = useStore();
   const { t } = useI18n();
@@ -103,7 +103,7 @@ export default function useAuthComposable() {
     });
 
     // clear user data...
-    store.dispatch('clearUserData')
+    store.dispatch('clearUserData');
 
     // logout pkce
     pkce.logout(silent);
@@ -135,7 +135,6 @@ export default function useAuthComposable() {
     // set userEmail<boolean> = true, if email has been added shortly
     return getUsername(profile);
   });
-
 
   /* Page Permission */
   const checkPagePermission = (currentRoute): void => {
@@ -181,7 +180,7 @@ export default function useAuthComposable() {
       console.log('error in oauth initialization...', error);
       switch ((error as any).message) {
         case 'ErrorInvalidGrant':
-          emitter.emit('showAuthorizationInvalidToken');
+          oauthEmitter.emit('showAuthorizationInvalidToken');
           break;
         default:
           console.error(error);
@@ -190,7 +189,6 @@ export default function useAuthComposable() {
       }
     }
   };
-
 
   // -------
   // PROFILE METHODS

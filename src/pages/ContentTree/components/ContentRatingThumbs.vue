@@ -92,10 +92,7 @@ export default defineComponent({
 
   computed: {
     noneResponse() {
-      return (
-        this.progression_rating === null ||
-        this.progression_rating === undefined
-      );
+      return typeof this.progression_rating !== 'number';
     },
   },
 

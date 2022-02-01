@@ -29,14 +29,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { debounce } from 'quasar';
 import { mapActions } from 'vuex';
 import constants from 'src/utils/constants';
 import { colors } from 'quasar';
 import useLibraryComposable from 'src/utils/library';
-import { INode } from 'src/composables/contenttree.composable';
 import useMonitorComposable from 'src/composables/monitor.composable';
+import { INodeTuple } from 'src/models/content';
 const { rgbToHex } = colors;
 
 export default defineComponent({
@@ -49,7 +49,7 @@ export default defineComponent({
   },
   name: 'ContentSalienceSlider',
   props: {
-    content: {},
+    content: Object as PropType<INodeTuple>,
     instruction: {},
     scaleLabel: {
       default: () => [
@@ -63,7 +63,7 @@ export default defineComponent({
   },
   data() {
     return {
-      progression_salience: null,
+      progression_salience: null as number | null | undefined,
       min: 0,
       max: 100,
     };
@@ -95,14 +95,15 @@ export default defineComponent({
     },
 
     scale100() {
-      if (this.progression_salience !== null) {
+      if ( this.progression_salience !== null &&
+        this.progression_salience !== undefined) {
         return (100 / this.colorRange) * (this.progression_salience - this.min);
       }
 
       return null;
     },
 
-    getSlideColor() {
+    getSlideColor(): any {
       if (this.noneResponse || this.scale100 === null) {
         return 'grey';
       }
@@ -113,15 +114,15 @@ export default defineComponent({
       });
       return color;
     },
-    noneResponse() {
+    noneResponse(): boolean {
       return (
         this.progression_salience === null ||
         this.progression_salience === undefined
       );
     },
 
-    realSalience() {
-      return (this.content as INode)?.progression?.salience;
+    realSalience(): number | null | undefined {
+      return this.content?.progression?.salience;
     },
   },
 
@@ -135,20 +136,20 @@ export default defineComponent({
       }
 
       const data = {
-        contentID: (this.content as INode).content.id,
+        contentID: this.content?.content?.id,
         salience: this.progression_salience,
-        topicID: (this.content as INode)?.path
-          ? (this.content as INode).path[0]
+        topicID: this.content?.path
+          ? this.content?.path[0]
           : null,
       };
       this.monitorLog(constants.MONITOR_SET_SALIENCE, data);
 
       // immediatly update saliences in vuex store (=> allows to update the dynamically generated charts)
       this.update_salience({
-        contenttreeID: (this.content as INode).content.contenttree_id,
-        contentID: (this.content as INode).content.id,
-        topicID: (this.content as INode).path?.length
-          ? (this.content as INode).path[0]
+        contenttreeID: this.content?.content?.contenttree_id,
+        contentID: this.content?.content?.id,
+        topicID: this.content?.path?.length
+          ? this.content?.path[0]
           : null,
         salience: this.progression_salience,
       });
@@ -163,8 +164,8 @@ export default defineComponent({
     this.debouncedInitSet = debounce(this.initSet, 1200);
   },
 
-  mounted: function () {
-    this.progression_salience = (this.content as INode)?.progression?.salience;
+  mounted () {
+    this.progression_salience = this.content?.progression?.salience;
   },
 
   watch: {

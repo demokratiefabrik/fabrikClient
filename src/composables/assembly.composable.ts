@@ -1,13 +1,15 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-import { RouteRecordRaw, LocationAsRelativeRaw } from 'vue-router';
+import { RouteLocationRaw } from 'vue-router';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { Ref, readonly, computed } from 'vue';
+import { readonly, Ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
 import useLibraryComposable from 'src/utils/library';
 import { useRouter } from 'vue-router';
+import { IStageTuple } from 'src/models/stage';
+// import { RouteLocation } from 'src/models/layout';
 
 // import { get_stage_number_by_stage_id } from 'src/store/assemblystore/getters';
 
@@ -27,16 +29,29 @@ export interface IContributionLimits {
 const oauthEmitter = useOAuthEmitter();
 const { userid } = usePKCEComposable();
 
+// ADD ASSEMBLY TYPES
+// export const installedAssemblyPlugins = ref<string[]>([])
+
+
 export default function useAssemblyComposable() {
-  console.log('DEBUG: useAssemblyComposable::SETUP')
+
+  console.log('DEBUG: useAssemblyComposable::SETUP');
+
+  // const installAssemblyPlugin = (plugin: string): void => {
+  //   installedAssemblyPlugins.value.push(plugin)
+  // }
+  
+  
   const store = useStore();
   // const currentRoute = useRoute();
   const emitter = useEmitter();
-  const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } = useRouterComposable();
+  const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
+    useRouterComposable();
   const get_stage_number_by_stage_id =
     store.getters['assemblystore/get_stage_number_by_stage_id'];
   const get_stage_number_by_stage =
     store.getters['assemblystore/get_stage_number_by_stage'];
+  const assemblyStages = store.getters['assemblystore/assemblyStages'];
   const last_accessible_stage =
     store.getters['assemblystore/last_accessible_stage'];
   const IsManager = store.getters['assemblystore/IsManager'];
@@ -54,9 +69,7 @@ export default function useAssemblyComposable() {
 
   const { push } = useRouter();
 
-
   const initialize = () => {
-
     oauthEmitter.on('AfterLogin', () => {
       clearSession();
       syncUserAssembly();
@@ -69,7 +82,6 @@ export default function useAssemblyComposable() {
 
     // INITIAL SYNC of Public Assembly (no authentication needed)
     syncPublicAssembly();
-
   };
 
   const syncPublicAssembly = () => {
@@ -104,28 +116,52 @@ export default function useAssemblyComposable() {
     }, intervall);
   };
 
-
   const getAssemblyHomeRoute = (
     assembly
-  ): RouteRecordRaw | LocationAsRelativeRaw => {
+  ): RouteLocationRaw => {
     if (!assembly) {
       return {
         name: 'home',
-      } as RouteRecordRaw;
+      } as RouteLocationRaw;
     }
 
     return {
       name: assembly.type,
       params: { assemblyIdentifier: assembly.identifier },
-    } as LocationAsRelativeRaw;
+    } as RouteLocationRaw
   };
 
+
+  
+  const getAssemblyManageRoute = (
+    assembly
+  ): RouteLocationRaw => {
+    if (!assembly) {
+      return {
+        name: 'home',
+      } as RouteLocationRaw;
+    }
+
+    return {
+      name: 'assembly_manage',
+      params: { assemblyIdentifier: assembly.identifier },
+    } as RouteLocationRaw
+  };
+
+  
   const gotoAssemblyHome = (assembly) => {
     const route = getAssemblyHomeRoute(assembly);
     pushR(route);
   };
 
-  const stage_nr_last_visited: Ref<number | null> = computed({
+
+  const gotoAssemblyManage = (assembly) => {
+    var route = getAssemblyManageRoute(assembly);
+    pushR(route)
+  }
+
+
+  const stage_nr_last_visited: Ref<number | null>  = computed({
     get() {
       if (stageID.value === null || isNaN(stageID.value)) {
         return null;
@@ -134,9 +170,9 @@ export default function useAssemblyComposable() {
         'DEBUG: stage_nr_last_visited => vuex::get_stage_number_by_stage_id',
         stageID.value
       );
-      return get_stage_number_by_stage_id(stageID.value);
+      return get_stage_number_by_stage_id(stageID.value) as number;
     },
-    set(stageNr) {
+    set(stageNr: number | null) {
       if (stageNr === null || stageNr === undefined) {
         setStageID(null);
       } else {
@@ -144,15 +180,15 @@ export default function useAssemblyComposable() {
         // console.log("set stageID by stageNR", stageNr, stageID)
         setStageID(stageID);
       }
-    },
+    }
   });
 
   // CONTENTTREE
-  const daySessions = computed(() => {
+  const daySessions = computed((): number => {
     return assemblyProgression?.number_of_day_sessions;
   });
 
-  const ready = computed(() => {
+  const ready = computed((): boolean => {
     const ready = loaded(assembly);
     if (ready) {
       emitter.emit('hideLoading');
@@ -160,14 +196,14 @@ export default function useAssemblyComposable() {
     return ready;
   });
 
-  const stage_last_visited = computed(() => {
+  const stage_last_visited = computed((): IStageTuple | null => {
     if (stage_nr_last_visited.value === null) {
       return null;
     }
     return assembly_sorted_stages[stage_nr_last_visited.value];
   });
 
-  const overallLimitForAddingProposalsReached = computed(() => {
+  const overallLimitForAddingProposalsReached = computed((): boolean | null => {
     const dailyContributionLimits = getDailyContributionLimits();
     if (!dailyContributionLimits) {
       return null;
@@ -179,7 +215,7 @@ export default function useAssemblyComposable() {
     return limitReached;
   });
 
-  const limitForAddingProposalsReached = computed(() => {
+  const limitForAddingProposalsReached = computed((): boolean | null => {
     const dailyAddingLimits = getDailyContributionLimits();
     if (!dailyAddingLimits) {
       return null;
@@ -190,7 +226,7 @@ export default function useAssemblyComposable() {
     return limitReached;
   });
 
-  const limitForAddingCommentsReached = computed(() => {
+  const limitForAddingCommentsReached = computed((): boolean | null => {
     if (IsManager) {
       return false;
     }
@@ -205,7 +241,7 @@ export default function useAssemblyComposable() {
     return limitReached;
   });
 
-  const clickBackToAssemblyListButton = () => {
+  const clickBackToAssemblyListButton = (): void => {
     // setAssemblyIdentifier(null);
     push({ name: 'assemblies' });
   };
@@ -220,50 +256,50 @@ export default function useAssemblyComposable() {
   //   }, 200);
   // };
 
-  const gotoNextStageNr = (stage) => {
+  const gotoNextStageNr = (stage): void => {
     console.assert(stage);
-    console.log('gotoNextStageNr');
+    // console.log('gotoNextStageNr');
     const currentStageGroup = stage.stage.group;
 
     const nextStage = find_next_accessible_stage(stage);
     if (!nextStage) {
-      console.log('NOTE: Assembly seems to be completed!');
-      return null;
+      // console.log('NOTE: Assembly seems to be completed!');
+      return;
     }
     const nextStageGroup = stage.stage.group;
     if (nextStageGroup !== currentStageGroup) {
       // different group: so make a new route...
-      console.log('ROUTERROUTE');
+      // console.log('ROUTERROUTE');
       push(`${nextStage.stage.id}/${nextStage.stage.group}`);
     } else {
       // just update , the "stage_nr_last_visited"
       // console.log(this.stage_nr_last_visited, "old stage")
       stage_nr_last_visited.value = get_stage_number_by_stage(nextStage);
-      console.log(stage_nr_last_visited.value, 'new stage');
+      // console.log(stage_nr_last_visited.value, 'new stage');
     }
   };
 
-  const gotoStage = (stage) => {
+  const gotoStage = (stage): void => {
     console.assert(stage);
     push(getStageRoute(stage));
   };
 
-  const getStageRoute = (stage): any => {
+  const getStageRoute = (stage): RouteLocationRaw => {
     console.assert(stage);
     const params = {
-      assemblyIdentifier,
+      assemblyIdentifier: assemblyIdentifier.value,
       stageID: stage.stage.id,
       contenttreeID: stage.stage.contenttree_id,
     };
 
     return {
       name: stage.stage.type,
-      params: params,
+      params,
     };
   };
 
   // TODO: what is that for?
-  const gotoDefaultStageTeaser = () => {
+  const gotoDefaultStageTeaser = (): void => {
     console.log('goto default stage teaser');
     if (stageID.value !== null && stageID.value !== undefined) {
       console.log(
@@ -320,8 +356,7 @@ export default function useAssemblyComposable() {
     assemblyIdentifier: assemblyIdentifier,
   });
 
-
-  console.log('DEBUG: end of assembly composable')
+  console.log('DEBUG: end of assembly composable');
 
   return {
     clearSession,
@@ -331,9 +366,12 @@ export default function useAssemblyComposable() {
     // next_scheduled_stage,
     // getFirstOrRoutedStageIDByGroup,
     assemblyIdentifier: readonly(assemblyIdentifier),
+    assembly_sorted_stages,
     // setAssemblyIdentifier,
     stageID,
+    gotoAssemblyManage,
     assembly,
+    assemblyStages,
     // setStageID,
     daySessions,
     ready,
@@ -345,7 +383,7 @@ export default function useAssemblyComposable() {
     clickBackToAssemblyListButton,
     // laggedScrollToStage,
     gotoNextStageNr,
-    gotoStage,
+    gotoStage
   };
 }
 
@@ -366,10 +404,6 @@ export default function useAssemblyComposable() {
 //       })
 //     }
 
-//     this.$root.gotoAssemblyManage = (assembly) => {
-//       var route = this.$root.getAssemblyManageRoute(assembly);
-//       this.$pushR(route)
-//     }
 
 // applyCssVarProfileColor(): Record<string, unknown> {
 //   // This code apply writes the profile color into the css variable profilecolor.

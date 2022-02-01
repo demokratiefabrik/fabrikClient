@@ -1,14 +1,14 @@
 <template>
   <span class="cursor-pointer" style="margin-top: 1em">
-    <q-banner dense inline-actions class="text-white bg-green">
-      <div v-if="model['id']">
+    <q-banner dense inline-actions class="text-white bg-green" v-if="model">
+      <div v-if="model.id">
         <q-icon
           name="mdi-circle-edit-outline"
           color="white"
           style="font-size: 1.3rem"
         />Willst du diese "Assembly" bearbeiten? Dann klicke auf "Bearbeiten".
       </div>
-      <div v-if="!model['id']">
+      <div v-if="!model.id">
         <q-icon
           name="mdi-shape-circle-plus"
           color="white"
@@ -20,7 +20,7 @@
         <q-btn
           flat
           color="white"
-          :label="model['id'] ? 'Bearbeiten' : 'Hinzufügen'"
+          :label="model.id ? 'Bearbeiten' : 'Hinzufügen'"
         />
       </template>
     </q-banner>
@@ -33,7 +33,7 @@
       :label-set="localmodel.id ? 'Speichern' : 'Hinzufügen'"
       :validate="validate"
     >
-      <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="$refs['popupeditor'].cancel()" /> -->
+      <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="popupeditor.cancel()" /> -->
       <div style="float: right">
         <q-btn
           flat
@@ -41,7 +41,7 @@
           dense
           size="lg"
           icon="mdi-close"
-          @click.stop="$refs['popupeditor'].cancel()"
+          @click.stop="popupeditor.cancel()"
         />
         <q-btn
           flat
@@ -49,7 +49,7 @@
           dense
           size="lg"
           icon="mdi-check"
-          @click.stop="$refs['popupeditor'].set()"
+          @click.stop="popupeditor.set()"
         />
       </div>
 
@@ -112,7 +112,7 @@
             style="max-width: 270px"
             dropdown-icon="mdi-menu-down"
             v-model="localmodel.type"
-            :options="$assemblyTypes"
+            :options="$plugins"
             label="Please Choose a Assembly Type (Required)"
             :error="errorAssemblyType"
             :error-message="errorMessageAssemblyType"
@@ -163,7 +163,7 @@
           </div>
 
           <b>Assembly Ends: {{ formatDate_localmodel_date_end }}</b>
-          <div v-if="!localmodel['date_end']">
+          <div v-if="!localmodel.date_end">
             {{ 'The duration of the citizenmodul is unlimited' }}
           </div>
           <div>
@@ -208,7 +208,7 @@
 
           <q-toggle
             class="q-ma-none q-mt-md"
-            v-model="localmodel['disabled']"
+            v-model="localmodel.disabled"
             :false-value="false"
             :true-value="true"
             color="red"
@@ -219,9 +219,8 @@
           />
           <div v-if="localmodel.id">
             <b>Additional Information:</b><br />
-            Last Modification: {{ formatDate_localmodel_date_modified
-            }}<br />
-            Created: {{ localmodel_date_created }}
+            Last Modification: {{ formatDate_localmodel_date_modified }}<br />
+            Created: {{ formatDate_localmodel_date_created }}
           </div>
         </div>
 
@@ -244,7 +243,7 @@
             dense
             size="lg"
             icon="mdi-close"
-            @click.stop="$refs['popupeditor'].cancel()"
+            @click.stop="popupeditor.cancel()"
           />
           <q-btn
             flat
@@ -252,7 +251,7 @@
             dense
             size="lg"
             icon="mdi-check"
-            @click.stop="$refs['popupeditor'].set()"
+            @click.stop="popupeditor.set()"
           />
         </div>
       </div>
@@ -261,46 +260,54 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { mapActions } from 'vuex';
+const modelBlank = {
+  id: null,
+  title: '',
+  disabled: false,
+  type: '',
+  // group: "",
+  info: '',
+  background: '',
+  // custom_data: null,
+  date_start: null,
+  date_end: null,
+  // disabled: false,
+  // NEW: true,
+};
+
+// import useAssemblyComposable from 'src/composables/assembly.composable';
+import { defineComponent, ref, PropType } from 'vue';
+import { mapActions, mapGetters } from 'vuex';
 
 export default defineComponent({
   name: 'AssemblyEditor',
   // mixins: [AssemblyMixin],
   props: {
     persistent: {
-      type: Boolean,
-      default: function () {
+      type: Boolean as PropType<boolean>,
+      default: () => {
         return true;
       },
     },
     model: {
-      type: Object,
-      default: function () {
-        // EMPTY CONTAINER MODEL as default value
-        return {
-          id: null,
-          title: '',
-          disabled: false,
-          type: '',
-          // group: "",
-          info: '',
-          background: '',
-          // custom_data: null,
-          date_start: null,
-          date_end: null,
-          // disabled: false,
-          // NEW: true,
-        };
+      type: Object as PropType<any>,
+      default: () => {
+        return modelBlank;
       },
     },
   },
-
+  setup() {
+    const popupeditor = ref();
+    return { popupeditor };
+  },
   data() {
     return {
-      show_date_start_selector: !!this.model['date_start'],
-      show_date_end_selector: !!this.model['date_end'],
-      localmodel: this.model,
+      show_date_start_selector: undefined as undefined | any,
+      //  !!this.model?.date_start,
+      show_date_end_selector: undefined as undefined | any,
+      // !!this.model?.date_end,
+      localmodel: undefined as undefined | any,
+      // this.model,
       errorAssemblyType: false,
       errorMessageAssemblyType: '',
       errorInfo: false,
@@ -311,87 +318,32 @@ export default defineComponent({
       errorMessageTitle: '',
       errorIcon: '',
       errorMessageIcon: '',
-      defaultToolbar: [
-        [
-          {
-            label: this.$q.lang.editor.align,
-            icon: this.$q.iconSet.editor.align,
-            fixedLabel: true,
-            options: ['left', 'center', 'right', 'justify'],
-          },
-        ],
-        ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
-        ['token', 'hr', 'link', 'custom_btn'],
-        ['print', 'fullscreen'],
-        [
-          {
-            label: this.$q.lang.editor.formatting,
-            icon: this.$q.iconSet.editor.formatting,
-            list: 'no-icons',
-            options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code'],
-          },
-          {
-            label: this.$q.lang.editor.fontSize,
-            icon: this.$q.iconSet.editor.fontSize,
-            fixedLabel: true,
-            fixedIcon: true,
-            list: 'no-icons',
-            options: [
-              'size-1',
-              'size-2',
-              'size-3',
-              'size-4',
-              'size-5',
-              'size-6',
-              'size-7',
-            ],
-          },
-          'removeFormat',
-        ],
-        ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
-
-        ['undo', 'redo'],
-        ['viewsource'],
-      ],
+      defaultToolbar: undefined as undefined | any,
     };
   },
   computed: {
+    ...mapGetters({
+      assemblies: 'assemblystore/assemblies',
+    }),
 
-     formatDate_localmodel_date_start(){
-      return this.$filters.formatDate(this.localmodel?.date_start)
+    formatDate_localmodel_date_start(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_start);
     },
-    
-     formatDate_localmodel_date_end(){
-      return this.$filters.formatDate(this.localmodel?.date_end)
+    formatDate_localmodel_date_end(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_end);
     },
-
-     formatDate_localmodel_date_modifieid(){
-      return this.$filters.formatDate(this.localmodel?.date_modifieid)
+    formatDate_localmodel_date_modified(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_modifieid);
     },
-
-
-    assembly_count: function () {
-      return this.assembly_assemblys
-        ? Object.keys(this.assembly_assemblys).length + 1
-        : 0;
+    formatDate_localmodel_date_created(): string | null {
+      return this.$filters.formatDate(this.localmodel?.date_created);
     },
+    assembly_count(): number {
+      return this.assemblies.length ? this.assemblies.length : 0;
+    }
   },
 
   methods: {
-    // validateJSON(str) {
-    //   try {
-    //     const alreadyObject =
-    //       typeof this.localmodel["custom_data"] === "object";
-    //     if (alreadyObject) {
-    //       return true;
-    //     }
-    //     JSON.parse(str);
-    //     return true;
-    //   } catch (error) {
-    //     return false;
-    //   }
-    // },
-
     validate() {
       // console.log("validate...");
       var has_error = false;
@@ -399,30 +351,30 @@ export default defineComponent({
       this.errorMessageInfo = '';
       this.errorBackground = false;
       this.errorMessageBackground = '';
-      this.errorIcon = false;
+      this.errorIcon = '';
       this.errorMessageIcon = '';
       this.errorAssemblyType = false;
       this.errorMessageAssemblyType = '';
       // this.errorAssemblyCustomData = false;
       // this.errorMessageAssemblyCustomData = "";
 
-      if (!this.localmodel['type']) {
+      if (!this.localmodel.type) {
         this.errorAssemblyType = true;
         this.errorMessageAssemblyType = 'The field must not be empty!';
         has_error = true;
       }
-      if (!this.localmodel['info']) {
+      if (!this.localmodel.info) {
         this.errorInfo = true;
         this.errorMessageInfo = 'The field must not be empty!';
         has_error = true;
       }
-      if (!this.localmodel['background']) {
+      if (!this.localmodel.background) {
         this.errorBackground = true;
         this.errorMessageBackground = 'The field must not be empty!';
         has_error = true;
       }
 
-      if (!this.localmodel['title']) {
+      if (!this.localmodel.title) {
         this.errorTitle = true;
         this.errorMessageTitle = 'Please add a title!';
         has_error = true;
@@ -437,6 +389,59 @@ export default defineComponent({
     ...mapActions({
       updateAssembly: 'assemblystore/updateAssembly',
     }),
+  },
+
+  watch: {
+    model(newModel) {
+      this.localmodel = newModel;
+      this.show_date_end_selector = !!this.model?.date_end;
+      this.show_date_start_selector = !!this.model?.date_start;
+    },
+  },
+
+  mounted() {
+    this.defaultToolbar = [
+      [
+        {
+          label: this.$q.lang.editor.align,
+          icon: this.$q.iconSet.editor.align,
+          fixedLabel: true,
+          options: ['left', 'center', 'right', 'justify'],
+        },
+      ],
+      ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
+      ['token', 'hr', 'link', 'custom_btn'],
+      ['print', 'fullscreen'],
+      [
+        {
+          label: this.$q.lang.editor.formatting,
+          icon: this.$q.iconSet.editor.formatting,
+          list: 'no-icons',
+          options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code'],
+        },
+        {
+          label: this.$q.lang.editor.fontSize,
+          icon: this.$q.iconSet.editor.fontSize,
+          fixedLabel: true,
+          fixedIcon: true,
+          list: 'no-icons',
+          options: [
+            'size-1',
+            'size-2',
+            'size-3',
+            'size-4',
+            'size-5',
+            'size-6',
+            'size-7',
+          ],
+        },
+        'removeFormat',
+      ],
+      ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+
+      ['undo', 'redo'],
+      ['viewsource'],
+    ];
   },
 });
 </script>

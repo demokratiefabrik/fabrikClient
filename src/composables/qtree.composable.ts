@@ -12,10 +12,11 @@ import { useStore } from 'vuex';
 // import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
 import useLibraryComposable from 'src/utils/library';
-import useContenttreeComposable, { INode } from './contenttree.composable';
+import useContenttreeComposable from './contenttree.composable';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import constants from 'src/utils/constants';
 import useAppComposable from './app.composable';
+import { INodeTuple } from 'src/models/content';
 
 // import useAuthComposable from './auth.composable';
 // import useRouterComposable from './router.composable';
@@ -28,14 +29,14 @@ import useAppComposable from './app.composable';
 
 export interface ITreeFilter {
   text?: string;
-  focus?: INode | null;
+  focus?: INodeTuple | null;
   own?: boolean;
   new?: boolean;
   unreviewed?: boolean; // used for manager review
 }
 
 export default function useQtreeComposable(props) {
-  console.log('DEBUG: useQtreeComposable::SETUP')
+  console.log('DEBUG: useQtreeComposable::SETUP');
   const store = useStore();
   const { getOffsetTop, loaded } = useLibraryComposable();
   const { contenttree, markRead, isRead } = useContenttreeComposable();
@@ -265,7 +266,7 @@ export default function useQtreeComposable(props) {
   };
 
   // FILTER TREE
-  const treeFilterMethod = (node: INode) => {
+  const treeFilterMethod = (node: INodeTuple) => {
     if (treeFilter.value.focus) {
       // False, if at least one path element is not in the current node' path.
       // console.log(treeFilter.path, node.path)
@@ -283,16 +284,18 @@ export default function useQtreeComposable(props) {
       }
     }
     if (treeFilter.value.new) {
+      const contentID = node?.content?.id;
       if (
+        contentID &&
         node.progression?.read &&
-        !tempBufferForJustReadContent.value.includes(node.content.id)
+        !tempBufferForJustReadContent.value.includes(contentID)
       ) {
         // if (node.progression?.read && node !== last_expanded_node) {
         return false;
       }
     }
     if (treeFilter.value.unreviewed) {
-      if (node.content?.reviewed || !node.content.private_property) {
+      if (node.content?.reviewed || !node?.content?.private_property) {
         return false;
       }
     }

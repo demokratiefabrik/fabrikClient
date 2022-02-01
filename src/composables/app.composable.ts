@@ -1,6 +1,6 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
 import { watch, ref, readonly } from 'vue';
-import { RouteRecordRaw, LocationAsRelativeRaw, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import useLibraryComposable from 'src/utils/library';
 import useEmitter from 'src/utils/emitter';
@@ -13,6 +13,7 @@ import { scroll, useQuasar } from 'quasar';
 const { setVerticalScrollPosition } = scroll;
 import { dom } from 'quasar';
 import { useStore } from 'vuex';
+import { INotificationBanner } from 'src/models/layout';
 const { offset } = dom;
 
 const { removeItem } = useLibraryComposable();
@@ -24,23 +25,13 @@ export interface INotificationConfig {
   settimer?: boolean;
   nobuttons?: boolean;
 }
-export interface INotificationBanner {
-  type: string;
-  // 'error' | 'warning';
-  title: string;
-  body: string;
-  icon: string;
-  buttons?: string[];
-  settimer?: boolean;
-  redirectRoute?: RouteRecordRaw | LocationAsRelativeRaw;
-}
 
 // APP State
 const appExitState = ref<boolean>(false);
 const emitter = useEmitter();
 
 // Notifications
-const notificationBanner = ref<INotificationBanner | null>(null);
+const notificationBanner = ref<INotificationBanner | undefined>(undefined);
 const loadingGifStack = ref<string[]>([]);
 
 export default function useAppComposable() {
@@ -53,7 +44,7 @@ export default function useAppComposable() {
   console.log('DEBUG: APP COMPOSABLE - START');
   const routerComposable = useRouterComposable();
   const currentRoute = useRoute();
-  const {getOffsetTop} = useLibraryComposable()
+  const { getOffsetTop } = useLibraryComposable();
   const { t } = useI18n();
   const exitApp = () => (appExitState.value = true);
 
@@ -135,7 +126,7 @@ export default function useAppComposable() {
   const showNotification = (banner: INotificationBanner): void => {
     if (banner.settimer) {
       setTimeout(() => {
-        notificationBanner.value = null;
+        notificationBanner.value = undefined;
         emitter.emit('notificationBannerChange', notificationBanner.value);
       }, 5000);
     }
@@ -162,7 +153,9 @@ export default function useAppComposable() {
     showNotification(banner);
   };
 
-  const showServiceError = (config: INotificationConfig | null = null) => {
+  const showServiceError = (
+    config: INotificationConfig | undefined = undefined
+  ) => {
     const banner = {
       type: 'error',
       icon: 'mdi-alarm-light-outline',
@@ -266,6 +259,10 @@ export default function useAppComposable() {
   // },
 
   const initialize = () => {
+    // FIRST: install plugins
+    // installedAssemblyPlugins
+    // assemblyComposable.installAssemblyPlugin('CIR')
+
     authComposable.initialize();
     // START MONITOR ENGINE
     monitorComposable.initialize();
@@ -275,9 +272,12 @@ export default function useAppComposable() {
     emitter.on('showNetworkError', () => {
       showNetworkError();
     });
-    emitter.on('showServiceError', () => {
-      showServiceError();
-    });
+    emitter.on(
+      'showServiceError',
+      (options: undefined | INotificationConfig = undefined) => {
+        showServiceError(options);
+      }
+    );
     emitter.on('showAuthorizationError', () => {
       showAuthorizationError();
     });
@@ -287,9 +287,9 @@ export default function useAppComposable() {
     emitter.on('showAuthenticationWarning', () => {
       showAuthenticationWarning();
     });
-    emitter.on('showServiceError', () => {
-      showServiceError();
-    });
+    // emitter.on('showServiceError', () => {
+    //   showServiceError();
+    // });
 
     emitter.on('receiveBackendFeedback', async (data: any) => {
       // RECEIVE MESSAGES FROM FROMBACKEND
@@ -347,11 +347,10 @@ export default function useAppComposable() {
 
     /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
     watch(currentRoute, () => {
-      notificationBanner.value = null;
+      notificationBanner.value = undefined;
       // TODO: should we indeed watch each route?
       // store.dispatch('assemblystore/monitor_route_changes', { to, from })
     });
-    
   };
 
   return {

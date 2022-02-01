@@ -92,7 +92,7 @@
 // import { mapGetters } from 'vuex';
 import { defineComponent, PropType, ComponentPublicInstance } from 'vue';
 import { mapActions, mapGetters } from 'vuex';
-import {IArtificialModeration, IArtificialModerationButton } from './model'
+import { IArtificialModeration, IArtificialModerationButton } from './model';
 
 /** EXAMPLE OF A AM-CONFIGURATION OBJECT
   topics_after_saliencing: {
@@ -114,7 +114,6 @@ import {IArtificialModeration, IArtificialModerationButton } from './model'
   }
  * 
  */
-
 
 // interface IArtificialModerationSet{
 //   buttons: IArtificialModerationButton[];

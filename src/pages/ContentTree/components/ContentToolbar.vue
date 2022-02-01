@@ -111,7 +111,7 @@ export default defineComponent({
   },
   data() {
     return {
-      prompt: true, 
+      prompt: true,
       // TODO: what is that for?
       confirm_deletion: false,
       confirm_deletion_content: null,
@@ -215,7 +215,7 @@ export default defineComponent({
           // this.deleteEntry(content, data);
         });
     },
- 
+
     validateConfirmDeletion() {
       var has_error = false;
       this.confirm_deletion_justification_error_message = '';
