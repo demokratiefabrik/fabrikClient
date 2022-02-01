@@ -40,12 +40,12 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 export default defineComponent({
   setup() {
     // console.log('DEBUG: INDEX:VUE');
-    // const { gotoAssemblyHome } = useAssemblyComposable();
+    // const { gotoAssemblyHome } = useAssemblyComposable('');
     const { userid } = useAuthComposable();
     // const routed_stage = u;
     const {routed_stage} = useStageComposable()
     const { gotoAssemblyHome, assemblyIdentifier, stageID } =
-      useAssemblyComposable();
+      useAssemblyComposable('');
     return { userid, gotoAssemblyHome, routed_stage, assemblyIdentifier, stageID, ...i18nPluginMixin };
   },
   name: 'Survey',

@@ -102,7 +102,7 @@ export default defineComponent({
   setup() {
     const emitter = useEmitter();
     const { gotoAssemblyHome, assembly, gotoDefaultStageTeaser } =
-      useAssemblyComposable();
+      useAssemblyComposable('');
     return {
       emitter,
       assembly,

@@ -33,9 +33,9 @@ const { userid } = usePKCEComposable();
 // export const installedAssemblyPlugins = ref<string[]>([])
 
 
-export default function useAssemblyComposable() {
+export default function useAssemblyComposable(caller='') {
 
-  console.log('DEBUG: useAssemblyComposable::SETUP');
+  console.log('DEBUG: useAssemblyComposable::SETUP', caller);
 
   // const installAssemblyPlugin = (plugin: string): void => {
   //   installedAssemblyPlugins.value.push(plugin)
@@ -47,29 +47,25 @@ export default function useAssemblyComposable() {
   const emitter = useEmitter();
   const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
     useRouterComposable();
-  const get_stage_number_by_stage_id =
-    store.getters['assemblystore/get_stage_number_by_stage_id'];
-  const get_stage_number_by_stage =
-    store.getters['assemblystore/get_stage_number_by_stage'];
-  const assemblyStages = store.getters['assemblystore/assemblyStages'];
-  const last_accessible_stage =
-    store.getters['assemblystore/last_accessible_stage'];
-  const IsManager = store.getters['assemblystore/IsManager'];
-  const assembly_sorted_stages =
-    store.getters['assemblystore/assembly_sorted_stages'];
-  const assemblyProgression =
-    store.getters['assemblystore/assemblyProgression'];
-  const assemblyConfiguration =
-    store.getters['assemblystore/assemblyConfiguration'];
-  const assembly = store.getters['assemblystore/assembly'];
-  const find_next_accessible_stage =
-    store.getters['assemblystore/find_next_accessible_stage'];
+    console.log('DEBUG: useAssemblyComposable::SETUP !!');
+
+  const get_stage_number_by_stage_id = store.getters['assemblystore/get_stage_number_by_stage_id']
+  const get_stage_number_by_stage = store.getters['assemblystore/get_stage_number_by_stage']
+  const assemblyStages = computed(() => store.getters['assemblystore/assemblyStages']);
+  const last_accessible_stage = computed(() => store.getters['assemblystore/last_accessible_stage']);
+  const IsManager = computed(() => store.getters['assemblystore/IsManager'])
+  const assembly_sorted_stages = computed(() => store.getters['assemblystore/assembly_sorted_stages'])
+  const assemblyProgression = computed(() => store.getters['assemblystore/assemblyProgression'])
+  const assemblyConfiguration = computed(() => store.getters['assemblystore/assemblyConfiguration'])
+  const assembly = computed(() => store.getters['assemblystore/assembly'])
+  const find_next_accessible_stage = computed(() => store.getters['assemblystore/find_next_accessible_stage'])
 
   const { loaded } = useLibraryComposable();
 
   const { push } = useRouter();
 
   const initialize = () => {
+    console.log('DEBUG: INITIALIZE ASSEMBLY.COMP')
     oauthEmitter.on('AfterLogin', () => {
       clearSession();
       syncUserAssembly();
@@ -82,6 +78,16 @@ export default function useAssemblyComposable() {
 
     // INITIAL SYNC of Public Assembly (no authentication needed)
     syncPublicAssembly();
+    syncUserAssembly();
+
+
+      // // WHEN MOUNTED
+  // store.dispatch('assemblystore/syncAssembly', {
+  //   oauthUserID: userid,
+  //   assemblyIdentifier: assemblyIdentifier.value,
+  // });
+
+
   };
 
   const syncPublicAssembly = () => {
@@ -156,10 +162,9 @@ export default function useAssemblyComposable() {
 
 
   const gotoAssemblyManage = (assembly) => {
-    var route = getAssemblyManageRoute(assembly);
+    const route = getAssemblyManageRoute(assembly);
     pushR(route)
   }
-
 
   const stage_nr_last_visited: Ref<number | null>  = computed({
     get() {
@@ -185,7 +190,7 @@ export default function useAssemblyComposable() {
 
   // CONTENTTREE
   const daySessions = computed((): number => {
-    return assemblyProgression?.number_of_day_sessions;
+    return assemblyProgression.value?.number_of_day_sessions;
   });
 
   const ready = computed((): boolean => {
@@ -227,7 +232,7 @@ export default function useAssemblyComposable() {
   });
 
   const limitForAddingCommentsReached = computed((): boolean | null => {
-    if (IsManager) {
+    if (IsManager.value) {
       return false;
     }
 
@@ -246,6 +251,7 @@ export default function useAssemblyComposable() {
     push({ name: 'assemblies' });
   };
 
+
   // const stageTransition = (newVal, oldVal) => {
   //   // this.scrollToStage()
   // }
@@ -261,7 +267,7 @@ export default function useAssemblyComposable() {
     // console.log('gotoNextStageNr');
     const currentStageGroup = stage.stage.group;
 
-    const nextStage = find_next_accessible_stage(stage);
+    const nextStage = find_next_accessible_stage.value(stage);
     if (!nextStage) {
       // console.log('NOTE: Assembly seems to be completed!');
       return;
@@ -329,32 +335,28 @@ export default function useAssemblyComposable() {
 
     return {
       number_of_proposals: {
-        daylimit: configuration.MAX_DAILY_USER_PROPOSALS,
-        overalllimit: configuration.MAX_OVERALL_USER_PROPOSALS,
+        daylimit: configuration.value.MAX_DAILY_USER_PROPOSALS,
+        overalllimit: configuration.value.MAX_OVERALL_USER_PROPOSALS,
         overallCurrent:
-          progression.number_of_proposals === null
+          progression.value.number_of_proposals === null
             ? 0
-            : progression.number_of_proposals,
+            : progression.value.number_of_proposals,
         current:
-          progression.number_of_proposals_today === null
+          progression.value.number_of_proposals_today === null
             ? 0
-            : progression.number_of_proposals_today,
+            : progression.value.number_of_proposals_today,
       },
       number_of_comments: {
-        daylimit: configuration.MAX_DAILY_USER_COMMENTS,
+        daylimit: configuration.value.MAX_DAILY_USER_COMMENTS,
         current:
-          progression.number_of_comments_today === null
+          progression.value.number_of_comments_today === null
             ? 0
-            : progression.number_of_comments_today,
+            : progression.value.number_of_comments_today,
       },
     };
   };
 
-  // // WHEN MOUNTED
-  store.dispatch('assemblystore/syncAssembly', {
-    oauthUserID: userid,
-    assemblyIdentifier: assemblyIdentifier,
-  });
+
 
   console.log('DEBUG: end of assembly composable');
 

@@ -37,7 +37,7 @@ const loadingGifStack = ref<string[]>([]);
 export default function useAppComposable() {
   console.log('DEBUG: APP COMPOSABLE - START');
 
-  const assemblyComposable = useAssemblyComposable();
+  const assemblyComposable = useAssemblyComposable('app.comp');
   console.log('DEBUG: APP COMPOSABLE - START');
   const authComposable = useAuthComposable();
   const monitorComposable = useMonitorComposable();
@@ -259,6 +259,7 @@ export default function useAppComposable() {
   // },
 
   const initialize = () => {
+    console.log('DEBUG: INITIALIZE APP.COMPO')
     // FIRST: install plugins
     // installedAssemblyPlugins
     // assemblyComposable.installAssemblyPlugin('CIR')

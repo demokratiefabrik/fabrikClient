@@ -104,7 +104,7 @@ export default defineComponent({
       groupsScheduled,
       stages_by_groups,
     } = useStagesComposable();
-    // const { gotoAssemblyHome, assemblyIdentifier } = useAssemblyComposable();
+    // const { gotoAssemblyHome, assemblyIdentifier } = useAssemblyComposable('');
     return {
       groupsScheduled,
       groupsAccessible,

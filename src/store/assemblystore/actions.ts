@@ -48,7 +48,7 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
     return null;
   }
 
-  // console.log('Retrieve assembly from resource server')
+  console.log('Retrieve assembly from resource server', assemblyIdentifier)
   api
     .retrieveAssembly(assemblyIdentifier)
     .then((response) => {
@@ -69,7 +69,7 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
 
 export const addOrUpdateStage = ({ commit }, { assemblyIdentifier, stage }) => {
   // const appComposable = useAppComposable();
-  // const {assemblyIdentifier} = useAssemblyComposable();
+  // const {assemblyIdentifier} = useAssemblyComposable('');
   console.log('stage: ', stage, assemblyIdentifier);
   api
     .addOrUpdateStage(assemblyIdentifier, stage)
@@ -137,7 +137,7 @@ export const addMilestone = ({ getters, commit }, { stageID, label, weight, key 
   console.log('ADD MILESTONE', label, ' WEIGHT:', weight, ' KEY:', key);
 
   const day = getters.assemblyProgression?.number_of_day_sessions;
-  // const {stageID} = useAssemblyComposable();
+  // const {stageID} = useAssemblyComposable('');
   // const stageID = stageID.value;
   // console.assert(stageID.value);
 
@@ -168,7 +168,7 @@ export const incrementAssemblyActivityCounter = (
       counterName
     )
   );
-  // const { assemblyIdentifier } = useAssemblyComposable();
+  // const { assemblyIdentifier } = useAssemblyComposable('');
   commit('incrementAssemblyActivityCounter', {
     assemblyIdentifier,
     counterName,

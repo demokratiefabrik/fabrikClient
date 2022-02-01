@@ -197,7 +197,7 @@ export default defineComponent({
     // console.log('DEBUG setup mainLayout')
     const { loaded } = useLibraryComposable();
     const { currentUsername, currentUsernameDerivation } = useAuthComposable();
-    const { assemblyIdentifier } = useAssemblyComposable();
+    const { assemblyIdentifier } = useAssemblyComposable('userinfo');
     // const {loading} = useLibraryComposable()
 
     // const { getUsernameDerivation, getUsername } = useAuthComposable();

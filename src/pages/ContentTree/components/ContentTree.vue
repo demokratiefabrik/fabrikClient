@@ -235,11 +235,11 @@ import useAppComposable from 'src/composables/app.composable';
 
 export default defineComponent({
   setup(props) {
-    const { getDailyContributionLimits } = useAssemblyComposable();
+    const { getDailyContributionLimits } = useAssemblyComposable('');
     const qtree = useQtreeComposable(props);
     const { sample } = useLibraryComposable();
     const { contenttree, isRead } = useContenttreeComposable();
-    const { limitForAddingCommentsReached } = useAssemblyComposable();
+    const { limitForAddingCommentsReached } = useAssemblyComposable('');
     const { scrollToAnchor } = useAppComposable();
     const content_editor = ref();
 

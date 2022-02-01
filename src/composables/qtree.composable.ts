@@ -6,7 +6,7 @@ i.e.  filtering and management of expanded content .
 import { scroll } from 'quasar';
 const { getVerticalScrollPosition, setVerticalScrollPosition } = scroll;
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 // import { useRoute} from 'vue-router';
 // import useEmitter from 'src/utils/emitter';
@@ -40,12 +40,12 @@ export default function useQtreeComposable(props) {
   const store = useStore();
   const { getOffsetTop, loaded } = useLibraryComposable();
   const { contenttree, markRead, isRead } = useContenttreeComposable();
-  const { assemblyIdentifier } = useAssemblyComposable();
+  const { assemblyIdentifier } = useAssemblyComposable('qtree.comp');
   const { userid } = usePKCEComposable();
   const { scrollToAnchor } = useAppComposable();
 
   // const currentRoute = useRoute();
-  // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable();
+  // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable('');
   // const { loaded } = useLibraryComposable();
 
   // ...mapActions("contentstore", ["'update_expanded_branches']),
@@ -58,12 +58,9 @@ export default function useQtreeComposable(props) {
   const treeFilter = ref<ITreeFilter>({});
   const highlightedNodeID = ref<number | null>(null);
   const expanded_filter = ref<any>(null);
-  // last_expanded_node: null,  // for lazy refresh when filter criteria do not meet anymore...
-
-  const public_profile = store.getters['publicprofilestore/get_public_profile'];
-  const IsManager = store.getters['assemblystore/IsManager'];
-  // const get_allowed_node_types = store.getters['contentstore/get_allowed_node_types'];
-  const getExpandedBranches = store.getters['contentstore/getExpandedBranches'];
+  const public_profile = computed(() => store.getters['publicprofilestore/get_public_profile'])
+  const IsManager = computed(() => store.getters['assemblystore/IsManager'])
+  const getExpandedBranches = store.getters['contentstore/getExpandedBranches']
 
   /*
     Which <label> should be displayed on top of the ContentTree?
@@ -279,7 +276,7 @@ export default function useQtreeComposable(props) {
       return true;
     }
     if (treeFilter.value.own) {
-      if (node.creator.id !== public_profile.id) {
+      if (node.creator.id !== public_profile.value.id) {
         return false;
       }
     }

@@ -126,7 +126,7 @@ export default defineComponent({
 
   setup() {
     // console.log('DEBUG setup notifications')
-    const { assemblyIdentifier } = useAssemblyComposable();
+    const { assemblyIdentifier } = useAssemblyComposable('');
     const { authorized, userid } = useAuthComposable();
     const { formatTimeLeft } = filters;
     const store = useStore();
@@ -221,9 +221,10 @@ export default defineComponent({
         }
       });
 
+      // TODO: does this work as expected?
       preloadAssemblies.forEach((assemblyIdentifier) => {
         this.store.dispatch('assemblystore/syncAssembly', {
-          assemblyIdentifier: assemblyIdentifier,
+          assemblyIdentifier: assemblyIdentifier.value,
           oauthUserID: this.userid.value,
         });
       });

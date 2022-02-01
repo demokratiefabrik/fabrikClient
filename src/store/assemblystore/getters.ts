@@ -40,7 +40,7 @@ export const assemblyType = (_state, getters): string | undefined => {
 
 export const assemblyConfiguration = (_state, getters): IAssemblyConfiguration | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready');
+    console.log('...assemblyTuple not ready (configuration)');
     return null;
   }
   return getters.assemblyTuple.configuration;
@@ -48,7 +48,7 @@ export const assemblyConfiguration = (_state, getters): IAssemblyConfiguration |
 
 export const assembly_userid = (state, getters): number | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready');
+    console.log('...assemblyTuple not ready (assembly userid...');
     return null;
   }
 
@@ -65,7 +65,7 @@ export const assemblyProgression = (state, getters): IAssemblyProgression | null
 
 export const assemblyStages = (state, getters): Record<number, IStageTuple> | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready');
+    console.log('...assemblyTuple not ready (stages)');
     return null;
   }
 
@@ -347,7 +347,7 @@ export const get_stage_number_by_stage_id =
   };
 
 export const find_next_accessible_stage =
-  (state, getters) =>
+  (_state, getters) =>
   (previous_stage): IStage | null => {
     // console.log("previous stage: moveon ", previous_stage)
     console.assert(previous_stage);
@@ -360,7 +360,7 @@ export const find_next_accessible_stage =
   };
 
 export const is_stage_first =
-  (state, getters) =>
+  (_state, getters) =>
   (stage): boolean => {
     console.assert(stage);
     const sorted_stages = getters.assembly_sorted_stages;
@@ -368,7 +368,7 @@ export const is_stage_first =
   };
 
 export const is_stage_last =
-  (state, getters) =>
+  (_state, getters) =>
   (stage): boolean => {
     console.assert(stage);
     console.assert(stage.stage);
@@ -380,7 +380,7 @@ export const is_stage_last =
 
 /* Is there still an activity required on this stage? */
 export const is_stage_scheduled =
-  (state, getters) =>
+  (_state, getters) =>
   (stage): boolean => {
     console.assert(stage);
     if (getters.is_stage_completed(stage)) {

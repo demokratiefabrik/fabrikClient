@@ -258,7 +258,7 @@ interface IVersionEntry {
 export default defineComponent({
   setup() {
     const { monitorLog } = useMonitorComposable();
-    const { assemblyIdentifier } = useAssemblyComposable();
+    const { assemblyIdentifier } = useAssemblyComposable('');
     const { loaded } = useLibraryComposable();
     const { getUsername, getUsernameDerivation } = useAuthComposable();
 

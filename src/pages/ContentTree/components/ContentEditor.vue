@@ -284,7 +284,7 @@ export default defineComponent({
       getDailyContributionLimits,
       limitForAddingCommentsReached,
       assemblyIdentifier,
-    } = useAssemblyComposable();
+    } = useAssemblyComposable('');
     const { getContentReference, contenttree, markDiscussed } =
       useContenttreeComposable();
     const popup_content_formor = ref();
@@ -304,12 +304,6 @@ export default defineComponent({
   },
 
   name: 'ContentEditor',
-  // inject: [
-  //   'CONTENTTREE',
-  //   'getContentReference',
-  //   'getDailyContributionLimits',
-  //   'markDiscussed',
-  // ],
 
   data() {
     return {

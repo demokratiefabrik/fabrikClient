@@ -163,7 +163,7 @@ export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
     const { assemblyIdentifier, assembly_sorted_stages, assembly, ready } =
-      useAssemblyComposable();
+      useAssemblyComposable('');
     // const { contenttree } = useContenttreeComposable();
     const store = useStore();
     const { userid } = usePKCEComposable();

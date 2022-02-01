@@ -24,35 +24,21 @@ export default function useStageComposable() {
 
   const store = useStore();
   const emitter = useEmitter();
-  // const currentRoute = useRoute();
-
-  // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable();
   const { loaded } = useLibraryComposable();
   const { userid } = usePKCEComposable();
-  const { gotoAssemblyHome, stageID } = useAssemblyComposable();
+  const { gotoAssemblyHome, stageID } = useAssemblyComposable('stage.comp');
   const { monitorLog } = useMonitorComposable();
-
-  // const currentRoute = useRoute();
-  // const { pushR } = useRouterComposable();
-
-  // const assembly_sorted_stages =
-  //   store.getters['assemblystore/assembly_sorted_stages'];
   const assemblyStages = store.getters['assemblystore/assemblyStages'];
   const assembly_sorted_stages =
     store.getters['assemblystore/assembly_sorted_stages'];
 
-  const is_stage_accessible =
-    store.getters['assemblystore/is_stage_accessible'];
-  // const assembly_accessible_stages =
-  //   store.getters['assemblystore/assembly_accessible_stages'];
-  // const assembly_scheduled_stages =
-  //   store.getters['assemblystore/assembly_scheduled_stages'];
-  const IsManager = store.getters['assemblystore/IsManager'];
+  const IsManager = computed(() => store.getters['assemblystore/IsManager']);
+  const assembly = computed(() => store.getters['assemblystore/assembly']);
+  const stageMilestonesCompleted = computed(
+    () => store.getters['assemblystore/stageMilestonesCompleted']
+  );
+  const is_stage_accessible = store.getters['assemblystore/is_stage_accessible']
   const is_stage_alerted = store.getters['assemblystore/is_stage_alerted'];
-  const assembly = store.getters['assemblystore/assembly'];
-  // const stageMilestoneWeigths = store.getters['assemblystore/stageMilestoneWeigths'];
-  const stageMilestonesCompleted =
-    store.getters['assemblystore/stageMilestonesCompleted'];
 
   const routed_stage = computed(() => {
     if (!stageID.value) {
@@ -70,7 +56,7 @@ export default function useStageComposable() {
       emitter.emit('hideLoading');
     }
 
-    if (!IsManager) {
+    if (!IsManager.value) {
       if (routed_stage.value && !is_stage_accessible(routed_stage)) {
         gotoAssemblyHome(assembly);
       }
@@ -139,7 +125,7 @@ export default function useStageComposable() {
   };
 
   const checkMilestones = () => {
-    if (stageMilestonesCompleted) {
+    if (stageMilestonesCompleted.value) {
       // ignore this statement...
       if (is_stage_alerted(routed_stage.value)) {
         markUnAlert();

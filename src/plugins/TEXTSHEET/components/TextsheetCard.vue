@@ -42,7 +42,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   setup() {
     // console.log('DEBUG: INDEX:VUE');
-    // const { gotoAssemblyHome } = useAssemblyComposable();
+    // const { gotoAssemblyHome } = useAssemblyComposable('');
     return {};
   },
   name: 'TextsheetCard',
@@ -54,7 +54,6 @@ export default defineComponent({
     'discussionAM',
     'discussionBlockLabel',
   ],
-  // inject: ['CONTENTTREE'],
   components: { ContentToolbar },
   computed: {
     header_class(): string | null {

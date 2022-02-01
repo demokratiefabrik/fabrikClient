@@ -72,10 +72,10 @@ export default defineComponent({
     // console.log('DEBUG: INDEX:VUE');
     // const { assemblyMenu } = useCIRComposable();
     const { push } = useRouter();
-    const {gotoStage} = useAssemblyComposable();
+    const {gotoStage} = useAssemblyComposable('');
     const { next_scheduled_stage, groupsAccessible, groupsScheduled } =
       useStagesComposable();
-    // const { gotoAssemblyHome, assemblyIdentifier } = useAssemblyComposable();
+    // const { gotoAssemblyHome, assemblyIdentifier } = useAssemblyComposable('');
     return {
       groupsScheduled,
       groupsAccessible,

@@ -283,7 +283,7 @@ export default defineComponent({
   name: 'StageEditor',
   setup() {
     const popupeditor = ref();
-    const { assemblyIdentifier } = useAssemblyComposable();
+    const { assemblyIdentifier } = useAssemblyComposable('');
     return { assemblyIdentifier, popupeditor };
   },
   props: {

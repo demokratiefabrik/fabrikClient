@@ -132,7 +132,6 @@ import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
 import Notifications from './Notifications.vue';
 import UserAvatar from 'src/components/UserAvatar.vue';
-import { RouteLocationRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'MainMenu',

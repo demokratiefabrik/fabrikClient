@@ -28,6 +28,8 @@
 import { defineComponent } from 'vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useCIRComposable from './composables/cir.composable';
+import TOCItem from './TOCItem.vue'
+
 // import { mapGetters } from 'vuex';
 import AMs from 'src/pages/Assembly/ArtificialModeration.js';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
@@ -38,7 +40,7 @@ export default defineComponent({
     // console.log('DEBUG: INDEX:VUE');
     const { assemblyMenu } = useCIRComposable();
     // const { groupsScheduled, next_scheduled_stage } = useStagesComposable();
-    const { assembly } = useAssemblyComposable();
+    const { assembly } = useAssemblyComposable('');
     return {
       // groupsScheduled,
       // next_scheduled_stage,
@@ -51,6 +53,7 @@ export default defineComponent({
   name: 'AssemblyTOC',
   components: {
     ArtificialModeration,
+    TOCItem
   },
   data() {
     return {

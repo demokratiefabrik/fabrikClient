@@ -9,7 +9,7 @@ export default function useMonitorComposable() {
   console.log('DEBUG: useMonitorComposable::SETUP')
   const currentRoute = useRoute();
   const store = useStore();
-  const assemblyComposable = useAssemblyComposable();
+  const assemblyComposable = useAssemblyComposable('monitor.comp');
   const { authorized } = usePKCEComposable();
   const $q = useQuasar();
   // ---------

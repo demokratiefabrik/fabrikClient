@@ -42,7 +42,6 @@ Timelag: postpone update call by one second...
   */
  export const updateContenttree = ({ commit, dispatch }, { assemblyIdentifier, contenttreeID, update_date, timelag }) => {
 
-    console.log('UPDATE CONTENTTREE; now or with timelag', timelag)
     commit('set_update_date_to_current', { contenttreeID });
 
     const timeout = timelag ? 1000 : 0
@@ -54,7 +53,6 @@ Timelag: postpone update call by one second...
       api.updateContenttree(assemblyIdentifier, contenttreeID, update_date)
         .then(
           response => {
-            console.log('RESPONSE OF CONTENTTREE UPDATE IS HERE...', response.data)
             console.assert(response?.data)
             console.assert('OK' in response.data)
             const modifiedContents = response.data.contents

@@ -10,7 +10,7 @@ export default function useCIRComposable() {
   // const initialize = () => {
   // };
 
-  const { assemblyIdentifier } = useAssemblyComposable();
+  const { assemblyIdentifier } = useAssemblyComposable('');
   const { next_scheduled_stage, getFirstOrRoutedStageIDByGroup } =
     useStagesComposable();
 

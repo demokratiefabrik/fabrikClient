@@ -36,7 +36,7 @@ import useContenttreeComposable from 'src/composables/contenttree.composable';
 // const {  } = useContenttreeComposable();
 export default defineComponent({
   setup() {
-    const { ready, gotoAssemblyManage, assembly } = useAssemblyComposable();
+    const { ready, gotoAssemblyManage, assembly } = useAssemblyComposable('');
     const { contenttree } = useContenttreeComposable();
     const { routed_stage } = useStageComposable();
     return { ready, routed_stage, gotoAssemblyManage, contenttree, assembly };

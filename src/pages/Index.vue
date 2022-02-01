@@ -61,7 +61,7 @@ export default defineComponent({
   setup() {
     // console.log('DEBUG: INDEX:VUE');
     const { authorized, profile } = useAuthComposable();
-    const { gotoAssemblyHome } = useAssemblyComposable();
+    const { gotoAssemblyHome } = useAssemblyComposable('');
     return {
       authorized,
       profile,

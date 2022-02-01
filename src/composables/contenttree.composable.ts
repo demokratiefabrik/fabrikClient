@@ -21,15 +21,11 @@ export default function useContenttreeComposable() {
   console.log('DEBUG: useContenttreeComposable::SETUP')
   const store = useStore();
   const emitter = useEmitter();
-  // const { gotoAssemblyHome } = useAssemblyComposable();
+  // const { gotoAssemblyHome } = useAssemblyComposable('');
   const { loaded, pushSorted} = useLibraryComposable();
   const { monitorLog } = useMonitorComposable();
   const { routed_stage } = useStagesComposable();
-
-  
-  const get_contenttree = store.getters['contentstore/get_contenttree'];
-  // const numberOfUnsaliencedTopLevelEntries   = store.getters['contentstore/get_contenttree'];
-  // const contenttree = store.getters['contentstore/get_contenttree'];
+  const get_contenttree = store.getters['contentstore/get_contenttree']
 
   const contenttreeID = computed(() => {
     // Mixin is only usable for pages with assemblyIdentifier in the URL

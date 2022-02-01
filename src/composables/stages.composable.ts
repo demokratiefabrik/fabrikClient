@@ -33,29 +33,29 @@ export default function useStagesComposable() {
 
   const store = useStore();
   const emitter = useEmitter();
-  const { gotoAssemblyHome, stageID } = useAssemblyComposable();
+  const { gotoAssemblyHome, stageID } = useAssemblyComposable('stages.comp');
   const { loaded } = useLibraryComposable();
 
   // const currentRoute = useRoute();
   // const { pushR } = useRouterComposable();
 
-  const assembly_sorted_stages =
-    store.getters['assemblystore/assembly_sorted_stages'];
-  const assemblyStages = store.getters['assemblystore/assemblyStages'];
-  const is_stage_accessible =
-    store.getters['assemblystore/is_stage_accessible'];
+  const assembly_sorted_stages = computed(() => 
+    store.getters['assemblystore/assembly_sorted_stages']);
+  const assemblyStages = computed(() => store.getters['assemblystore/assemblyStages']);
   const assembly_accessible_stages =
-    store.getters['assemblystore/assembly_accessible_stages'];
+  computed(() => store.getters['assemblystore/assembly_accessible_stages']);
   const assembly_scheduled_stages =
-    store.getters['assemblystore/assembly_scheduled_stages'];
-  const IsManager = store.getters['assemblystore/IsManager'];
-  const assembly = store.getters['assemblystore/assembly'];
+  computed(() => store.getters['assemblystore/assembly_scheduled_stages']);
+  const IsManager = computed(() => store.getters['assemblystore/IsManager']);
+  const assembly = computed(() => store.getters['assemblystore/assembly']);
+  const is_stage_accessible =
+  store.getters['assemblystore/is_stage_accessible'];
 
   const routed_stage = computed(() => {
     if (!stageID.value) {
       return null;
     }
-    if (!assemblyStages) {
+    if (!assemblyStages.value) {
       return null;
     }
     return assemblyStages[stageID.value];
@@ -67,7 +67,7 @@ export default function useStagesComposable() {
       emitter.emit('hideLoading');
     }
 
-    if (!IsManager) {
+    if (!IsManager.value) {
       if (routed_stage.value && !is_stage_accessible(routed_stage)) {
         gotoAssemblyHome(assembly);
       }
@@ -82,7 +82,7 @@ export default function useStagesComposable() {
 
   const stages_by_groups = computed(() => {
     const stages_by_groups = {};
-    if (!assemblyStages) {
+    if (!assemblyStages.value) {
       return null;
     }
 
@@ -97,18 +97,18 @@ export default function useStagesComposable() {
   });
 
   const groupsAccessible = computed(() => {
-    if (!assembly_scheduled_stages) {
+    if (!assembly_scheduled_stages.value) {
       return;
     }
-    const groups = assembly_accessible_stages.map((stage) => stage.stage.group);
+    const groups = assembly_accessible_stages.value.map((stage) => stage.stage.group);
     return groups;
   });
 
   const groupsScheduled = computed(() => {
-    if (!assembly_scheduled_stages) {
+    if (!assembly_scheduled_stages.value) {
       return;
     }
-    const groups = assembly_scheduled_stages.map((stage) => stage.stage.group);
+    const groups = assembly_scheduled_stages.value.map((stage) => stage.stage.group);
     return groups;
   });
 
@@ -123,12 +123,12 @@ export default function useStagesComposable() {
   const is_stage_first_shown = (stage) => {
     console.assert(stage);
     console.assert(assembly_sorted_stages);
-    return stage === assembly_sorted_stages[assembly_sorted_stages.length - 1];
+    return stage === assembly_sorted_stages[assembly_sorted_stages.value.length - 1];
   };
 
   const is_stage_last_shown = (stage) => {
     console.assert(stage);
-    return stage === assembly_sorted_stages[0];
+    return stage === assembly_sorted_stages.value[0];
   };
 
   const getFirstOrRoutedStageIDByGroup = (group) => {
@@ -149,13 +149,6 @@ export default function useStagesComposable() {
 
   const next_scheduled_stage =
     store.getters['assemblystore/next_scheduled_stage'];
-
-  // const next_scheduled_stage = computed(() => {
-  //   return  store.getters['assemblystore/next_scheduled_stage'];
-  // });
-  // const getFirstOrRoutedStageIDByGroup = computed(() => {
-  //   return  store.getters['assemblystore/getFirstOrRoutedStageIDByGroup'];
-  // });
 
   return {
     currentGroup,

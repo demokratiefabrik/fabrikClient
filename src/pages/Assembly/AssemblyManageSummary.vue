@@ -196,7 +196,7 @@ export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
     const { assemblyIdentifier, assembly, assemblyStages, ready } =
-      useAssemblyComposable();
+      useAssemblyComposable('');
     const { routed_stage, markUnAlert } = useStageComposable();
     const store = useStore();
     const { userid } = usePKCEComposable();

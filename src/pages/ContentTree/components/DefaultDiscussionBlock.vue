@@ -166,12 +166,8 @@ export default defineComponent({
     return {
       show_discussion: false,
       temporaryHighlightedBackground: false,
-      // tree: null,
     };
   },
-
-  // "openIndex",
-  // inject: ['CONTENTTREE', 'isRead', 'isAlerted'],
 
   computed: {
     // COLLECT ALL Ids to include into this discussion tree...
