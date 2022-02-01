@@ -12,7 +12,7 @@ export default {
         buttons: [
           {
             action: (ctx) => {
-              ctx.$root.gotoAssemblyHome(ctx.assembly);
+              ctx.gotoAssemblyHome(ctx.assembly);
             },
             label: () => 'Zurück zum Programm',
           },
@@ -70,7 +70,7 @@ export default {
         buttons: [
           {
             action: (ctx) => {
-              ctx.$root.gotoAssemblyHome(ctx.assembly);
+              ctx.gotoAssemblyHome(ctx.assembly);
             },
             label: () => 'zum Programm',
           },
@@ -124,7 +124,7 @@ export default {
         buttons: [
           {
             action: (ctx) => {
-              ctx.$root.gotoAssemblyHome(ctx.assembly);
+              ctx.gotoAssemblyHome(ctx.assembly);
             },
             label: () => 'zum Programm',
           },
@@ -173,7 +173,7 @@ export default {
           {
             action: (ctx) => {
               ctx.markUnAlert();
-              ctx.$root.gotoAssemblyHome(ctx.assembly);
+              ctx.gotoAssemblyHome(ctx.assembly);
             },
             label: () => 'Ja, bitte!',
           },

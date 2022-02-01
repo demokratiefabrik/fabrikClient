@@ -12,9 +12,9 @@
   >
     <div
       class="q-mb-md q-ml-md text-notification"
-      v-if="limitForAddingCommentsReached && !isAModification"
+      v-if="CONTENTTREE.limitForAddingCommentsReached && !isAModification"
     >
-      Sie haben heute schon {{ dailyContributionLimits?.current }} Kommentare
+      Sie haben heute schon {{ dailyContributionLimits.current }} Kommentare
       geschrieben. Damit haben Sie die Tageslimite erreicht. Ab morgen früh
       können Sie wieder neue Kommentare verfassen.
 
@@ -31,8 +31,8 @@
     <div
       class="q-pa-md"
       v-if="
-        localmodel && 
-        (!limitForAddingCommentsReached || isAModification)
+        loaded(localmodel) &&
+        (!CONTENTTREE.limitForAddingCommentsReached || isAModification)
       "
     >
       <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="$refs['popupeditor'].cancel()" /> -->
@@ -203,7 +203,7 @@
             :option-label="
               (tuple) =>
                 `${
-                  tuple && tuple.content.id == this.localmodel?.parent_id
+                  tuple && tuple.content.id == this.localmodel.parent_id
                     ? '*** '
                     : ''
                 }#${tuple.content.id} ${tuple.content.title}`
@@ -226,13 +226,14 @@
         </div>
       </div>
 
-      <p v-if="!isAModification && dailyContributionLimits">
+      <p v-if="!isAModification">
         Hinweis: In den Diskussionsforen können Sie pro Tag maximal
         {{ dailyContributionLimits.daylimit }} Beiträge schreiben.
         <span v-if="dailyContributionLimits.current > 1"
           >Bis jetzt waren es {{ dailyContributionLimits.current }}.</span
         >
       </p>
+
       <!-- <q-btn flat label="cancel" dense icon="mdi-close-box-outline" style="float:right" @click.stop="$refs['popupeditor'].cancel()" /> -->
       <div style="float: right">
         <q-btn
@@ -257,50 +258,16 @@
 </template>
 
 <script lang="ts">
-import { mapGetters, mapActions, useStore } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import api from 'src/utils/api';
-import { defineComponent, ref } from 'vue';
-import useLibraryComposable from 'src/utils/library';
-import useAssemblyComposable from 'src/composables/assembly.composable';
-import useContenttreeComposable, { INode } from 'src/composables/contenttree.composable';
-
-export interface IError {
-  title?: string;
-  text?: string;
-  type?: string;
-}
-
-export interface IData {
-  id: number | null;
-  title: string;
-  disabled: boolean;
-  type: string;
-  text: string;
-  parent_id: number | null;
-};
-
+import { runtimeStore } from 'src/store/runtime.store';
 
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { getDailyContributionLimits, limitForAddingCommentsReached, assemblyIdentifier } = useAssemblyComposable();
-    const {getContentReference, contenttree, markDiscussed} = useContenttreeComposable();
-    const popup_content_formor = ref();
-    const store = useStore()
-    
-    return {
-      loaded,
-      popup_content_formor,
-      getDailyContributionLimits,
-      limitForAddingCommentsReached,
-      getContentReference,
-      store,
-      markDiscussed,
-      contenttree,
-      assemblyIdentifier
-    };
+    const popup_content_formor = ref()
+    return { loaded, popup_content_formor };
   },
-
   name: 'ContentEditor',
   // inject: [
   //   'CONTENTTREE',
@@ -311,25 +278,24 @@ export default defineComponent({
 
   data() {
     return {
-      localmodel: null as IData | null,
-      originalmodel: null as IData | null,
-      error: false as boolean,
+      localmodel: null,
+      originalmodel: null,
+      error: false,
       TYPES_WITHOUT_REQUIRED_TEXTS: ['VAA_QUESTION'],
-      errors: {} as IError,
+      errors: {},
       errormsg: '',
-      action: null as string | null,
+      action: null,
       btnlabel: '',
       showParentSelectionBool: false,
-      parentOptions: null as any,
-      parentOptionsFiltered: [] as any[],
+      parentOptions: null,
+      parentOptionsFiltered: [],
     };
   },
 
   computed: {
-
-    dailyContributionLimits(): Record<string, number> | undefined {
+    dailyContributionLimits() {
       const limits = this.getDailyContributionLimits();
-      return limits?.number_of_comments;
+      return limits.number_of_comments;
     },
 
     /* Get all context types that are allowed at this position.
@@ -337,7 +303,7 @@ export default defineComponent({
     There are b) parentType restrictions (See Configuration.ONTOLOGY),
     and there are c) context restrictions (See QTree.filterTypes-Prop)),
      */
-    reviewNeeded(): boolean {
+    reviewNeeded() {
       // Manager cannot add proposal...
       if (this.IsManager) {
         return false;
@@ -350,109 +316,117 @@ export default defineComponent({
       // For Modification: check old a new content type...(if at least one is commont property, return true)
       var propertyIsCommon = true;
       if (this.originalmodel?.type) {
-        propertyIsCommon = this.isCommonPropertyByConentType(
+        propertyIsCommon = isCommonPropertyByConentType(
           this.originalmodel.type
         );
       }
       if (this.localmodel?.type) {
         propertyIsCommon =
           propertyIsCommon ||
-          this.isCommonPropertyByConentType(this.localmodel.type);
+          isCommonPropertyByConentType(this.localmodel.type);
       }
 
       return propertyIsCommon;
     },
 
-    isAModification(): boolean {
+    isAModification() {
       return this.action === 'edit';
     },
-    maxTextLength(): number {
+    maxTextLength() {
       return this.get_content_text_max_length({
-        contenttreeID: this.contenttree.id,
-        type: this.localmodel?.type,
+        contenttreeID: this.CONTENTTREE.contenttree.id,
+        type: this.localmodel.type,
       });
     },
-    maxTitleLength(): number {
+    maxTitleLength() {
       return this.get_content_title_max_length({
-        contenttreeID: this.contenttree.id,
-        type: this.localmodel?.type,
+        contenttreeID: this.CONTENTTREE.contenttree.id,
+        type: this.localmodel.type,
       });
     },
-    parentReference(): string | null {
+    parentReference() {
       if (!this.localmodel?.parent_id) {
         return null;
       }
+
       return this.getContentReference(this.localmodel.parent_id);
     },
-    submitButtonLabel(): string {
+    submitButtonLabel() {
       if (this.reviewNeeded) {
         return 'Absenden';
       }
       return 'Speichern';
     },
 
-    contextNodeTypes (): string[] {
-      if (this.localmodel && !('id' in this.localmodel)) {
+    contextNodeTypes: function () {
+      if (!('id' in this.localmodel)) {
         return [];
       }
 
-      // get parent type (if available)
       var parentType = null;
-      if (this.localmodel?.parent_id) {
+      if (this.localmodel.parent_id) {
         const parentNode =
-          this.contenttree.entries[this.localmodel.parent_id]
+          this.CONTENTTREE.contenttree.entries[this.localmodel.parent_id]
             .content;
         parentType = parentNode.type;
       }
 
-      // get allowed types for this parent
       var context_node_types = this.get_allowed_node_types({
-        contenttreeID: this.contenttree.id,
+        contenttreeID: this.CONTENTTREE.contenttree.id,
         parentType,
       });
 
-      // FILTER THE TYPES, THE USER HAS ADD PERMISSION
-      // get types (considering current permissions)
       var allowedContentTypesToAdd = this.get_node_types_with_add_permission({
-        contenttreeID: this.contenttree.id,
+        contenttreeID: this.CONTENTTREE.contenttree.id,
         parentType,
       });
 
-      // Reduce to overlapp
+      // Overlap
+      // console.log(parentType);
       context_node_types = context_node_types.filter((value) =>
         allowedContentTypesToAdd.includes(value)
       );
 
       if (
-        this.localmodel?.type &&
+        this.localmodel.type &&
         !context_node_types.includes(this.localmodel.type)
       ) {
         context_node_types = [this.localmodel.type];
       }
 
+      // FILTER THE TYPES, THE USER HAS ADD PERMISSION
+      // if (this.reviewNeeded){
+      //   // Review needed:
+      // }else{
+      //       // TODO: filter ALLOWED_CONTENT_TYPES_TO_ADD
+      // }
+
+      // CONTEXT
+      // TODO: are there any filtered node types in this context?
+      // context_node_types = context_node_types.filter((v) =>
+      //   this.realFilterTypes.includes(v)
+      // );
+      // console.log("context_node_types", context_node_types);
       return context_node_types;
     },
 
-    contextNodeTypesOptions (): any {
+    contextNodeTypesOptions: function () {
       const options = Object.values(
-        this.contextNodeTypes.reduce((prev, cur, i) => {
+        this.contextNodeTypes.reduce((obj, cur, i) => {
           return {
-            ...(prev as string[]),
-            [i as number]: {
-              value: cur as string,
+            ...obj,
+            [i]: {
+              value: cur,
               label: this.$t(`contenttree.types.${cur}`),
             },
           };
-        }, [] as any[])
+        }, [])
       );
       return options;
     },
 
-    currentParent(): INode | null {
-      if (this.localmodel?.parent_id) {
-        return this.contenttree.entries[this.localmodel.parent_id];
-      }
-      return null
+    currentParent() {
+      return this.CONTENTTREE.contenttree.entries[this.localmodel.parent_id];
     },
 
     ...mapGetters({
@@ -467,13 +441,12 @@ export default defineComponent({
   },
 
   methods: {
-
-    initialize (action, model: IData) {
+    initialize: function (action, model) {
       console.log('Initialize popup action ' + action);
-      this.originalmodel = model;
+      this.original = model;
       this.action = action;
 
-      const template: IData = {
+      const template = {
         id: null,
         title: '',
         disabled: false,
@@ -508,23 +481,14 @@ export default defineComponent({
     },
 
     showParentSelection() {
-      if (!this.localmodel) {
-        return;
-      }
-
       const tmpParentOptions = Object.values(
-        this.contenttree.entries
+        this.CONTENTTREE.contenttree.entries
       );
-      // console.log(tmpParentOptions);
-      const nodeId = this.localmodel?.id
-      if (nodeId){
-        this.parentOptions = tmpParentOptions.filter(v => {
-          const noCyclying = !(v as INode).path.includes(nodeId);
-          return noCyclying;
-        });
-      } else{
-        console.log('warning: nodeID not defined..973..')
-      }
+      console.log(tmpParentOptions);
+      this.parentOptions = tmpParentOptions.filter((v) => {
+        const noCyclying = !v.path.includes(this.localmodel.id);
+        return noCyclying;
+      });
       // console.log(this.parentOptions);
 
       this.showParentSelectionBool = true;
@@ -555,20 +519,16 @@ export default defineComponent({
       var has_error = false;
       this.errors = {};
 
-      if (!this.localmodel){
-        return false
-      }
-
       if (
-        !this.localmodel?.type ||
+        !this.localmodel['type'] ||
         !this.contextNodeTypes.includes(this.localmodel.type)
       ) {
         this.errors['type'] = 'Sie müssen ein Inhaltstyp angeben.';
         has_error = true;
       }
 
-      if (!this.localmodel?.title) {
-        this.errors['text'] =
+      if (!this.localmodel['title']) {
+        this.errors.text =
           'Bitte fügen Sie einen Titel für diesen Beitrag ein.';
         has_error = true;
       } else if (this.localmodel.title.length > this.maxTitleLength) {
@@ -578,10 +538,10 @@ export default defineComponent({
         has_error = true;
       }
       if (
-        !this.localmodel?.text &&
-        !this.TYPES_WITHOUT_REQUIRED_TEXTS.includes(this.localmodel.type)
+        !this.localmodel['text'] &&
+        !this.TYPES_WITHOUT_REQUIRED_TEXTS.includes(this.localmodel['type'])
       ) {
-        this.errors['text'] = 'Bitte fügen Sie einen Text für diesen Beitrag ein.';
+        this.errors.text = 'Bitte fügen Sie einen Text für diesen Beitrag ein.';
         has_error = true;
       } else if (this.localmodel.text.length > this.maxTextLength) {
         this.errors[
@@ -594,15 +554,11 @@ export default defineComponent({
     },
 
     getTopicID: function () {
-      if (!this.localmodel){
-        return;
-      }
-
       let contentID = this.isAModification
         ? this.localmodel.id
         : this.localmodel.parent_id;
       if (contentID) {
-        const path = this.contenttree.entries[contentID]?.path;
+        const path = this.CONTENTTREE.contenttree.entries[contentID]?.path;
         if (path.length) {
           return path[0];
         }
@@ -612,21 +568,21 @@ export default defineComponent({
     saveContent: function () {
       // console.log(this.localmodel)
       console.log('Save content');
-      console.assert(this.contenttree.id);
-      var assemblyIdentifier = this.assemblyIdentifier;
+      console.assert(this.CONTENTTREE.contenttree.id);
+      var assemblyIdentifier = runtimeStore.assemblyIdentifier;
       console.assert(assemblyIdentifier);
 
       // Set topic as dicussed
       const topicID = this.getTopicID();
       if (topicID) {
-        this.markDiscussed(this.contenttree.entries[topicID]);
+        this.markDiscussed(this.CONTENTTREE.contenttree.entries[topicID]);
+        // this.update_discussed({
+        //   contenttreeID: this.STAGE.contenttreeID,
+        //   contentID: topicID,
+        // });
       }
 
-      let submitApiFunction = null as null | ((
-        assemblyIdentifier: string | null,
-        contenttreeID: number,
-        localmodel: IData | null
-      ) => Promise<any>);
+      var submitApiFunction = null;
       if (this.reviewNeeded) {
         submitApiFunction = api.proposeContent;
       } else {
@@ -634,8 +590,8 @@ export default defineComponent({
       }
 
       submitApiFunction(
-        this.assemblyIdentifier,
-        this.contenttree.id,
+        assemblyIdentifier,
+        this.CONTENTTREE.contenttree.id,
         this.localmodel
       )
         .then((response) => {
@@ -653,7 +609,7 @@ export default defineComponent({
               this.update_content({ contentTuple: response.data.content });
               console.log('SEND TO VUEX', response.data.content);
 
-              this.store.dispatch(
+              this.$store.dispatch(
                 'assemblystore/incrementAssemblyActivityCounter',
                 { counterName: 'number_of_comments_today' }
               );

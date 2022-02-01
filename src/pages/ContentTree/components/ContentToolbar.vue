@@ -93,17 +93,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 // import ApiService from "src/utils/xhr";
 import { mapActions, mapGetters } from 'vuex';
 // import { runtimeStore } from "src/store/runtime.store";
 import ContentBackground from './ContentBackground.vue';
 
 export default defineComponent({
-  // setup() {},
+  setup() {
+    const backgroundDialog = ref();
+    return { backgroundDialog };
+  },
   name: 'ContentToolbarComponent',
   props: ['obj'],
-  inject: ['popup_content_form'], // is injecting CONTENTTREE needed: only for contenttree_id, right?
   components: {
     ContentBackground,
   },
@@ -121,7 +123,6 @@ export default defineComponent({
   },
 
   computed: {
-
     ContentResponseComponentLoader(): any {
       if (
         this.obj.content.acl.includes('manage') &&
@@ -135,7 +136,7 @@ export default defineComponent({
         return () => import('./ContentRatingThumbs.vue');
       }
 
-      return null
+      return null;
     },
 
     track_changes_icon: function () {
@@ -158,33 +159,46 @@ export default defineComponent({
 
   methods: {
     popup_edit() {
-      this.popup_content_form('edit', this.obj.content);
+      if (this.obj) {
+        this.$emit('popup-content-form', {
+          action: 'edit',
+          content: this.obj.content,
+        });
+      } else {
+        console.error('Error: content node not loaded');
+      }
     },
 
     popup_create() {
-      this.popup_content_form('reply', { parent_id: this.obj.content.id });
+      if (this.obj) {
+        this.$emit('popup-content-form', {
+          action: 'reply',
+          content: { parent_id: this.obj.content.id },
+        });
+      } else {
+        console.error('Error: content node not loaded');
+      }
+      // this.popup_content_form('reply', { parent_id: this.obj.content.id });
     },
     showBackground() {
       console.log('SHOOOOW');
-      this.$refs.backgroundDialog.toolbar = true;
+      this.backgroundDialog.value.toolbar = true;
     },
 
     deletePrompt(content) {
-      var message = '';
+      var message =
+        'This is private property. If you want, you can delete it. However, please provide a short justification.';
       if (content.common_property) {
         message =
           'This is common property. You can submit a Proposal to delete this entry. However, provide a short justification, why do you think deletion is appropriate.';
-      } else {
-        message =
-          'This is private property. If you want, you can delete it. However, please provide a short justification.';
       }
 
       this.$q
         .dialog({
           title: content.common_property
-            ? this.$i18n.t('contenttree.toolbar.submit_delete_proposal')
-            : this.$i18n.t('contenttree.toolbar.delete'),
-          message: message,
+            ? this.$t('contenttree.toolbar.submit_delete_proposal')
+            : this.$t('contenttree.toolbar.delete'),
+          message,
           prompt: {
             model: '',
             isValid: (val) => val.length > 3, // << here is the magic
@@ -193,11 +207,13 @@ export default defineComponent({
           cancel: true,
           persistent: true,
         })
-        .onOk((data) => {
-          this.deleteEntry(content, data);
+        .onOk(() => {
+          alert('DELETE ENTRY METHOD DOES NOT EXIST..908.');
+          // console.log(data, 'object to delete?');
+          // this.deleteEntry(content, data);
         });
     },
-
+ 
     validateConfirmDeletion() {
       var has_error = false;
       this.confirm_deletion_justification_error_message = '';

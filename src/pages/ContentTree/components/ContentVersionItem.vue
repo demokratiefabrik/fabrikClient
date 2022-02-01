@@ -103,7 +103,6 @@ export default defineComponent({
       if (this.profile) {
         return this.getUsernameDerivation(this.profile);
       }
-
       return '';
     },
 

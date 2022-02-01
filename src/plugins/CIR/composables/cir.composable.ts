@@ -2,15 +2,18 @@
 
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import constants from 'src/utils/constants';
-import useStagesComposable, {IStageGroup} from 'src/composables/stages.composable'
+import useStagesComposable, {
+  IStageGroup,
+} from 'src/composables/stages.composable';
 
 export default function useCIRComposable() {
   // const initialize = () => {
   // };
 
   const { assemblyIdentifier } = useAssemblyComposable();
-  const {next_scheduled_stage, getFirstOrRoutedStageIDByGroup} = useStagesComposable();
-  
+  const { next_scheduled_stage, getFirstOrRoutedStageIDByGroup } =
+    useStagesComposable();
+
   const assemblyMenu: Record<string, IStageGroup> = {
     preparation: {
       name: 'preparation',
@@ -124,8 +127,8 @@ export default function useCIRComposable() {
 //       })
 //     }
 
-//     this.$root.gotoAssemblyManage = (assembly) => {
-//       var route = this.$root.getAssemblyManageRoute(assembly);
+//     this.gotoAssemblyManage = (assembly) => {
+//       var route = this.getAssemblyManageRoute(assembly);
 //       this.$pushR(route)
 //     }
 
@@ -223,7 +226,7 @@ export default function useCIRComposable() {
 // <!-- v-if="$q.screen.gt.sm && assemblyName" -->
 
 // <!-- TODO uncomment-->
-// <!-- @click="$root.gotoAssemblyHome(assembly)" -->
+// <!-- @click="gotoAssemblyHome(assembly)" -->
 
 // <q-toolbar-title
 // shrink

@@ -24,9 +24,13 @@ import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
 // import { debounce } from "quasar";
 import constants from 'src/utils/constants';
+import useMonitorComposable from 'src/composables/monitor.composable';
 
 export default defineComponent({
-  // setup() {},
+  setup() {
+    const { monitorLog } = useMonitorComposable();
+    return { monitorLog };
+  },
   name: 'ContentManagerReview',
   props: ['content'],
   data() {
@@ -57,7 +61,7 @@ export default defineComponent({
         reviewed: this.content_reviewed,
       };
       console.log('new review data received...', this.content_reviewed);
-      this.$root.monitorLog(constants.MONITOR_SET_CONTENT_REVIEWED, data);
+      this.monitorLog(constants.MONITOR_SET_CONTENT_REVIEWED, data);
 
       // immediatly update flag in vuex store
       this.update_review({

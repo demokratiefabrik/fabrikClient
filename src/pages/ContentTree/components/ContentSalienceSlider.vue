@@ -13,7 +13,7 @@
             v-model="value"
             :min="min"
             :max="max"
-            @change="debouncedIniSet"
+            @change="debouncedInitSet"
             label-always
             :label-value="getSlideLabel"
             :style="{ color: getSlideColor }"
@@ -34,12 +34,18 @@ import { debounce } from 'quasar';
 import { mapActions } from 'vuex';
 import constants from 'src/utils/constants';
 import { colors } from 'quasar';
+import useLibraryComposable from 'src/utils/library';
+import { INode } from 'src/composables/contenttree.composable';
+import useMonitorComposable from 'src/composables/monitor.composable';
 const { rgbToHex } = colors;
 
 export default defineComponent({
   setup() {
+    const { monitorLog } = useMonitorComposable();
     const { loaded } = useLibraryComposable();
-    return { loaded };
+    // const debouncedInitSet: null | (() => void) = () => void
+    const debouncedInitSet: null | (() => void) = () => undefined;
+    return { loaded, debouncedInitSet, monitorLog };
   },
   name: 'ContentSalienceSlider',
   props: {
@@ -78,9 +84,10 @@ export default defineComponent({
     },
 
     getSlideLabel() {
-      if (this.noneResponse) {
+      if (this.noneResponse || this.scale100 === null) {
         return 'Bitte wählen';
       }
+
       const value = Math.round(
         (this.scale100 / 100) * (this.scaleLabel.length - 1)
       );
@@ -88,11 +95,15 @@ export default defineComponent({
     },
 
     scale100() {
-      return (100 / this.colorRange) * (this.progression_salience - this.min);
+      if (this.progression_salience !== null) {
+        return (100 / this.colorRange) * (this.progression_salience - this.min);
+      }
+
+      return null;
     },
 
     getSlideColor() {
-      if (this.noneResponse) {
+      if (this.noneResponse || this.scale100 === null) {
         return 'grey';
       }
       const color = rgbToHex({
@@ -110,7 +121,7 @@ export default defineComponent({
     },
 
     realSalience() {
-      return this.content?.progression?.salience;
+      return (this.content as INode)?.progression?.salience;
     },
   },
 
@@ -124,17 +135,21 @@ export default defineComponent({
       }
 
       const data = {
-        contentID: this.content.content.id,
+        contentID: (this.content as INode).content.id,
         salience: this.progression_salience,
-        topicID: this.content?.path ? this.content.path[0] : null,
+        topicID: (this.content as INode)?.path
+          ? (this.content as INode).path[0]
+          : null,
       };
-      this.$root.monitorLog(constants.MONITOR_SET_SALIENCE, data);
+      this.monitorLog(constants.MONITOR_SET_SALIENCE, data);
 
       // immediatly update saliences in vuex store (=> allows to update the dynamically generated charts)
       this.update_salience({
-        contenttreeID: this.content.content.contenttree_id,
-        contentID: this.content.content.id,
-        topicID: this.content.path?.length ? this.content.path[0] : null,
+        contenttreeID: (this.content as INode).content.contenttree_id,
+        contentID: (this.content as INode).content.id,
+        topicID: (this.content as INode).path?.length
+          ? (this.content as INode).path[0]
+          : null,
         salience: this.progression_salience,
       });
 
@@ -145,11 +160,11 @@ export default defineComponent({
   },
 
   created() {
-    this.debouncedIniSet = debounce(this.initSet, 1200);
+    this.debouncedInitSet = debounce(this.initSet, 1200);
   },
 
   mounted: function () {
-    this.progression_salience = this.content?.progression?.salience;
+    this.progression_salience = (this.content as INode)?.progression?.salience;
   },
 
   watch: {

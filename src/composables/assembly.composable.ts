@@ -346,6 +346,7 @@ export default function useAssemblyComposable() {
     assemblyIdentifier: readonly(assemblyIdentifier),
     setAssemblyIdentifier,
     stageID,
+    assembly,
     setStageID,
     daySessions,
     ready,

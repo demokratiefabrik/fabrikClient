@@ -34,7 +34,7 @@ export interface ITreeFilter {
   unreviewed?: boolean; // used for manager review
 }
 
-export default function useQtreeComposable(ctx) {
+export default function useQtreeComposable(props) {
   const store = useStore();
   const { getOffsetTop, loaded } = useLibraryComposable();
   const { contenttree, markRead, isRead } = useContenttreeComposable();
@@ -72,7 +72,7 @@ export default function useQtreeComposable(ctx) {
     If nothing is indicated: every type is allowed, that is allowed for the given parent. */
 
   const total_nof_contents = () => {
-    return ctx.node.nof_descendants;
+    return props.node.nof_descendants;
   };
 
   const is_currently_expanded = (node) => {
@@ -105,7 +105,7 @@ export default function useQtreeComposable(ctx) {
   const expand_node = (node) => {
     const isTopBranch =
       node.content.parent_id === null || node.content.parent_id == node.id;
-    if (ctx.accordion.value && isTopBranch) {
+    if (props.accordion.value && isTopBranch) {
       const newlyExpanded = expand_node_accordion(node);
       markAsReadByIDs(newlyExpanded);
     } else {
@@ -252,7 +252,7 @@ export default function useQtreeComposable(ctx) {
 
     store.dispatch('contenttreestore/update_expanded_branches', {
       contenttreeID: contenttree.value.id,
-      rootNodeID: ctx.node.id,
+      rootNodeID: props.node.id,
       expanded: expanded,
     });
 
@@ -336,21 +336,21 @@ export default function useQtreeComposable(ctx) {
   // set expanded branches
   expanded.value = getExpandedBranches({
     contenttreeID: contenttree.value.id,
-    rootNodeID: ctx.node.id,
+    rootNodeID: props.node.id,
   });
 
   if (expanded.value === null) {
     console.assert(contenttree);
     // Nothing expaneded here: so expand 15 random branchens
-    if (ctx.doNotExpandNodesAtInitialization) {
+    if (props.doNotExpandNodesAtInitialization) {
       expanded.value = [];
     } else {
-      expanded.value = calculate_default_expanded_branches(ctx.node);
+      expanded.value = calculate_default_expanded_branches(props.node);
     }
 
     store.dispatch('contenttreestore/update_expanded_branches', {
       contenttreeID: contenttree.value.id,
-      rootNodeID: ctx.node.id,
+      rootNodeID: props.node.id,
       expanded: expanded,
     });
 
@@ -359,6 +359,13 @@ export default function useQtreeComposable(ctx) {
   }
 
   return {
+    expanded,
+    treeFilter,
+    highlightNode,
+    highlightedNodeID,
+    expanded_filter,
+    animationDuration,
+    updateExpanded,
     total_nof_contents,
     is_currently_expanded,
     is_currently_expanded_id,

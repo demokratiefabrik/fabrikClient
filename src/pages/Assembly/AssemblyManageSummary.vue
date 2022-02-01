@@ -173,6 +173,15 @@ import Skeleton from 'src/components/Skeleton.vue';
 // import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useLibraryComposable from 'src/utils/library';
+
+export interface ISideMenuItem {
+  label: string,
+  anchor: string,
+  caption?: string,
+  visible?: () => boolean
+}
+
+export type ISideMenuItems = ISideMenuItem[];
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
@@ -184,7 +193,7 @@ export default defineComponent({
   mixins: [],
   data() {
     return {
-      AMs,
+      AMs: [],
       chartType: 'chartRadar',
 
       sideMenuItems: [
@@ -212,7 +221,7 @@ export default defineComponent({
           label: 'Ausblick',
           anchor: 'OUTLOOK',
         },
-      ],
+      ] as ISideMenuItem[],
     };
   },
 

@@ -9,13 +9,13 @@ export default {
         id: 1,
         prosa: ' Redirect zum Survey....',
         condition: (ctx) => !ctx.is_stage_completed(ctx.routed_stage),
-        body: (ctx) => ctx.$i18n.t('survey.redirect_to_survey'),
+        body: (ctx) => ctx.$t('survey.redirect_to_survey'),
       },
       {
         id: 2,
         prosa: ' Bereits Survey beendet',
         condition: (ctx) => ctx.is_stage_completed(ctx.routed_stage),
-        body: (ctx) => ctx.$i18n.t('survey.survey_completed'),
+        body: (ctx) => ctx.$t('survey.survey_completed'),
         buttons: [
           {
             action: (ctx) => { ctx.markUnAlert(); ctx.gotoStage(ctx.next_scheduled_stage) },

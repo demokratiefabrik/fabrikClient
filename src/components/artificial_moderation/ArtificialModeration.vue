@@ -44,8 +44,8 @@
           noTextPadding ? 'noTextPadding' : '',
         ]"
       >
-        <template v-slot:default  v-if="loading">
-            <q-spinner-dots size="2rem" v-if="loading" />
+        <template v-slot:default v-if="loading">
+          <q-spinner-dots size="2rem" v-if="loading" />
         </template>
 
         <template v-slot:avatar>
@@ -67,10 +67,10 @@
       <div
         :class="['artificialmoderation', actorClass, 'full-width']"
         :style="`text-align:${alignmentForced}; padding-${alignmentForced}:100px`"
-        v-if="buttons && !loading"
+        v-if="buttons && buttons.length && !loading"
       >
         <q-btn
-          v-for="(button, index) in (buttons as IArtificialModerationButton[])"
+          v-for="(button, index) in buttons"
           :key="index"
           class="q-ma-xs"
           :icon="button.icon ? button.icon : undefined"
@@ -92,6 +92,8 @@
 // import { mapGetters } from 'vuex';
 import { defineComponent, PropType, ComponentPublicInstance } from 'vue';
 import { mapActions, mapGetters } from 'vuex';
+import {IArtificialModeration, IArtificialModerationButton } from './model'
+
 /** EXAMPLE OF A AM-CONFIGURATION OBJECT
   topics_after_saliencing: {
     condition: (ctx) => ctx.routed_stage,
@@ -113,24 +115,6 @@ import { mapActions, mapGetters } from 'vuex';
  * 
  */
 
-interface IArtificialModerationButton {
-  condition: (ctx) => boolean;
-  action: (ctx) => () => void;
-  label: (ctx) => string;
-  size: (ctx) => string | undefined;
-  icon: (ctx) => string | undefined;
-}
-
-interface IArtificialModeration {
-  id: number;
-  prosa: string;
-  priority: number | undefined;
-  loading: (ctx) => boolean;
-  condition: (ctx, params: Record<string, unknown>) => boolean;
-  buttons: IArtificialModerationButton[];
-  items: IArtificialModeration[] | undefined;
-  body: (ctx, params: Record<string, unknown>) => string[];
-}
 
 // interface IArtificialModerationSet{
 //   buttons: IArtificialModerationButton[];
@@ -391,8 +375,8 @@ export default defineComponent({
         console.log('SELECTED', selected);
         return selected as IArtificialModeration;
       }
-      
-      return undefined
+
+      return undefined;
     },
 
     text(): string[] | unknown {

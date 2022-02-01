@@ -1,6 +1,6 @@
 <template>
   <q-page class="doc_content" v-if="ready">
-    <q-chip clickable @click="$root.gotoAssemblyManage(assembly)"
+    <q-chip clickable @click="gotoAssemblyManage(assembly)"
       >Zurück zur Moderations-Übersicht</q-chip
     >
 

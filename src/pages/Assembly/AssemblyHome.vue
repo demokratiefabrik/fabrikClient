@@ -101,11 +101,12 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 export default defineComponent({
   setup() {
     const emitter = useEmitter()
-    const {gotoAssemblyHome} = useAssemblyComposable()
+    const {gotoAssemblyHome, assembly, gotoDefaultStageTeaser} = useAssemblyComposable()
     return {
-
       emitter,
-      gotoAssemblyHome
+      assembly,
+      gotoAssemblyHome,
+      gotoDefaultStageTeaser
     }
   },
   name: 'PageAssemblyHome',
@@ -150,13 +151,13 @@ export default defineComponent({
     //   var caption = "";
     //   // PREFIX
     //   if (this.is_stage_completed(stage)) {
-    //     caption = this.$i18n.t("stages.status_completed");
+    //     caption = this.$t("stages.status_completed");
     //   } else if (!this.is_stage_done(stage)) {
-    //     caption = this.$i18n.t("stages.status_not_yet_accessible");
+    //     caption = this.$t("stages.status_not_yet_accessible");
     //   } else if (stage.stage.disabled) {
-    //     caption = this.$i18n.t("stages.status_disabled");
+    //     caption = this.$t("stages.status_disabled");
     //   } else if ("deleted" in stage.stage && stage.stage.deleted) {
-    //     caption = this.$i18n.t("stages.status_deleted");
+    //     caption = this.$t("stages.status_deleted");
     //   }
     //   if (caption) {
     //     return `(${caption})`;
@@ -211,7 +212,7 @@ export default defineComponent({
     this.gotoAssemblyHome(this.assembly);
 
     // Catch all authentication status changes
-    emitter.once('AssemblyLoaded', () => {
+    this.emitter.once('AssemblyLoaded', () => {
       // console.log("LayoutEventBus on AssemblyLoaded")
       // this.gotoDefaultStageTeaser();
       this.gotoAssemblyHome(this.assembly);

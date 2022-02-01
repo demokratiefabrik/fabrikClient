@@ -10,14 +10,13 @@ import PySwarmPlot from 'src/plugins/CIR/components/PySwarmPlot.vue';
 import useAuthComposable from 'src/composables/auth.composable';
 // import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 
-
 export default defineComponent({
   name: 'PageIndex',
-  
+
   setup() {
     // console.log('DEBUG: INDEX:VUE');
     const auth = useAuthComposable();
-    return {auth, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE};
+    return { auth, ENV_I18N_LOCALE: process.env.ENV_I18N_LOCALE };
   },
   components: { PySwarmPlot },
 
@@ -27,7 +26,6 @@ export default defineComponent({
       msg: 'test',
     };
   },
-
 });
 </script>
 

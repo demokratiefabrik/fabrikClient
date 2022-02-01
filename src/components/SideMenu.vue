@@ -23,12 +23,12 @@
           :class="{
             'q-pa-none': $q.screen.lt.sm,
             'q-ma-none': $q.screen.lt.sm,
-            hidden: item.visible && !item.visible(),
+            hidden: item?.visible && !item?.visible(),
           }"
           :style="
             selectedItemsAnchor.includes(item.anchor) ? selectedStyle : ''
           "
-          @click="$root.scrollToAnchor(item.anchor)"
+          @click="scrollToAnchor(item.anchor)"
           v-ripple
         >
           <q-item-section
@@ -88,7 +88,7 @@
               {{ item.label }}
             </q-item-label>
             <q-icon
-              v-if="highlightedItem && highlightedItem.anchor == item.anchor"
+              v-if="highlightedItem && highlightedItem?.anchor == item.anchor"
               style="position: absolute; right: 2px"
               color="blue"
               name="mdi-account-supervisor-circle"
@@ -109,28 +109,35 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { mapGetters } from 'vuex';
 import { dom } from 'quasar';
 
 // import { colors } from 'quasar';
 import useAppComposable from 'src/composables/app.composable';
+import {
+  ISideMenuItems,
+  ISideMenuItem,
+} from 'src/pages/Assembly/AssemblyManageSummary.vue';
 
 // const { changeAlpha } = colors;
 const { offset } = dom;
 
 export default defineComponent({
-  setup(){
-    const { headerOffset } = useAppComposable();
-    return {headerOffset}
+  setup() {
+    const { headerOffset, scrollToAnchor } = useAppComposable();
+    return { headerOffset, scrollToAnchor };
   },
   name: 'SideMenu',
-  props: ['items', 'highlightedItem'],
+  props: {
+    items: Array as PropType<ISideMenuItems>,
+    highlightedItem: Object as PropType<ISideMenuItem>,
+  },
   data() {
     return {
-      scrollSelectedItemAnchor: null,
+      scrollSelectedItemAnchor: null as string | null,
       fixedSelectedItemAnchor: null,
-      enabledAnchors: null,
+      enabledAnchors: undefined as string[] | undefined,
       // step: null,
     };
   },
@@ -152,7 +159,7 @@ export default defineComponent({
     },
 
     itemAnchors() {
-      return this.items.map((item) => item.anchor);
+      return this.items?.map((item) => item.anchor);
     },
 
     ...mapGetters({
@@ -166,7 +173,7 @@ export default defineComponent({
 
     getEnabledAnchors() {
       const anchors = this.itemAnchors;
-      return anchors.filter((anchor) => !!document.getElementsByName(anchor));
+      return anchors?.filter((anchor) => !!document.getElementsByName(anchor));
     },
 
     refresh() {

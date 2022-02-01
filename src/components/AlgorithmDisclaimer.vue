@@ -12,7 +12,7 @@
     <q-banner
       align="justify"
       v-if="showDisclaimer"
-      :class="[bgcolor ? bgcolor: 'bg-grey-3']"
+      :class="[bgcolor ? bgcolor : 'bg-grey-3']"
     >
       <span class="text-weight-thin">
         <q-icon
@@ -25,9 +25,8 @@
   </span>
 </template>
 
-
 <script lang="ts">
-import { defineComponent} from 'vue';
+import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'AlgorithmDisclaimer',
   data() {
@@ -43,9 +42,9 @@ export default defineComponent({
     expanded: {
       type: Boolean,
       default: false,
-    },    
+    },
     bgcolor: {
-      type: String
+      type: String,
     },
   },
   created() {

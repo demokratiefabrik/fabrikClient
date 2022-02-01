@@ -106,7 +106,7 @@
               <q-item v-if="obj.content.type !== 'UPDATEPROPOSAL'">
                 <q-item-section> Reichweite </q-item-section>
 
-                <q-item-section side v-if="contentStats.PC">
+                <q-item-section side v-if="contentStats?.PC">
                   <q-item-label
                     >{{ contentStats.PC }}
                     {{
@@ -165,18 +165,19 @@
         <q-tab-panel name="history">
           <q-card-section>
             <q-list v-if="history">
-
-
-
-              <ContentVersionItem 
+              <ContentVersionItem
                 v-for="version in history"
                 :key="version.id"
-                :profile="version.user_profile" :changeset="version.changeset" />
-              <ContentVersionItem :profile="profile" :customText="`Erstellt am ${obj.content.date_created_formatted}`" />
-                
+                :profile="version.user_profile"
+                :changeset="version.changeset"
+              />
+              <ContentVersionItem
+                :profile="profile"
+                :customText="`Erstellt am ${obj.content.date_created_formatted}`"
+              />
 
               <!-- <q-item v-for="version in history" :key="version.id"> -->
-<!-- 
+              <!-- 
               <q-item>
                 <q-item-section avatar>
                   <q-avatar
@@ -254,18 +255,22 @@ interface IVersionEntry {
   date_formatted?: string;
 }
 
-
 export default defineComponent({
   setup() {
-    const {monitorLog} = useMonitorComposable()
-    const {assemblyIdentifier} = useAssemblyComposable()
+    const { monitorLog } = useMonitorComposable();
+    const { assemblyIdentifier } = useAssemblyComposable();
     const { loaded } = useLibraryComposable();
-    const {getUsername, getUsernameDerivation} = useAuthComposable()
-    
-    return {loaded, assemblyIdentifier, monitorLog, getUsernameDerivation, getUsername }
+    const { getUsername, getUsernameDerivation } = useAuthComposable();
 
+    return {
+      loaded,
+      assemblyIdentifier,
+      monitorLog,
+      getUsernameDerivation,
+      getUsername,
+    };
   },
-  
+
   name: 'ContentBackground',
   props: ['obj'],
   components: { UserInfo },
@@ -277,14 +282,13 @@ export default defineComponent({
       userStats: null,
       locked: null as boolean | null,
       history: null as IVersionEntry[] | null,
-      contentStats: null,
+      contentStats: null as any,
       tab: 'content',
       // TYPE_LABELS: constants.TYPE_LABELS,
     };
   },
 
   computed: {
-
     permissions(): string[] {
       const permissions = [
         this.obj.content.acl.includes('add') ? 'den Beitrag kommentieren' : '',
@@ -299,9 +303,9 @@ export default defineComponent({
     },
 
     formatDate_obj_content_date_created(): string | undefined {
-      return this.$filters.formatDate(this.obj.content.date_created)
+      return this.$filters.formatDate(this.obj.content.date_created);
     },
-    
+
     content_type(): string | null {
       if (this.obj.content) {
         // console.log(
@@ -310,11 +314,10 @@ export default defineComponent({
         //   'assert failed..'
         // );
         // console.assert(constants.TYPE_LABELS[this.obj.content.type]);
-        return constants.TYPE_LABELS[this.obj.content.type]
+        return constants.TYPE_LABELS[this.obj.content.type];
       }
 
-
-      return null
+      return null;
       // const type = this.obj?.content.type;
       // switch (this.obj?.content.type) {
       //   case "COMMENT":
@@ -401,12 +404,15 @@ export default defineComponent({
 
               // prepare human content
               this.history.forEach((version: IVersionEntry) => {
-                version.date_formatted = this.$filters.formatDate(version.date)
-                if(version?.profile) {
-                  version.profile.username_derivation_formatted = this.getUsernameDerivation(version.profile)
-                  version.profile.username_formatted = this.getUsername(version.profile)
+                version.date_formatted = this.$filters.formatDate(version.date);
+                if (version?.profile) {
+                  version.profile.username_derivation_formatted =
+                    this.getUsernameDerivation(version.profile);
+                  version.profile.username_formatted = this.getUsername(
+                    version.profile
+                  );
                 }
-              })
+              });
             } else {
               // Error Message
               this.$q.notify({

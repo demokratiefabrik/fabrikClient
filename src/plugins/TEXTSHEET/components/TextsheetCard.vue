@@ -40,36 +40,36 @@ import ContentToolbar from 'src/pages/ContentTree/components/ContentToolbar.vue'
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    setup() {
-      // console.log('DEBUG: INDEX:VUE');
-      // const { gotoAssemblyHome } = useAssemblyComposable();
-      return {};
-    },
-    name: 'TextsheetCard',
-    props: [
-      'node',
-      'standalone',
-      'filterTypes',
-      'heading_number',
-      'discussionAM',
-      'discussionBlockLabel',
-    ],
-    // inject: ['CONTENTTREE'],
-    components: { ContentToolbar },
-    computed: {
-      header_class(): string | null {
-        const type = this.node.content.type as string
-        switch (type) {
-          case 'SECTION':
-            return 'text-h4 q-mt-lg q-mb-xs';
-          case 'SUBSECTION':
-            return 'text-subtitle1 q-mt-sm q-mb-xs';
-          case 'PARAGRAPH':
-            return 'text-subtitle2 q-mt-none q-mb-xs';
-        }
+  setup() {
+    // console.log('DEBUG: INDEX:VUE');
+    // const { gotoAssemblyHome } = useAssemblyComposable();
+    return {};
+  },
+  name: 'TextsheetCard',
+  props: [
+    'node',
+    'standalone',
+    'filterTypes',
+    'heading_number',
+    'discussionAM',
+    'discussionBlockLabel',
+  ],
+  // inject: ['CONTENTTREE'],
+  components: { ContentToolbar },
+  computed: {
+    header_class(): string | null {
+      const type = this.node.content.type as string;
+      switch (type) {
+        case 'SECTION':
+          return 'text-h4 q-mt-lg q-mb-xs';
+        case 'SUBSECTION':
+          return 'text-subtitle1 q-mt-sm q-mb-xs';
+        case 'PARAGRAPH':
+          return 'text-subtitle2 q-mt-none q-mb-xs';
+      }
 
-        return null
-      },
+      return null;
     },
+  },
 });
 </script>

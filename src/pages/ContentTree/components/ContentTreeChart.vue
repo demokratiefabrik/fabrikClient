@@ -64,6 +64,7 @@ import ChartBar from 'src/components/charts/ChartBar.vue';
 import ChartRadar from 'src/components/charts/ChartRadar.vue';
 import ChartPie from 'src/components/charts/ChartPie.vue';
 import useLibraryComposable from 'src/utils/library';
+import { INode } from 'src/composables/contenttree.composable';
 
 export default defineComponent({
   setup() {
@@ -105,7 +106,7 @@ export default defineComponent({
     sortedChartEntries() {
       // deep copy
       // console.log(this.nodes, "all population")
-      const tmp_nodes = [...this.nodes];
+      const tmp_nodes = [...(this.nodes as INode[])];
 
       if (this.sortByPopulation && this.hasPopulationData) {
         return tmp_nodes.sort((a, b) => b.content?.S?.SA - a.content?.S?.SA);
@@ -139,7 +140,9 @@ export default defineComponent({
       return this.sortedChartEntries.map((entry) => entry.content?.S?.SA);
     },
     hasPopulationData() {
-      return !!this.nodes.find((entry) => this.loaded(entry.content?.S?.SA));
+      return !!(this.nodes as INode[]).find((entry) =>
+        this.loaded(entry.content?.S?.SA)
+      );
     },
   },
 });

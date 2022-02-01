@@ -18,7 +18,8 @@ import useStagesComposable from './stages.composable';
 export interface INode {
   id: number | null;
   path: number[];
-  children: INode[];   
+  children: INode[];
+  nof_descendants?: number;
   progression?: any;
   creator?: any;
   content?: any;

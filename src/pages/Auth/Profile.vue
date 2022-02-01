@@ -11,7 +11,7 @@
             <b>Pseudonym: </b>
             Sie bekommen auf dieser Plattform einen eigenen Namen. Andere
             Teilnehmende werden Sie unter diesem Namen ansprechen können.
-            {{ username_derivation }}. <br />
+            {{ currentUsernameDerivation }}. <br />
             <br />
             <q-input disable outlined v-model="localprofile.pseudonym" :dense="true">
               <template v-slot:prepend>
@@ -139,9 +139,10 @@ export default defineComponent({
     },
   },
 
+
   setup() {
-    const { username_derivation, payload, markIndicatedEmail } = useAuthComposable();
-    return { payload, markIndicatedEmail };
+    const { currentUsernameDerivation, payload, markIndicatedEmail } = useAuthComposable();
+    return { payload, markIndicatedEmail, currentUsernameDerivation };
   },
   components: { AlgorithmDisclaimer },
 

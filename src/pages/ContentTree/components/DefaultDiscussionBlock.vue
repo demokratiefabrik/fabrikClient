@@ -1,10 +1,6 @@
 <template ref="forumContainer">
   <div v-if="contenttree" class="full-width">
-    <a
-      :name="`CONTENTTREE${contenttree.id}CONTENT${
-        tree.id ? tree.id : ''
-      }`"
-    />
+    <a :name="`CONTENTTREE${contenttree.id}CONTENT${tree.id ? tree.id : ''}`" />
     <div align="right">
       <span :class="{ 'bg-blue-1': temporaryHighlightedBackground }">
         <q-btn
@@ -78,61 +74,84 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import ComponentContentTree from 'src/pages/ContentTree/components/ContentTree.vue';
+import { IArtificialModeration } from 'src/components/artificial_moderation/model';
 import constants from 'src/utils/constants';
 // import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useAppComposable from 'src/composables/app.composable';
 import useMonitorComposable from 'src/composables/monitor.composable';
 import useLibraryComposable from 'src/utils/library';
 // import useAssemblyComposable from 'src/composables/assembly.composable';
-import useContenttreeComposable from 'src/composables/contenttree.composable';
+import useContenttreeComposable, {
+  INode,
+} from 'src/composables/contenttree.composable';
 // import useMonitorComposable from './monitor.composable';
+
+type IPath = number[]; //array of cells
 
 export default defineComponent({
   setup() {
-    const {monitorLog} = useMonitorComposable()
-    const {pushSorted} = useLibraryComposable()
-    const {scrollToAnchor} = useAppComposable()
-    const {contenttree, isRead, isAlerted } = useContenttreeComposable();
+    const { monitorLog } = useMonitorComposable();
+    const { pushSorted } = useLibraryComposable();
+    const { scrollToAnchor } = useAppComposable();
+    const { contenttree, isRead, isAlerted } = useContenttreeComposable();
 
-    return {scrollToAnchor, pushSorted, monitorLog, isAlerted, isRead, contenttree
-    }
+    return {
+      scrollToAnchor,
+      pushSorted,
+      monitorLog,
+      isAlerted,
+      isRead,
+      contenttree,
+    };
   },
   name: 'DefaultDiscussionBlock',
   components: { ComponentContentTree },
   props: {
     customAM: {
+      type: Object as PropType<IArtificialModeration>,
       default: null,
     },
     amEnabled: {
+      type: Boolean,
       default: true,
     },
     amRole: {
       default: null,
     },
     amPosition: {
+      type: String,
       default: 'left',
     },
     amGroup: {
+      type: String,
       default: null,
     },
     expanded: {
+      type: Boolean,
       default: false,
     },
     doNotExpandNodesAtInitialization: {},
     accordion: {
+      type: Boolean,
       default: false,
     },
     alwaysExpanded: {
+      type: Boolean,
       default: false,
     },
     allowAddingToRootLevel: {
+      type: Boolean,
       default: true,
     },
-    node: {},
+    node: {
+      type: Object as PropType<INode | null>,
+      default: () => null, // TODO: used to be {}
+    },
     filterTypes: {
-      default: null,
+      default: () => null,
+      type: Array as PropType<string[]>,
     },
     discussionBlockLabel: {
       default: 'Diskussionsforum',
@@ -140,6 +159,7 @@ export default defineComponent({
     discussionBlockIntro: {},
     initialFocusNode: {},
     classBackgroundColor: {
+      type: String,
       default: () => 'bg-secondary-light',
     },
   },
@@ -156,14 +176,14 @@ export default defineComponent({
 
   computed: {
     // COLLECT ALL Ids to include into this discussion tree...
-    entrieIds() {
+    entrieIds(): number[] {
       // filter entries...
       // NOTE: this takes also subentries of filtered entries
-      const ids = [];
-      const paths = [];
-      const filteredBranches = [];
+      const ids = [] as number[];
+      const paths = [] as IPath[];
+      const filteredBranches = [] as number[];
       for (const [id, tuple] of Object.entries(
-        this.contenttree.entries
+        this.contenttree.entries as Record<string, INode>
       )) {
         const withinPath =
           !this.node?.content.id ||
@@ -171,7 +191,6 @@ export default defineComponent({
             tuple.path.includes(this.node.content.id) &&
             this.node?.content.id !== tuple.content.id);
         const withinTypeFilter =
-          // this.node?.content.id == tuple.content.id ||
           !this.filterTypes || this.filterTypes.includes(tuple.content.type);
 
         if (!withinTypeFilter && withinPath) {
@@ -182,11 +201,9 @@ export default defineComponent({
       }
       // remove all descendants of filtered elements...
       paths.map((path) => {
-        if (
-          path &&
-          !path.find((el) => filteredBranches.includes(parseInt(el)))
-        ) {
-          ids.push(parseInt(path[path.length - 1]));
+        if (path && !path.find((el) => filteredBranches.includes(el))) {
+          const lastEl = path[path.length - 1] as number;
+          ids.push(lastEl);
         }
       });
       return ids;
@@ -217,7 +234,7 @@ export default defineComponent({
       const rootLevel = this.node?.path ? this.node.path.length : 0;
       const rootId = this.node?.content ? this.node.content.id : null;
 
-      for (let [id, original] of Object.entries(this.rawEntries)) {
+      for (let [id, original] of Object.entries(this.rawEntries as INode)) {
         if (parseInt(id) === rootId) {
           continue;
         }
@@ -268,15 +285,8 @@ export default defineComponent({
             parentNode.nof_children++;
             parentNode.nof_children_unread += !this.isRead(entry) ? 1 : 0;
             parentNode.nof_children_alerted += this.isAlerted(entry) ? 1 : 0;
-          // } else {
-          //   console.log(
-          //     original.content.parent_id,
-          //     'CONTENT ENTRY MISSING: deleted?'
-          //   )
           }
         }
-
-
 
         // It's the root element
         if (rootId === original.content.parent_id) {
@@ -294,7 +304,8 @@ export default defineComponent({
   },
 
   methods: {
-    toggleDiscussion() { // event, scroll = false
+    toggleDiscussion() {
+      // event, scroll = false
       if (this.show_discussion) {
         this.closeDiscussion();
       } else {
@@ -316,11 +327,11 @@ export default defineComponent({
       }
 
       // Monitor action
-      const data = {};
+      const data = {} as any;
       if (this.node) {
         data.content_id = this.node.content.id;
       }
-      this.monitorLog(constants.MONITOR_DISCUSSION_HIDE, data);
+      // this.monitorLog(constants.MONITOR_DISCUSSION_HIDE, data);
 
       // TEMPORARILY HIGHLIGHT BACKGROUND OF BUTTON
       // TODO: is this used?
@@ -336,11 +347,11 @@ export default defineComponent({
       this.show_discussion = true;
 
       // Monitor action
-      const data = {};
+      const data = {} as any;
       if (this.node) {
         data.content_id = this.node.content.id;
       }
-      this.$root.monitorLog(constants.MONITOR_DISCUSSION_SHOW, data);
+      this.monitorLog(constants.MONITOR_DISCUSSION_SHOW, data);
     },
 
     getEmptyNode(id) {

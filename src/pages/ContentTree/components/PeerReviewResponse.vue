@@ -30,11 +30,14 @@ import { mapActions } from 'vuex';
 import { debounce } from 'quasar';
 import constants from 'src/utils/constants';
 import useLibraryComposable from 'src/utils/library';
+import useMonitorComposable from 'src/composables/monitor.composable';
 
 export default defineComponent({
   setup() {
+    const debouncedInitSet: null | (() => void) = () => undefined;
     const { loaded } = useLibraryComposable();
-    return { loaded };
+    const { monitorFire } = useMonitorComposable();
+    return { loaded, monitorFire, debouncedInitSet };
   },
   name: 'PeerReviewResponse',
   props: ['peerreview', 'acceptDisabled', 'accept1', 'accept2', 'accept3'],
@@ -123,7 +126,7 @@ export default defineComponent({
         criteria_accept3: this.accept3,
       };
       // console.log("new response received...", this.progression_response);
-      this.$root.monitorFire(constants.MONITOR_SET_PEERREVIEW_RESPONSE, data);
+      this.monitorFire(constants.MONITOR_SET_PEERREVIEW_RESPONSE, data);
 
       // immediatly update saliences in vuex store (=> allows to update the dynamically generated charts)
       this.update_response({

@@ -8,11 +8,11 @@
 body.screen--xs .q-tree__node-header {
   padding: 0px;
 }
-body.screen--xs
+/* body.screen--xs
   .q-tree__node--parent
   > .q-tree__node-collapsible
   > .q-tree__node-body {
-}
+} */
 body.screen--xs .q-tree__children {
   padding-left: 19px;
 }
@@ -64,17 +64,17 @@ body.screen--xs .q-gutter-x-sm > *,
           <q-input
             ref="treeFilterInput"
             filled
-            v-model="qtree.treeFilter.text"
+            v-model="qtree.treeFilter.value.text"
             :label="$t('contenttree.search_field_label')"
           >
           </q-input>
 
           <div class="q-gutter-sm">
-            <q-checkbox v-model="qtree.treeFilter.own" label="Eigene" />
-            <q-checkbox v-model="qtree.treeFilter.new" label="Neu" />
+            <q-checkbox v-model="qtree.treeFilter.value.own" label="Eigene" />
+            <q-checkbox v-model="qtree.treeFilter.value.new" label="Neu" />
             <q-checkbox
               v-if="IsManager"
-              v-model="qtree.treeFilter.unreviewed"
+              v-model="qtree.treeFilter.value.unreviewed"
               label="Ungeprüft"
             />
           </div>
@@ -153,6 +153,10 @@ body.screen--xs .q-gutter-x-sm > *,
           <a :name="`NODE${prop.node.id}`" />
           <ContentTreeQTreeHead
             :node="prop.node"
+            :is_currently_expanded="isExpandedNode"
+            :is_read="isReadNode"
+            v-on:toggle-node="qtree.toggle_node($event)"
+            v-on:popup-edit="popup_content_form($event.action, $event.content)"
             :highlightedNode="prop.node.id == qtree.highlightedNodeID"
           />
         </template>
@@ -171,15 +175,13 @@ body.screen--xs .q-gutter-x-sm > *,
           ref="content_editor"
           @expand-node="qtree.focus_on_branch"
           :parent_id="node.id"
-        />
+        /> 
       </div>
 
       <div class="full-width" align="right">
         <!-- class="bg-accent" -->
         <q-chip
-          v-if="
-            allowAddingToRootLevel && !limitForAddingCommentsReached
-          "
+          v-if="allowAddingToRootLevel && !limitForAddingCommentsReached"
           icon="mdi-tooltip-plus-outline"
           clickable
           @click="popup_create"
@@ -218,7 +220,7 @@ body.screen--xs .q-gutter-x-sm > *,
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
 import { mapGetters } from 'vuex';
 import ContentTreeQTreeHead from './ContentTreeQTreeHead.vue';
@@ -229,21 +231,27 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 import useQtreeComposable from 'src/composables/qtree.composable';
 import useLibraryComposable from 'src/utils/library';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
+import useAppComposable from 'src/composables/app.composable';
 
 export default defineComponent({
-  setup() {
+  setup(props) {
     const { getDailyContributionLimits } = useAssemblyComposable();
-    const qtree = useQtreeComposable();
-    const {sample} = useLibraryComposable()
-    const {contenttree} = useContenttreeComposable()
-    const {limitForAddingCommentsReached} = useAssemblyComposable()
+    const qtree = useQtreeComposable(props);
+    const { sample } = useLibraryComposable();
+    const { contenttree, isRead } = useContenttreeComposable();
+    const { limitForAddingCommentsReached } = useAssemblyComposable();
+    const { scrollToAnchor } = useAppComposable();
+    const content_editor = ref();
 
     return {
+      content_editor,
       getDailyContributionLimits,
       qtree,
       sample,
+      isRead,
+      scrollToAnchor,
       contenttree,
-      limitForAddingCommentsReached
+      limitForAddingCommentsReached,
     };
   },
   name: 'ContentTree',
@@ -273,14 +281,14 @@ export default defineComponent({
     ContentTreeQTreeBody,
   },
 
-  provide() {
-    return {
-      popup_content_form: this.popup_content_form,
-      toggle_node: this.qtree.toggle_node,
-      is_currently_expanded_id: this.qtree.is_currently_expanded_id,
-      is_currently_expanded: this.qtree.is_currently_expanded,
-    };
-  },
+  // provide() {
+  //   return {
+  //     popup_content_form: this.popup_content_form,
+  //     toggle_node: this.qtree.toggle_node,
+  //     is_currently_expanded_id: this.qtree.is_currently_expanded_id,
+  //     is_currently_expanded: this.qtree.is_currently_expanded,
+  //   };
+  // },
   data() {
     return {
       AMs,
@@ -288,11 +296,18 @@ export default defineComponent({
     };
   },
   computed: {
+    isReadNode(): boolean {
+      return this.qtree.is_currently_expanded(this.node);
+    },
+
+    isExpandedNode(): boolean {
+      return this.isRead(this.node);
+    },
+
     disclaimerText: function () {
       var text = this.$t('disclaimer.contenttree.basic');
       if (this.node.nof_descendants.length > 30) {
-        text +=
-          ' ' + this.$t('disclaimer.contenttree.extensionExtraLarge');
+        text += ' ' + this.$t('disclaimer.contenttree.extensionExtraLarge');
       }
       return text;
     },
@@ -365,7 +380,7 @@ export default defineComponent({
         data.length &&
         data[0].progression.salience < 40 &&
         data[0].progression.salience - data[0].content.S.SC < -30 &&
-        !child.progression?.discussed
+        !data[0].progression?.discussed
       ) {
         return data[0];
       }
@@ -403,7 +418,8 @@ export default defineComponent({
     unexpandedTopLevelEntryWithUnreadMessage() {
       const unreads = this.node.children.filter(
         (child) =>
-          child.nof_descendants_unread > 2 && !this.qtree.is_currently_expanded(child)
+          child.nof_descendants_unread > 2 &&
+          !this.qtree.is_currently_expanded(child)
       );
       unreads.sort(function (first) {
         const firstS = first.nof_descendants_unread;
@@ -428,7 +444,10 @@ export default defineComponent({
   methods: {
     popup_content_form: function (action, model) {
       console.log('popup action ' + action);
-      this.$refs.content_editor.initialize(action, model);
+      if (this.content_editor?.value) {
+        this.content_editor.value.initialize(action, model);
+      }
+      console.error('content form not yet loaded...');
     },
 
     popup_create() {
@@ -456,7 +475,7 @@ export default defineComponent({
 
   created() {
     if (this.initialFocusNode) {
-      this.qtree.treeFilter.focus = this.initialFocusNode;
+      this.qtree.treeFilter.value.focus = this.initialFocusNode;
     }
   },
 });

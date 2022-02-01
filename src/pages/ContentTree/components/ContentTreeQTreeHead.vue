@@ -15,7 +15,7 @@
     @click.stop
     @keypress.stop
     class="cursor-pointer full-width q-ma-none q-pa-none"
-    @click="toggle_node(node)"
+    @click="$emit('toggle-node', node)"
     :class="{ highlightedDefault: highlightedNode }"
     :style="{
       cursor: 'default',
@@ -24,6 +24,7 @@
     }"
   >
     <q-card-section
+      v-if="node"
       class="q-ma-none q-pa-none"
       :class="{ backToDefault: highlightedNode }"
     >
@@ -31,14 +32,17 @@
         <div class="col">
           <!-- SHOW USER INFOS FOR PRIVATE CONTENT -->
           <div v-if="node.content.private_property">
-            <UserAvatar v-if="node.creator" :profile="node.creator"></UserAvatar>
+            <UserAvatar
+              v-if="node.creator"
+              :profile="node.creator"
+            ></UserAvatar>
 
             <!-- transparent -->
             <q-badge
               color="blue"
               style="left: 17px; top: -10px"
               class="absolute"
-              v-if="!isRead(node)"
+              v-if="!isRead"
             >
               <!-- EXPANDABLE-ALL: v-if="isExpanded !== false" -->
               <q-tooltip
@@ -56,7 +60,6 @@
             ><br />
           </div>
 
-          <!-- SHOW TITLE FOR GIVEN AND COMMON CONTENT -->
           <div v-else class="text-h5 q-pt-sm q-pl-none">
             <q-chip>
               <q-avatar color="grey" text-color="white">
@@ -135,35 +138,40 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { mapGetters } from 'vuex';
 import UserAvatar from 'src/components/UserAvatar.vue';
 import constants from 'src/utils/constants';
+import { INode } from 'src/composables/contenttree.composable';
 
 export default defineComponent({
   // setup() {},
   name: 'ContentTreeQTreeHead',
-  props: ['node', 'highlightedNode'],
-  components: {
-    UserAvatar
+  props: {
+    node: { type: Object as PropType<INode> },
+    highlightedNode: { type: Boolean },
+    isRead: { type: Boolean },
+    isExpanded: { type: Boolean },
   },
-  inject: ['toggle_node', 'is_currently_expanded', 'isRead'],
+  components: {
+    UserAvatar,
+  },
+  // inject: ['toggle_node', 'is_currently_expanded', 'isRead'],
   data() {
     return {
       ICONS: constants.ICONS,
       TYPE_LABELS: constants.TYPE_LABELS,
     };
   },
-
+  emits: ['is-currently-expanded', 'popup-content-form', 'toggle-node'],
   computed: {
-
-    formatDate_node_content_date_created() {
-      return this.$filters.formatDate(node.content.date_created)
+    formatDate_node_content_date_created(): string {
+      return this.$filters.formatDate(this.node?.content.date_created);
     },
 
-    isExpanded() {
-      return this.is_currently_expanded(this.node);
-    },
+    // isExpanded() {
+    //   return this.isExpanded;
+    // },
 
     headColor() {
       return 'grey-6';
@@ -174,7 +182,14 @@ export default defineComponent({
 
   methods: {
     popup_edit() {
-      this.popup_content_form('edit', this.content.content);
+      if (this.node) {
+        this.$emit('popup-content-form', {
+          action: 'edit',
+          content: this.node.content,
+        });
+      } else {
+        console.error('Error: content node not loaded');
+      }
     },
   },
 });

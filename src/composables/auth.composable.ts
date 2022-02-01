@@ -124,6 +124,12 @@ export default function useAuthComposable() {
     return payload;
   });
 
+  const currentUsernameDerivation = computed(() => {
+    // set userEmail<boolean> = true, if email has been added shortly
+    return getUsernameDerivation(profile);
+  });
+
+
   /* Page Permission */
   const checkPagePermission = (currentRoute): void => {
     // check permission: allow for all general pages.
@@ -252,6 +258,7 @@ export default function useAuthComposable() {
     // PROFILE
     profile,
     getUsernameDerivation,
+    currentUsernameDerivation,
     getUsername,
     markIndicatedEmail,
   };

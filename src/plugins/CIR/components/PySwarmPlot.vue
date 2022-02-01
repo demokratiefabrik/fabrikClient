@@ -1,7 +1,5 @@
 <template>
-  <div v-if="error">
-  Die Grafik konnte nicht geladen werden.
-  </div>
+  <div v-if="error">Die Grafik konnte nicht geladen werden.</div>
 
   <div v-if="!loading && !error" class="full-width">
     <div>
@@ -210,13 +208,14 @@ export default defineComponent({
       } as IPolarBeeRequest;
 
       this.showLoadingGif('polarbee');
-      this.api.polarbee(request)
-      .then((response) => {
-        this.cirplot = response.data;
-        this.hideLoadingGif('polarbee');
-        this.loading = this.users === null;
-      })
-      .catch(() => this.error=true);
+      this.api
+        .polarbee(request)
+        .then((response) => {
+          this.cirplot = response.data;
+          this.hideLoadingGif('polarbee');
+          this.loading = this.users === null;
+        })
+        .catch(() => (this.error = true));
     },
 
     loadUser: function (userId: number): IUser | null {
@@ -230,13 +229,14 @@ export default defineComponent({
 
     getUsers: function () {
       this.loading = true;
-      this.api.polarbeeUsers()
-      .then((response) => {
-        this.users = response.data.users;
-        this.hideLoadingGif('polarbee');
-        this.loading = !this.cirplot;
-      })
-      .catch(() => this.error=true);
+      this.api
+        .polarbeeUsers()
+        .then((response) => {
+          this.users = response.data.users;
+          this.hideLoadingGif('polarbee');
+          this.loading = !this.cirplot;
+        })
+        .catch(() => (this.error = true));
     },
   },
 });

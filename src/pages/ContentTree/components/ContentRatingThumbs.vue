@@ -20,7 +20,11 @@
       @input.capture="debouncedInitSet"
       :options="buttons"
     >
-      <template v-for="button in buttons" v-slot:[button.slot] :key="button.value">
+      <template
+        v-for="button in buttons"
+        v-slot:[button.slot]
+        :key="button.value"
+      >
         <q-icon :name="button.ratingicon">
           <q-tooltip>{{
             $t(`contenttree.rating.${button.tooltipNr}`)
@@ -39,14 +43,23 @@ import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
 import { debounce } from 'quasar';
 import constants from 'src/utils/constants';
+import useMonitorComposable from 'src/composables/monitor.composable';
 
 export default defineComponent({
-  // setup() {},
+  setup() {
+    const debouncedInitSet: null | (() => void) = () => undefined;
+    const { monitorLog } = useMonitorComposable();
+    return {
+      monitorLog,
+      debouncedInitSet,
+    };
+  },
   name: 'ContentRatingThumbs',
   props: ['content'],
   data() {
     return {
       // TODO: do we need zero as starting value?
+
       progression_rating: 50,
       buttons: [
         {
@@ -94,7 +107,7 @@ export default defineComponent({
         rating: this.progression_rating,
       };
       console.log('new rating received...', this.progression_rating);
-      this.$root.monitorLog(constants.MONITOR_SET_RATING, data);
+      this.monitorLog(constants.MONITOR_SET_RATING, data);
       // this.$root.monitorLog(constants.MONITOR_SET_CONTENT_DISCUSSED, data);
 
       // immediatly update saliences in vuex store (=> allows to update the dynamically generated charts)

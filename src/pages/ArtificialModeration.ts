@@ -75,7 +75,7 @@ export default {
             'Herzlich willkommen!',
             `In der Demokratiefabrik tragen Sie den Namen ${
               ctx.profile.U
-            }. ${ctx.$root.username_derivation(
+            }. ${ctx.username_derivation(
               ctx.profile,
               false,
               false
@@ -196,7 +196,7 @@ export default {
         condition: (ctx) =>
           ctx.authorized && ctx.UsersManagerAssemblies?.length > 0,
         action: (ctx) =>
-          ctx.$root.gotoAssemblyManage(ctx.UsersManagerAssemblies[0]),
+          ctx.gotoAssemblyManage(ctx.UsersManagerAssemblies[0]),
         label: () => 'Verwaltung',
       },
     ],

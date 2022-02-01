@@ -8,11 +8,13 @@ const filters = {
   /////////////////////////////////
 
   // Format Date
-  formatDate(value) {
+  formatDate(value: undefined | null | string) {
     // TODO: add time when its today...
     if (value) {
       return formatDate(value, process.env.ENV_I18N_DATEFORMAT)
     }
+
+    return ''
   },
 
   // Format Date
