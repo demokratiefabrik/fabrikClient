@@ -1,7 +1,6 @@
 <template>
   <q-page class="doc_content">
-
-    <h1>{{$t('background.h1')}}</h1>
+    <h1>{{ $t('background.h1') }}</h1>
 
     <!-- RIGHT SIDE -->
     <!-- <div align="right"> -->
@@ -13,11 +12,7 @@
     />
     <!-- </div> -->
 
-    <q-list
-      class="q-ma-xl q-pt-xl rounded-borders"
-      style="clear: both"
-    >
-
+    <q-list class="q-ma-xl q-pt-xl rounded-borders" style="clear: both">
       <!-- CITIZEN ASSEMBLIES -->
       <q-expansion-item
         group="somegroup"
@@ -27,7 +22,7 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.citizen_assemblies.text')}}
+            {{ $t('background.citizen_assemblies.text') }}
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -41,7 +36,7 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.digital_participation.text')}}
+            {{ $t('background.digital_participation.text') }}
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -54,7 +49,13 @@
         header-class="text-secondary"
       >
         <q-card>
-          <q-card-section v-dompurify-html="$t('background.transparency.text', {iconTechnicalTransparency: iconTechnicalTransparency})"></q-card-section>
+          <q-card-section
+            v-dompurify-html="
+              $t('background.transparency.text', {
+                iconTechnicalTransparency: iconTechnicalTransparency,
+              })
+            "
+          ></q-card-section>
         </q-card>
       </q-expansion-item>
 
@@ -67,7 +68,7 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.privacy.text')}}
+            {{ $t('background.privacy.text') }}
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -81,7 +82,7 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.artificialmoderators.text')}}
+            {{ $t('background.artificialmoderators.text') }}
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -95,7 +96,7 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.team.text')}}
+            {{ $t('background.team.text') }}
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -109,14 +110,11 @@
       >
         <q-card>
           <q-card-section>
-            {{$t('background.technologies.text')}}
-            <div
-              class="full-width"
-              align="center"
-            >
+            {{ $t('background.technologies.text') }}
+            <div class="full-width" align="center">
               <q-img
                 src="/storage/upload/technologies.png"
-                style="max-width: 400px;"
+                style="max-width: 400px"
               />
             </div>
           </q-card-section>
@@ -131,10 +129,13 @@
         header-class="text-secondary"
       >
         <q-card>
-          <q-card-section v-dompurify-html:alink="$t('background.next_steps.text', {linkAPS})" />
+          <q-card-section
+            v-dompurify-html:alink="
+              $t('background.next_steps.text', { linkAPS })
+            "
+          />
         </q-card>
       </q-expansion-item>
-
     </q-list>
 
     <ArtificialModeration
@@ -143,7 +144,6 @@
       alignment="right"
       :ctx="that"
     />
-
   </q-page>
 </template>
 
