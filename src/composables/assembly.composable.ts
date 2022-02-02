@@ -18,12 +18,11 @@ const output = ref<null | any>(null);
 
 export default function useAssemblyComposable(caller = '') {
   const setup = () => {
-    console.log('DEBUG: useAssemblyComposable::SETUPPP', caller);
+    console.log('DEBUG: useAssemblyComposable::SETUP', caller);
 
     const emitter = useEmitter();
     const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
       useRouterComposable();
-    console.log('DEBUG: useAssemblyComposable::SETUP !!');
     const { loaded } = useLibraryComposable();
     const { push } = useRouter();
 

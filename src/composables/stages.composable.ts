@@ -1,18 +1,11 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
-// import { RouteRecordRaw, LocationAsRelativeRaw, useRoute} from 'vue-router';
-// import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-// import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-// import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
 import useLibraryComposable from 'src/utils/library';
-
-// const oauthEmitter = useOAuthEmitter();
-// const { userid } = usePKCEComposable();
-// const assemblyIdentifier = ref<string | null>(null);
-// const stageID = ref<number | null>(null);
+import { IStageTuple } from 'src/models/stage';
+import { IAssemblyTuple } from 'src/models/assembly';
 
 export interface IStageGroup {
   name: string;
@@ -28,141 +21,174 @@ export interface IStageGroup {
   to: () => any; // TODO. add route interface
 }
 
+const output = ref<null | any>(null);
+
 export default function useStagesComposable() {
-  console.log('DEBUG: useStagesComposable::SETUP');
+  const setup = () => {
+    console.log('DEBUG: useStagesComposable::SETUP');
 
-  const store = useStore();
-  const emitter = useEmitter();
-  const { gotoAssemblyHome, stageID } = useAssemblyComposable('stages.comp');
-  const { loaded } = useLibraryComposable();
+    const store = useStore();
+    const emitter = useEmitter();
+    const { gotoAssemblyHome, stageID } = useAssemblyComposable('stages.comp');
+    const { loaded } = useLibraryComposable();
 
-  // const currentRoute = useRoute();
-  // const { pushR } = useRouterComposable();
+    const assembly_sorted_stages = computed(
+      (): IStageTuple[] | null =>
+        store.getters['assemblystore/assembly_sorted_stages']
+    );
+    const assemblyStages = computed(
+      (): IStageTuple[] | null => store.getters['assemblystore/assemblyStages']
+    );
+    const assembly_accessible_stages = computed(
+      (): IStageTuple[] | null =>
+        store.getters['assemblystore/assembly_accessible_stages']
+    );
+    const assembly_scheduled_stages = computed(
+      (): IStageTuple[] | null =>
+        store.getters['assemblystore/assembly_scheduled_stages']
+    );
+    const IsManager = computed(
+      (): boolean => store.getters['assemblystore/IsManager']
+    );
+    const assembly = computed(
+      (): IAssemblyTuple => store.getters['assemblystore/assembly']
+    );
 
-  const assembly_sorted_stages = computed(() => 
-    store.getters['assemblystore/assembly_sorted_stages']);
-  const assemblyStages = computed(() => store.getters['assemblystore/assemblyStages']);
-  const assembly_accessible_stages =
-  computed(() => store.getters['assemblystore/assembly_accessible_stages']);
-  const assembly_scheduled_stages =
-  computed(() => store.getters['assemblystore/assembly_scheduled_stages']);
-  const IsManager = computed(() => store.getters['assemblystore/IsManager']);
-  const assembly = computed(() => store.getters['assemblystore/assembly']);
-  const is_stage_accessible =
-  store.getters['assemblystore/is_stage_accessible'];
+    const is_stage_accessible =
+      store.getters['assemblystore/is_stage_accessible'];
 
-  const routed_stage = computed(() => {
-    if (!stageID.value) {
-      return null;
-    }
-    if (!assemblyStages.value) {
-      return null;
-    }
-    return assemblyStages[stageID.value];
-  });
+    const next_scheduled_stage = computed(
+      (): IStageTuple | null =>
+        store.getters['assemblystore/next_scheduled_stage']
+    );
 
-  const ready = computed(() => {
-    const ready = loaded(assemblyStages);
-    if (ready) {
-      emitter.emit('hideLoading');
-    }
-
-    if (!IsManager.value) {
-      if (routed_stage.value && !is_stage_accessible(routed_stage)) {
-        gotoAssemblyHome(assembly);
+    const routed_stage = computed((): IStageTuple | null => {
+      if (!stageID.value) {
+        return null;
       }
-    }
-
-    return ready;
-  });
-
-  const groups = computed(() => {
-    return Object.keys(stages_by_groups);
-  });
-
-  const stages_by_groups = computed(() => {
-    const stages_by_groups = {};
-    if (!assemblyStages.value) {
-      return null;
-    }
-
-    Object.values(assembly_sorted_stages).forEach((stage: any) => {
-      if (!stages_by_groups[stage.stage.group]) {
-        stages_by_groups[stage.stage.group] = [];
+      if (!assemblyStages.value) {
+        return null;
       }
-      stages_by_groups[stage.stage.group].push(stage);
+      return assemblyStages[stageID.value];
     });
 
-    return stages_by_groups;
-  });
-
-  const groupsAccessible = computed(() => {
-    if (!assembly_scheduled_stages.value) {
-      return;
-    }
-    const groups = assembly_accessible_stages.value.map((stage) => stage.stage.group);
-    return groups;
-  });
-
-  const groupsScheduled = computed(() => {
-    if (!assembly_scheduled_stages.value) {
-      return;
-    }
-    const groups = assembly_scheduled_stages.value.map((stage) => stage.stage.group);
-    return groups;
-  });
-
-  const currentGroup = computed(() => {
-    console.log('get Stage Group');
-    if (!stageID.value || !routed_stage.value) {
-      return 'preparation';
-    }
-    return routed_stage.value.stage.group;
-  });
-
-  const is_stage_first_shown = (stage) => {
-    console.assert(stage);
-    console.assert(assembly_sorted_stages);
-    return stage === assembly_sorted_stages[assembly_sorted_stages.value.length - 1];
-  };
-
-  const is_stage_last_shown = (stage) => {
-    console.assert(stage);
-    return stage === assembly_sorted_stages.value[0];
-  };
-
-  const getFirstOrRoutedStageIDByGroup = (group) => {
-    console.assert(stages_by_groups);
-    if (routed_stage.value) {
-      if (
-        stages_by_groups[group].find(
-          (x) => routed_stage.value.stage.id === x.stage.id
-        )
-      ) {
-        return routed_stage.value.stage.id;
+    const ready = computed((): boolean => {
+      const ready = loaded(assemblyStages);
+      if (ready) {
+        emitter.emit('hideLoading');
       }
-    }
-    console.assert(stages_by_groups[group]);
-    console.assert(stages_by_groups[group][0]);
-    return stages_by_groups[group][0].stage.id;
-  };
 
-  const next_scheduled_stage =
-    store.getters['assemblystore/next_scheduled_stage'];
+      if (!IsManager.value) {
+        if (routed_stage.value && !is_stage_accessible(routed_stage)) {
+          gotoAssemblyHome(assembly);
+        }
+      }
 
-  return {
-    currentGroup,
-    groups,
-    ready,
-    routed_stage,
-    next_scheduled_stage,
-    groupsScheduled,
-    groupsAccessible,
-    stages_by_groups,
-    getFirstOrRoutedStageIDByGroup,
-    is_stage_first_shown,
-    is_stage_last_shown,
+      return ready;
+    });
+
+    const groups = computed((): string[] => {
+      return Object.keys(stages_by_groups);
+    });
+
+    const stages_by_groups = computed(
+      (): Record<string, IStageTuple[]> | null => {
+        const stages_by_groups = {};
+        if (!assembly_sorted_stages.value) {
+          return null;
+        }
+        assembly_sorted_stages.value.forEach((stage: IStageTuple) => {
+          if (!stages_by_groups[stage.stage.group]) {
+            stages_by_groups[stage.stage.group] = [];
+          }
+          stages_by_groups[stage.stage.group].push(stage);
+        });
+
+        return stages_by_groups;
+      }
+    );
+
+    const groupsAccessible = computed((): string[] | undefined => {
+      if (!assembly_accessible_stages.value) {
+        return;
+      }
+      const groups = assembly_accessible_stages.value?.map(
+        (stage) => stage.stage.group
+      );
+      return groups;
+    });
+
+    const groupsScheduled = computed((): string[] | undefined => {
+      if (!assembly_scheduled_stages.value) {
+        return;
+      }
+      const groups = assembly_scheduled_stages.value.map(
+        (stage) => stage.stage.group
+      );
+      return groups;
+    });
+
+    const currentGroup = computed((): string => {
+      console.log('get Stage Group');
+      if (!stageID.value || !routed_stage.value) {
+        return 'preparation';
+      }
+      return routed_stage.value.stage.group;
+    });
+
+    const is_stage_first_shown = (stage): boolean | undefined => {
+      console.assert(stage);
+      console.assert(assembly_sorted_stages);
+      if (!assembly_sorted_stages.value) {
+        return undefined;
+      }
+      const len = assembly_sorted_stages.value.length - 1;
+      return stage === assembly_sorted_stages[len];
+    };
+
+    const is_stage_last_shown = (stage): boolean => {
+      console.assert(stage);
+      if (!assembly_sorted_stages.value) {
+        return false;
+      }
+      return stage === assembly_sorted_stages.value[0];
+    };
+
+    const getFirstOrRoutedStageIDByGroup = (group): number => {
+      console.assert(stages_by_groups);
+      if (routed_stage.value) {
+        if (
+          stages_by_groups[group].find(
+            (x) => routed_stage.value?.stage.id === x.stage.id
+          )
+        ) {
+          return routed_stage.value.stage.id;
+        }
+      }
+      console.assert(stages_by_groups[group]);
+      console.assert(stages_by_groups[group][0]);
+      return stages_by_groups[group][0].stage.id;
+    };
+
+    return {
+      currentGroup,
+      groups,
+      ready,
+      routed_stage,
+      next_scheduled_stage,
+      groupsScheduled,
+      groupsAccessible,
+      stages_by_groups,
+      getFirstOrRoutedStageIDByGroup,
+      is_stage_first_shown,
+      is_stage_last_shown,
+    };
   };
+  if (output.value === null) {
+    output.value = setup();
+  }
+
+  return output.value;
 }
 
 //     /**

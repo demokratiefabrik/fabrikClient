@@ -64,16 +64,16 @@
           flat
           size="lg"
           v-if="item.expandable && !expanded"
-          :color="isFocused(item) ? 'blue' : 'green'"
+          :color="isFocused ? 'blue' : 'green'"
           :icon="item.manual_expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
         />
       </q-card-actions>
     </q-card-section>
 
     <!-- SUB-ITEMS -->
-    <q-list v-if="expanded && stages_by_groups" class="q-pb-lg">
+    <q-list v-if="expanded && subStages.length" class="q-pb-lg">
       <TOCSubItem
-        v-for="stage in stages_by_groups[item.name]"
+        v-for="stage in subStages"
         :key="(stage as any).stage.id"
         :stage="stage"
       />
@@ -92,6 +92,7 @@ import TOCSubItem from './TOCSubItem.vue';
 // import AMs from 'src/pages/Assembly/ArtificialModeration.js';
 // import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import useStagesComposable from 'src/composables/stages.composable';
+import { IStageTuple } from 'src/models/stage';
 // { IStageGroup }
 export default defineComponent({
   setup() {
@@ -129,36 +130,49 @@ export default defineComponent({
     //   return this.assemblyMenu[group];
     // },
 
-    isAccessible() {
+    subStages(): IStageTuple[] {
+      // console.log('group === ', this.item.name, this.stages_by_groups)
+      if (!this.stages_by_groups ) {
+        return []
+      }
+      const keys = Object.keys(this.stages_by_groups);
+      if (keys?.includes(this.item.name)) {
+        return this.stages_by_groups[this.item.name]
+      }
+      return []
+    },
+
+    isAccessible(): boolean {
       return (
         !this.isDisabled && !this.item.expandable && !this.isScheduledForLater
       );
     },
 
-    isDisabled() {
-      return !this.groupsAccessible.value.includes(this.item.name);
+    isDisabled(): boolean {
+      return !this.groupsAccessible?.includes(this.item.name);
     },
 
-    isCompleted() {
-      return !this.groupsScheduled.value.includes(this.item.name);
+    isCompleted(): boolean {
+      return !this.groupsScheduled?.includes(this.item.name);
     },
 
-    isScheduledForLater() {
-      return (
-        this.groupsScheduled.value.includes(this.item.name) && !this.isFocused
-      );
+    isScheduledForLater(): boolean | undefined {
+      return this.groupsScheduled?.includes(this.item?.name) && !this.isFocused;
     },
 
-    isFocused(item) {
+    isFocused(): boolean | null {
+      if (!this.item?.name) {
+        return null
+      }
       return (
         this.next_scheduled_stage &&
-        this.next_scheduled_stage.stage.group == item.name
+        this.next_scheduled_stage.stage.group == this.item.name
       );
     },
 
-    expanded() {
-      return this.item.expanded(this.item)
-    }
+    expanded(): boolean {
+      return this.item.expanded(this.item);
+    },
   },
 
   methods: {

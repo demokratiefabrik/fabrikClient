@@ -3,7 +3,7 @@ const AMs = {
   toc: {
     id: 'toc',
     prosa: ' Wird bei der Tagesübersicht angzeigt.',
-    loading: (ctx) => ctx.stages_by_groups === null,
+    loading: (ctx) => ctx.stages_by_groups === null || ctx.stages_by_groups === undefined,
     items: [
       {
         id: 1,

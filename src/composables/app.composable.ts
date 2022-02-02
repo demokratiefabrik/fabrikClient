@@ -34,17 +34,15 @@ const emitter = useEmitter();
 const notificationBanner = ref<INotificationBanner | undefined>(undefined);
 const loadingGifStack = ref<string[]>([]);
 
-const output = ref<null | any>(null);
+let output: null | any = null;
 
 export default function useAppComposable() {
   const setup = () => {
     console.log('DEBUG: APP COMPOSABLE - START');
 
     const assemblyComposable = useAssemblyComposable('app.comp');
-    console.log('DEBUG: APP COMPOSABLE - START');
     const authComposable = useAuthComposable();
     const monitorComposable = useMonitorComposable();
-    console.log('DEBUG: APP COMPOSABLE - START');
     const routerComposable = useRouterComposable();
     const currentRoute = useRoute();
     const { getOffsetTop } = useLibraryComposable();
@@ -401,11 +399,11 @@ export default function useAppComposable() {
     };
   };
 
-  if (output.value === null) {
-    output.value = setup();
+  if (output === null) {
+    output = setup();
   }
 
-  return output.value;
+  return output;
 }
 
 // RESET LAYOUT

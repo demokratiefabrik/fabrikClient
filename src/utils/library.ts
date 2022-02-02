@@ -69,8 +69,21 @@ export default function useLibraryComposable() {
     return Math.round(ts / 1000);
   }
 
+  // const groupBy = (array: any[], key: string | { (obj: any): string }): Record<string, any[]> => {
+  //   const keyFn = key instanceof Function ? key : (obj: any) => obj[key]
+  //   return array.reduce(
+  //     (objectsByKeyValue, obj) => {
+  //       const value = keyFn(obj)
+  //       objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj)
+  //       return objectsByKeyValue
+  //     },
+  //     {} as Record<string, any[]>
+  //   )
+  // }
+
   return {
     timestamp,
+    // groupBy,
     removeItem,
     getOffsetTop,
     pushSorted,

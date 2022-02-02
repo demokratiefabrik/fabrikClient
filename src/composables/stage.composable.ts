@@ -14,178 +14,178 @@ import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { IStageTuple } from 'src/models/stage';
 import useMonitorComposable from './monitor.composable';
 import constants from 'src/utils/constants';
-// const oauthEmitter = useOAuthEmitter();
-// const { userid } = usePKCEComposable();
-const assemblyIdentifier = ref<string | null>(null);
-// const stageID = ref<number | null>(null);
+import useRouterComposable from './router.composable';
+
+const output = ref<null | any>(null);
 
 export default function useStageComposable() {
-  console.log('DEBUG: useStageComposable::SETUP');
+  const setup = () => {
+    console.log('DEBUG: useStageComposable::SETUP');
 
-  const store = useStore();
-  const emitter = useEmitter();
-  const { loaded } = useLibraryComposable();
-  const { userid } = usePKCEComposable();
-  const { gotoAssemblyHome, stageID } = useAssemblyComposable('stage.comp');
-  const { monitorLog } = useMonitorComposable();
-  const assemblyStages = store.getters['assemblystore/assemblyStages'];
-  const assembly_sorted_stages =
-    store.getters['assemblystore/assembly_sorted_stages'];
+    const store = useStore();
+    const emitter = useEmitter();
+    const { loaded } = useLibraryComposable();
+    const { userid } = usePKCEComposable();
+    const { gotoAssemblyHome, stageID } = useAssemblyComposable('stage.comp');
+    const { monitorLog } = useMonitorComposable();
+    const { assemblyIdentifier } = useRouterComposable();
 
-  const IsManager = computed(() => store.getters['assemblystore/IsManager']);
-  const assembly = computed(() => store.getters['assemblystore/assembly']);
-  const stageMilestonesCompleted = computed(
-    () => store.getters['assemblystore/stageMilestonesCompleted']
-  );
-  const is_stage_accessible = store.getters['assemblystore/is_stage_accessible']
-  const is_stage_alerted = store.getters['assemblystore/is_stage_alerted'];
+    const assemblyStages = store.getters['assemblystore/assemblyStages'];
+    const assembly_sorted_stages =
+      store.getters['assemblystore/assembly_sorted_stages'];
 
-  const routed_stage = computed(() => {
-    if (!stageID.value) {
-      return null;
-    }
-    if (!assemblyStages) {
-      return null;
-    }
-    return assemblyStages[stageID.value];
-  });
+    const IsManager = computed(() => store.getters['assemblystore/IsManager']);
+    const assembly = computed(() => store.getters['assemblystore/assembly']);
+    const stageMilestonesCompleted = computed(
+      () => store.getters['assemblystore/stageMilestonesCompleted']
+    );
+    const is_stage_accessible =
+      store.getters['assemblystore/is_stage_accessible'];
+    const is_stage_alerted = store.getters['assemblystore/is_stage_alerted'];
 
-  const ready = computed(() => {
-    const ready = loaded(assemblyStages);
-    if (ready) {
-      emitter.emit('hideLoading');
-    }
-
-    if (!IsManager.value) {
-      if (routed_stage.value && !is_stage_accessible(routed_stage)) {
-        gotoAssemblyHome(assembly);
+    const routed_stage = computed(() => {
+      if (!stageID.value) {
+        return null;
       }
-    }
-
-    return ready;
-  });
-
-  const contenttreeID = computed((): null | number => {
-    // console.log("load contenttreeID in contentree.computed")
-    // console.log("RETRIEVE contenttreeID..", this.routed_stage)
-    if (!routed_stage.value?.stage?.contenttree_id) {
-      return null;
-    }
-    return routed_stage.value?.stage?.contenttree_id;
-  });
-
-  const isFirstText = computed((): null | boolean => {
-    const firstTextStage = Object.values(
-      assembly_sorted_stages as Record<number, IStageTuple>
-    ).find((stage) => stage?.stage.type === 'TEXTSHEET');
-    return routed_stage.value == firstTextStage;
-  });
-
-  // TODO: TO IMPLEMENT
-  // const highlightedItem = computed((): null | boolean => {
-  //   return this.sideMenuItems.find(
-  //     (item) => {
-  //       if (item.customHightlighting) {
-  //         return item.customHightlighting()
-  //       }
-  //       const weights = stageMilestoneWeigths[item.anchor];
-  //       return !weights || weights < 3
-  //     }
-  //   );
-  // },
-
-  const markUnAlert = (stage: IStageTuple | null = null) => {
-    // Notify stage as completed
-    if (!stage) {
-      stage = routed_stage.value;
-    }
-
-    if (!stage) {
-      return;
-    }
-
-    store.dispatch('storeStageProgressionAlertFlag', {
-      stageID: stage.stage.id,
-      alerted: false,
+      if (!assemblyStages) {
+        return null;
+      }
+      return assemblyStages[stageID.value];
     });
-    // Fire (immediately), immediately
-    const data = { stageID: stage.stage.id };
-    monitorLog(constants.MONITOR_STAGE_UNALERT, data);
-  };
 
-  const markCompleted = () => {
-    // Notify stage as completed
-    if (!routed_stage.value.progression?.completed) {
-      monitorLog(constants.MONITOR_STAGE_COMPLETED);
-      store.dispatch('assemblystore/storeStageProgressionCompleted', {
-        stageID: routed_stage.value.stage.id,
-        completed: true,
+    const ready = computed(() => {
+      const ready = loaded(assemblyStages);
+      if (ready) {
+        emitter.emit('hideLoading');
+      }
+
+      if (!IsManager.value) {
+        if (routed_stage.value && !is_stage_accessible(routed_stage)) {
+          gotoAssemblyHome(assembly);
+        }
+      }
+
+      return ready;
+    });
+
+    const contenttreeID = computed((): null | number => {
+      // console.log("load contenttreeID in contentree.computed")
+      // console.log("RETRIEVE contenttreeID..", this.routed_stage)
+      if (!routed_stage.value?.stage?.contenttree_id) {
+        return null;
+      }
+      return routed_stage.value?.stage?.contenttree_id;
+    });
+
+    const isFirstText = computed((): null | boolean => {
+      const firstTextStage = Object.values(
+        assembly_sorted_stages as Record<number, IStageTuple>
+      ).find((stage) => stage?.stage.type === 'TEXTSHEET');
+      return routed_stage.value == firstTextStage;
+    });
+
+    // TODO: TO IMPLEMENT
+    // const highlightedItem = computed((): null | boolean => {
+    //   return this.sideMenuItems.find(
+    //     (item) => {
+    //       if (item.customHightlighting) {
+    //         return item.customHightlighting()
+    //       }
+    //       const weights = stageMilestoneWeigths[item.anchor];
+    //       return !weights || weights < 3
+    //     }
+    //   );
+    // },
+
+    const markUnAlert = (stage: IStageTuple | null = null) => {
+      // Notify stage as completed
+      if (!stage) {
+        stage = routed_stage.value;
+      }
+
+      if (!stage) {
+        return;
+      }
+
+      store.dispatch('storeStageProgressionAlertFlag', {
+        stageID: stage.stage.id,
+        alerted: false,
       });
-    }
-  };
+      // Fire (immediately), immediately
+      const data = { stageID: stage.stage.id };
+      monitorLog(constants.MONITOR_STAGE_UNALERT, data);
+    };
 
-  const checkMilestones = () => {
-    if (stageMilestonesCompleted.value) {
-      // ignore this statement...
-      if (is_stage_alerted(routed_stage.value)) {
-        markUnAlert();
+    const markCompleted = () => {
+      // Notify stage as completed
+      if (!routed_stage.value.progression?.completed) {
+        monitorLog(constants.MONITOR_STAGE_COMPLETED);
+        store.dispatch('assemblystore/storeStageProgressionCompleted', {
+          stageID: routed_stage.value.stage.id,
+          completed: true,
+        });
       }
-      return;
+    };
+
+    const checkMilestones = () => {
+      if (stageMilestonesCompleted.value) {
+        // ignore this statement...
+        if (is_stage_alerted(routed_stage.value)) {
+          markUnAlert();
+        }
+        return;
+      }
+    };
+
+    const milestone = (milestoneLabel: string, weight: number, key: string) => {
+      store.dispatch('assemblystore/addMilestone', {
+        label: milestoneLabel,
+        weight,
+        key,
+      });
+      checkMilestones();
+    };
+
+    //TODO add watcher... to sync data..
+    // watch: {
+    //   contenttreeID(to, from) {
+    //     if (to) {
+    //       this.$store.dispatch('contentstore/syncContenttree', {
+    //         assemblyIdentifier: runtimeStore.assemblyIdentifier,
+    //         contenttreeID: to,
+    //         oauthUserID: this.oauth.userid
+    //       })
+    //     }
+    //   },
+    // },
+
+    // MOUNTED
+    // when stage has been loaded already
+    if (routed_stage.value?.stage.contenttree_id && userid) {
+      store.dispatch('contentstore/syncContenttree', {
+        assemblyIdentifier,
+        contenttreeID: routed_stage.value.stage.contenttree_id,
+        oauthUserID: userid,
+      });
+
+      // earlier: in created section of mixin
+      checkMilestones();
     }
+
+    return {
+      ready,
+      routed_stage,
+      isFirstText,
+      contenttreeID,
+      milestone,
+      markUnAlert,
+      markCompleted,
+    };
   };
 
-  const milestone = (milestoneLabel: string, weight: number, key: string) => {
-    store.dispatch('assemblystore/addMilestone', {
-      label: milestoneLabel,
-      weight,
-      key,
-    });
-    checkMilestones();
-  };
-
-  //TODO add watcher... to sync data..
-  // watch: {
-  //   contenttreeID(to, from) {
-  //     if (to) {
-  //       this.$store.dispatch('contentstore/syncContenttree', {
-  //         assemblyIdentifier: runtimeStore.assemblyIdentifier,
-  //         contenttreeID: to,
-  //         oauthUserID: this.oauth.userid
-  //       })
-  //     }
-  //   },
-  // },
-
-  // MOUNTED
-  // when stage has been loaded already
-  if (routed_stage.value?.stage.contenttree_id && userid) {
-    store.dispatch('contentstore/syncContenttree', {
-      assemblyIdentifier,
-      contenttreeID: routed_stage.value.stage.contenttree_id,
-      oauthUserID: userid,
-    });
-
-    // earlier: in created section of mixin
-    checkMilestones();
+  if (output.value === null) {
+    output.value = setup();
   }
 
-  return {
-    // currentGroup,
-    // groups,
-    ready,
-    routed_stage,
-    isFirstText,
-    contenttreeID,
-    milestone,
-    markUnAlert,
-    markCompleted,
-
-    // next_scheduled_stage,
-    // groupsScheduled,
-    // groupsAccessible,
-    // stages_by_groups,
-    // getFirstOrRoutedStageIDByGroup,
-    // is_stage_first_shown,
-    // is_stage_last_shown,
-  };
+  return output.value;
 }

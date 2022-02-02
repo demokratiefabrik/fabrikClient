@@ -1,9 +1,14 @@
 import { date } from 'quasar';
 import useRouterComposable from 'src/composables/router.composable';
-import { IAssembly, IAssemblyConfiguration, IAssemblyProgression, IAssemblyTuple } from 'src/models/assembly';
+import {
+  IAssembly,
+  IAssemblyConfiguration,
+  IAssemblyProgression,
+  IAssemblyTuple,
+} from 'src/models/assembly';
 import { IStage, IStageTuple } from 'src/models/stage';
 const { isSameDate } = date;
-1
+1;
 export const assemblies = (state): IAssemblyTuple[] | null => {
   // const { assemblyIdentifier } = useRouterComposable();
   return Object.values(state.assemblydata);
@@ -38,7 +43,10 @@ export const assemblyType = (_state, getters): string | undefined => {
   }
 };
 
-export const assemblyConfiguration = (_state, getters): IAssemblyConfiguration | null => {
+export const assemblyConfiguration = (
+  _state,
+  getters
+): IAssemblyConfiguration | null => {
   if (!getters.assemblyTuple) {
     console.log('...assemblyTuple not ready (configuration)');
     return null;
@@ -55,7 +63,10 @@ export const assembly_userid = (state, getters): number | null => {
   return getters.assemblyTuple.access_sub;
 };
 
-export const assemblyProgression = (state, getters): IAssemblyProgression | null => {
+export const assemblyProgression = (
+  state,
+  getters
+): IAssemblyProgression | null => {
   if (!getters.assemblyTuple) {
     return null;
   }
@@ -63,7 +74,10 @@ export const assemblyProgression = (state, getters): IAssemblyProgression | null
   return getters.assemblyTuple.progression;
 };
 
-export const assemblyStages = (state, getters): Record<number, IStageTuple> | null => {
+export const assemblyStages = (
+  state,
+  getters
+): Record<number, IStageTuple> | null => {
   if (!getters.assemblyTuple) {
     console.log('...assemblyTuple not ready (stages)');
     return null;
@@ -286,6 +300,7 @@ export const assembly_accessible_stages = (
   // console.assert(sorted_stages)
   const last_accessible_stage = getters.last_accessible_stage;
   console.assert(last_accessible_stage);
+  // console.log('zzzzzzzzzz')
 
   // Return all stages until the last_accessible_stage
   return sorted_stages.filter(
@@ -301,7 +316,6 @@ export const assembly_accessible_stages = (
 /** Which stages are freely open / accessible */
 export const assembly_accessible_stage_ids = (getters): number[] | null => {
   const accessible_stages = getters.assembly_accessible_stages;
-
   if (!accessible_stages) {
     return null;
   }
@@ -435,11 +449,9 @@ export const is_stage_skipped =
 
 export const is_stage_disabled =
   () =>
-  (stage): boolean => {
-    console.assert(stage);
-    console.log('deprecated.... is_stage_disabled');
-    return false;
-    // TODO: not anymore available, right? return (stage.stage.disabled || stage.stage.deleted)
+  (stage: IStageTuple): boolean => {   
+    const disabled = stage.stage.disabled !== undefined && stage.stage.disabled === true
+    return (disabled)
   };
 
 export const is_stage_completed =
@@ -453,8 +465,9 @@ export const is_stage_accessible =
   (getters) =>
   (stage): boolean => {
     console.assert(stage);
+    // console.log(stage, 'ttttt', assembly_accessible_stage_ids)
     const accessible_stage_ids = getters.assembly_accessible_stage_ids;
-    return accessible_stage_ids.includes(stage.stage.id);
+    return accessible_stage_ids?.includes(stage.stage.id);
   };
 
 export const is_stage_done =
