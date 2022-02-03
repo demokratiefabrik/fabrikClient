@@ -23,11 +23,10 @@ export const assemblyTuple = (state): IAssemblyTuple | null => {
   return state.assemblydata[assemblyIdentifier.value];
 };
 
-export const assembly = (getters): IAssembly | null => {
-  if (!getters.assemblyTuple) {
+export const assembly = (_state, getters): IAssembly | null => {
+  if (!getters.assemblyTuple ) {
     return null;
   }
-
   return getters.assemblyTuple.assembly;
 };
 
@@ -294,7 +293,7 @@ export const assembly_accessible_stages = (
 ): IStageTuple[] | null => {
   const sorted_stages = getters.assembly_sorted_stages;
   if (!sorted_stages) {
-    console.log('assemmbly is not yet loaded');
+    // console.log('assemmbly is not yet loaded');
     return null;
   }
   // console.assert(sorted_stages)
@@ -314,7 +313,7 @@ export const assembly_accessible_stages = (
 };
 
 /** Which stages are freely open / accessible */
-export const assembly_accessible_stage_ids = (getters): number[] | null => {
+export const assembly_accessible_stage_ids = (_state, getters): number[] | null => {
   const accessible_stages = getters.assembly_accessible_stages;
   if (!accessible_stages) {
     return null;

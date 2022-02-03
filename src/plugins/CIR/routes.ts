@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
       // { path: ':stageID/questions/:contentID', name: 'VAA_QUESTIONS_ENTRY', component: () => import('./QUESTIONS/Questions'), meta: meta4AssemblyDelegates },
       // { path: ':stageID/questions', name: 'VAA_QUESTIONS', component: () => import('./QUESTIONS/Questions'), meta: meta4AssemblyDelegates },
       // { path: ':stageID/topics', name: 'VAA_TOPICS', component: () => import('./TOPICS/Topics'), meta: meta4AssemblyDelegates },
-      { path: '', name: 'CIR', component: () => import('/src/plugins/CIR/TOC.vue'), meta: { hideAssemblyMenu: true, ...meta4AssemblyDelegates } }
+      { path: '', name: 'CIR', component: () => import('/src/pages/Assembly/TOC/TOC.vue'), meta: { hideAssemblyMenu: true, ...meta4AssemblyDelegates } }
     ]
   }
 ]

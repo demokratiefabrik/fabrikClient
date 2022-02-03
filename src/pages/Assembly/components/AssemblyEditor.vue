@@ -112,7 +112,7 @@
             style="max-width: 270px"
             dropdown-icon="mdi-menu-down"
             v-model="localmodel.type"
-            :options="$plugins"
+            :options="$pluginNames"
             label="Please Choose a Assembly Type (Required)"
             :error="errorAssemblyType"
             :error-message="errorMessageAssemblyType"

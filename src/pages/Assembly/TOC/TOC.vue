@@ -28,7 +28,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
-import useCIRComposable from './composables/cir.composable';
 import TOCItem from './TOCItem.vue';
 import AMs from 'src/pages/Assembly/ArtificialModeration.js';
 import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
@@ -36,8 +35,7 @@ import { IStageGroup } from 'src/composables/stages.composable';
 
 export default defineComponent({
   setup() {
-    const { assemblyMenu } = useCIRComposable();
-    const { assembly } = useAssemblyComposable('');
+    const { assembly, assemblyMenu } = useAssemblyComposable();
     return {
       assemblyMenu,
       assembly,
@@ -60,9 +58,9 @@ export default defineComponent({
       return true;
     },
 
-    assemblyMenuItems (): IStageGroup[] {
-      return Object.values(this.assemblyMenu)
-    }
+    assemblyMenuItems(): IStageGroup[] {
+      return Object.values(this.assemblyMenu);
+    },
   },
 });
 </script>

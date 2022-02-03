@@ -173,8 +173,6 @@ import ContentTreeChart from 'src/pages/ContentTree/components/ContentTreeChart.
 import SideMenu from 'src/components/SideMenu.vue';
 import { mapGetters, useStore } from 'vuex';
 import Skeleton from 'src/components/Skeleton.vue';
-// import AMs from './ArtificialModeration';
-// import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useLibraryComposable from 'src/utils/library';
 import { IStageTuple } from 'src/models/stage';
@@ -183,15 +181,8 @@ import { INodeTuple } from 'src/models/content';
 import useStageComposable from 'src/composables/stage.composable';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useEmitter from 'src/utils/emitter';
+import { ISideMenuItem } from 'src/models/layout';
 
-export interface ISideMenuItem {
-  label: string;
-  anchor: string;
-  caption?: string;
-  visible?: () => boolean;
-}
-
-export type ISideMenuItems = ISideMenuItem[];
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
@@ -239,10 +230,6 @@ export default defineComponent({
           label: 'Anträge',
           anchor: 'PEERREVIEWS',
         },
-        // {
-        //   label: "Teilnehmende",
-        //   anchor: "USERS",
-        // },
         {
           label: 'Ausblick',
           anchor: 'OUTLOOK',
@@ -252,21 +239,14 @@ export default defineComponent({
   },
 
   components: {
-    // ArtificialModeration,
     SideMenu,
     ContentTreeChart,
     Skeleton,
   },
 
   computed: {
-    topicContentTree(): any {
-      // TODO interface
+    topicContentTree(): IContentTree | null {
       const contenttreeID = this.topicContentTreeID;
-      // const topicStage = Object.values(this.assemblyStages).find(
-      //   (stageTuple) => stageTuple.stage.type == "VAA_TOPICS"
-      // );
-      // console.assert(topicStage);
-      // console.assert(topicStage.stage.contenttree_id);
       return this.get_contenttree({
         contenttreeID: contenttreeID,
       });
@@ -296,8 +276,6 @@ export default defineComponent({
     },
 
     topicHighestSalience(): INodeTuple | undefined {
-      // TODO: interface
-      // const sorted = this.topics.sort((a, b) => b?.S?.SA - a.S?.SA);
       const sorted = this.topics;
 
       if (!sorted) {
@@ -365,7 +343,6 @@ export default defineComponent({
     },
 
     questionsHighestSalience(): INodeTuple[] | null {
-      // TODO: interface
       if (!this.questions) {
         return null;
       }

@@ -355,22 +355,33 @@ export default function useAppComposable() {
 
       /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
       watch(currentRoute, () => {
-        console.log('WATCHER')
+        console.log('WATCHER in CURRENT ROUTE (APP)', 'syncAssembliesSync')
         notificationBanner.value = undefined;
-        // TODO: should we indeed watch each route?
-        // store.dispatch('assemblystore/monitor_route_changes', { to, from })
-        
-        if (currentRoute.params?.assemblyIdentifier) {
-          routerComposable.setAssemblyIdentifier(
-            currentRoute?.params?.assemblyIdentifier as string | null
-          );
 
+        // TODO: should we log each route?
+        // store.dispatch('assemblystore/monitor_route_changes', { to, from })
+
+        if (currentRoute.params?.assemblyIdentifier) {
+          
+          // UPDATE CURRENT ASSEMBLY...
+          // TODO: redirect to Home, when assembly is invalid
+          if (currentRoute.params?.assemblyIdentifier != routerComposable.assemblyIdentifier) {
+            routerComposable.setAssemblyIdentifier(
+              currentRoute?.params?.assemblyIdentifier as string | null
+            );
+            assemblyComposable.syncUserAssembly()
+          }
+
+          // UPDATE STAGES...
+          // TODO: redirect to asembly home, when stage is invalid
           if (
             currentRoute.params?.stageID !== null &&
-            currentRoute.params?.stageID !== undefined
+            currentRoute.params?.stageID !== undefined && 
+            currentRoute.params?.stageID !== routerComposable.stageID
           ) {
-            // TODO: redirect to asembly home, when stage is invalid
-            routerComposable.setStageID(parseInt(currentRoute.params.stageID as string));
+            routerComposable.setStageID(
+              parseInt(currentRoute.params.stageID as string)
+            );
             emitter.emit('showLoading');
           }
         }
@@ -378,9 +389,9 @@ export default function useAppComposable() {
     };
 
     return {
-      // stageID: readonly(stageID),
       appExitState: readonly(appExitState),
       headerOffset: readonly(headerOffset),
+      instanceNr: readonly(routerComposable.instanceNr),
       scrollToAnchorIfNecessary,
       scrollToAnchor,
       showAuthenticationError,
@@ -395,7 +406,6 @@ export default function useAppComposable() {
       setHeaderOffset,
       hideLoadingGif,
       showLoadingGif,
-      instanceNr: routerComposable.instanceNr,
     };
   };
 

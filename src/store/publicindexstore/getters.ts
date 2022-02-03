@@ -96,10 +96,10 @@ export const UsersDelegateAssemblies = (
   // Check permissions:
   const compare_func = rootGetters['profilestore/translateOauthAcls'];
 
-  console.log(getters.ongoing_assemblies)
+  // console.log(getters.ongoing_assemblies)
   const accessibleAssemblies = filter(getters.ongoing_assemblies, (x) => {
     const acls = compare_func(x.identifier);
-    console.log(x.identifier, acls, 'acls');
+    // console.log(x.identifier, acls, 'acls');
     return acls.includes('delegate');
   });
   return Object.values(accessibleAssemblies);
@@ -111,7 +111,7 @@ export const IsUserDelegateOfOngoingAssembly = (_state, getters) => {
   return assemblies && Object.values(assemblies).length > 0;
 };
 
-export const IsUserObserverOfOngoingAssembly = (getters) => {
+export const IsUserObserverOfOngoingAssembly = (_state, getters) => {
   // console.log("IsUserObserverOfOngoingAssembly", getters.UsersDelegateAssemblies)
   const assemblies = getters.UsersObserverAssemblies;
   return assemblies && Object.values(assemblies).length > 0;

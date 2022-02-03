@@ -85,19 +85,11 @@
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import TOCSubItem from './TOCSubItem.vue';
-
-// import useAssemblyComposable from 'src/composables/assembly.composable';
-// import useCIRComposable from './composables/cir.composable';
-// import { mapGetters } from 'vuex';
-// import AMs from 'src/pages/Assembly/ArtificialModeration.js';
-// import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
 import useStagesComposable from 'src/composables/stages.composable';
 import { IStageTuple } from 'src/models/stage';
-// { IStageGroup }
+
 export default defineComponent({
   setup() {
-    // console.log('DEBUG: INDEX:VUE');
-    // const { assemblyMenu } = useCIRComposable();
     const { push } = useRouter();
     const {
       next_scheduled_stage,
@@ -105,7 +97,7 @@ export default defineComponent({
       groupsScheduled,
       stages_by_groups,
     } = useStagesComposable();
-    // const { gotoAssemblyHome, assemblyIdentifier } = useAssemblyComposable('');
+
     return {
       groupsScheduled,
       groupsAccessible,
@@ -131,15 +123,14 @@ export default defineComponent({
     // },
 
     subStages(): IStageTuple[] {
-      // console.log('group === ', this.item.name, this.stages_by_groups)
-      if (!this.stages_by_groups ) {
-        return []
+      if (!this.stages_by_groups) {
+        return [];
       }
       const keys = Object.keys(this.stages_by_groups);
       if (keys?.includes(this.item.name)) {
-        return this.stages_by_groups[this.item.name]
+        return this.stages_by_groups[this.item.name];
       }
-      return []
+      return [];
     },
 
     isAccessible(): boolean {
@@ -162,7 +153,7 @@ export default defineComponent({
 
     isFocused(): boolean | null {
       if (!this.item?.name) {
-        return null
+        return null;
       }
       return (
         this.next_scheduled_stage &&

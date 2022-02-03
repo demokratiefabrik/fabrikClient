@@ -4,6 +4,7 @@ export interface IContentTree {
     date_last_tree_modification?: Date | string;
     id: number;
     entries: INodeTuple[];
+    rootElementIds: number[];
 }
 
 export interface IContentTreeProgression {

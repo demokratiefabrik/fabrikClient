@@ -31,8 +31,6 @@ export default function useRouterComposable() {
         // Reload
         emitter.emit('reload');
       } else {
-        // const newRoute = { ...route };
-        // Push
         router.push(route);
       }
     };
@@ -56,8 +54,7 @@ export default function useRouterComposable() {
       pushR({ name: 'profile' } as RouteLocationRaw);
     };
 
-    const setAssemblyIdentifier = (identifier: string | null) =>
-      (assemblyIdentifier.value = identifier);
+    const setAssemblyIdentifier = (identifier: string | null) => assemblyIdentifier.value = identifier;
 
     const setStageID = (id: number | null) => (stageID.value = id);
 

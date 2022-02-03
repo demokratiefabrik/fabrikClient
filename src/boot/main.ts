@@ -3,7 +3,7 @@ import filters from 'src/utils/filters';
 import useEmitter from 'src/utils/emitter';
 import Constants from 'src/utils/constants';
 import useLibraryComposable from 'src/utils/library';
-import plugins from 'src/plugins';
+import {pluginNames, pluginComposables} from 'src/plugins';
 
 // import {
 //   useRoute,
@@ -22,7 +22,8 @@ const library = useLibraryComposable();
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     $filters: typeof filters;
-    $plugins: typeof plugins;
+    $pluginNames: typeof pluginNames;
+    $pluginComposables: typeof pluginComposables;
     $emitter: typeof emitter;
     $library: typeof library;
     $constants: typeof Constants;
@@ -31,17 +32,10 @@ declare module '@vue/runtime-core' {
 
 // Anonther Boot Hook.
 export default boot(async ({ app }) => {
-  // console.log('DEBUG boot main.ts start');
+
   app.config.globalProperties.$emitter = emitter;
   app.config.globalProperties.$filters = filters;
-  // app.config.globalProperties.$constants = Constants;
   app.config.globalProperties.$library = library;
-
-  app.config.globalProperties.$plugins = plugins;
-
-  // installedAssemblyPlugins
-  // assemblyComposable.installAssemblyPlugin('CIR')
-
-
-
+  app.config.globalProperties.$pluginComposables = pluginComposables;
+  app.config.globalProperties.$pluginNames = pluginNames;
 });
