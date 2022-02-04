@@ -170,9 +170,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import ContentTreeChart from 'src/pages/ContentTree/components/ContentTreeChart.vue';
-import SideMenu from 'src/components/SideMenu.vue';
+import SideMenu from 'src/pages/components/SideMenu.vue';
 import { mapGetters, useStore } from 'vuex';
-import Skeleton from 'src/components/Skeleton.vue';
+import Skeleton from 'src/pages/components/Skeleton.vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useLibraryComposable from 'src/utils/library';
 import { IStageTuple } from 'src/models/stage';

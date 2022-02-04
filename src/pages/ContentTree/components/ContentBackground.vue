@@ -237,7 +237,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import UserInfo from 'src/components/UserInfo.vue';
+import UserInfo from 'src/pages/components/UserInfo.vue';
 import useLibraryComposable from 'src/utils/library';
 // import { runtimeStore } from 'src/store/runtime.store';
 import api from 'src/utils/api';

@@ -1,9 +1,7 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
 import { ref, readonly, computed } from 'vue';
 import Constants from 'src/utils/constants';
-import usePKCEComposable, {
-  IPayload,
-} from 'src/plugins/VueOAuth2PKCE/pkce.composable';
+import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
 import { useRouter, useRoute } from 'vue-router';
@@ -16,7 +14,7 @@ import { useI18n } from 'vue-i18n';
 
 const pkce = usePKCEComposable();
 const logoutState = ref<boolean>(false);
-const emailIsAvailable = ref<boolean>(false);
+const _emailIsAvailable = ref<boolean>(false);
 const emitter = useEmitter();
 const oauthEmitter = useOAuthEmitter();
 
@@ -44,13 +42,6 @@ export default function useAuthComposable() {
       oauthEmitter.on('RecycleLogin', () => {
         loadProfile();
       });
-      // oauthEmitter.on('AfterPayloadChanges', (_payload) => {
-      //   const payload = _payload  as IPayload | null
-      //   if (payload) {
-      //     console.log('!!!!!PAYLOAD CHANGES', payload?.roles)
-      //     store.dispatch('profilestore/storeOauthAcls', payload?.roles)
-      //   }
-      // });
 
       addRoutePermisionWatcher();
       const response = await pkce.initialize();
@@ -120,22 +111,20 @@ export default function useAuthComposable() {
       pkce.login(destination_route);
     };
 
-    const payload = computed(() => {
-      // set userEmail<boolean> = true, if email has been added shortly
-      const payload = pkce.payload.value as IPayload;
-      if (emailIsAvailable.value) {
-        payload.userEmail = true;
-      }
-      return payload;
-    });
+    // const payload = computed(() => {
+    //   // set userEmail<boolean> = true, if email has been added shortly
+    //   const payload = pkce.payload.value as IPayload;
+    //   if (emailIsAvailable.value) {
+    //     payload.userEmail = true;
+    //   }
+    //   return payload;
+    // });
 
     const currentUsernameDerivation = computed(() => {
-      // set userEmail<boolean> = true, if email has been added shortly
       return getUsernameDerivation(profile);
     });
 
     const currentUsername = computed(() => {
-      // set userEmail<boolean> = true, if email has been added shortly
       return getUsername(profile);
     });
 
@@ -161,7 +150,7 @@ export default function useAuthComposable() {
       // find first permission that is allowed.
       const allowed = currentRoute.meta.assemblyAcl.find((assemblyAcl) => {
         const role = `${assemblyAcl}@${currentRoute.params.assemblyIdentifier}`;
-        return payload.value.roles.includes(role);
+        return pkce.payload.value.roles.includes(role);
       });
       if (!allowed) {
         router.push({ name: 'home' });
@@ -233,8 +222,14 @@ export default function useAuthComposable() {
     };
 
     const markIndicatedEmail = (): void => {
-      emailIsAvailable.value = true;
+      _emailIsAvailable.value = true;
     };
+
+    const emailIsAvailable = computed(() => {
+      return _emailIsAvailable.value || !!pkce.payload.value.userEmail;
+    });
+
+    pkce.payload.value;
 
     const loadProfile = async () => {
       store.dispatch('profilestore/touchRandomSeed');
@@ -243,7 +238,7 @@ export default function useAuthComposable() {
       if (pkce.userid.value) {
         store.dispatch('profilestore/keepInSyncProfile', {
           oauthUserID: pkce.userid.value,
-          oauthUserEmail: payload.value.userEmail,
+          // oauthUserEmail: payload.value.userEmail,
         });
       }
     };
@@ -260,7 +255,7 @@ export default function useAuthComposable() {
       refresh_token_if_required: pkce.refresh_token_if_required,
       authorized: readonly(pkce.authorized),
       jwt: readonly(pkce.jwt),
-      payload: readonly(payload),
+      payload: pkce.payload,
       userid: readonly(pkce.userid),
 
       // PROFILE
@@ -269,6 +264,7 @@ export default function useAuthComposable() {
       currentUsernameDerivation,
       currentUsername,
       getUsername,
+      emailIsAvailable,
       markIndicatedEmail,
     };
   };

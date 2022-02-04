@@ -21,6 +21,8 @@ const headerOffset = ref<number>(150); // default header is minimized within ass
 const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
 const fixedSelectedItem = ref<HTMLElement | null>(null); // Fixed Element (TODO: describe better what this is for!)
 
+
+
 export interface INotificationConfig {
   settimer?: boolean;
   nobuttons?: boolean;
@@ -357,6 +359,8 @@ export default function useAppComposable() {
       watch(currentRoute, () => {
         console.log('WATCHER in CURRENT ROUTE (APP)', 'syncAssembliesSync')
         notificationBanner.value = undefined;
+        routerComposable.setLastRoute(currentRoute)
+        // currentRoute.fullPath
 
         // TODO: should we log each route?
         // store.dispatch('assemblystore/monitor_route_changes', { to, from })

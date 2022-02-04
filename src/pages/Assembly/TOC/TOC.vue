@@ -30,7 +30,7 @@ import { defineComponent } from 'vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import TOCItem from './TOCItem.vue';
 import AMs from 'src/pages/Assembly/ArtificialModeration.js';
-import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import { IStageGroup } from 'src/composables/stages.composable';
 
 export default defineComponent({

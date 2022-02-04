@@ -131,7 +131,7 @@ import useAuthComposable from 'src/composables/auth.composable';
 import useRouterComposable from 'src/composables/router.composable';
 import { mapGetters, mapActions } from 'vuex';
 import Notifications from './Notifications.vue';
-import UserAvatar from 'src/components/UserAvatar.vue';
+import UserAvatar from 'src/pages/components/UserAvatar.vue';
 
 export default defineComponent({
   name: 'MainMenu',

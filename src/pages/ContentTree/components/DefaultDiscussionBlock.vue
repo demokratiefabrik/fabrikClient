@@ -76,7 +76,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import ComponentContentTree from 'src/pages/ContentTree/components/ContentTree.vue';
-import { IArtificialModeration } from 'src/components/artificial_moderation/model';
+import { IArtificialModeration } from 'src/pages/components/artificial_moderation/model';
 import constants from 'src/utils/constants';
 // import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useAppComposable from 'src/composables/app.composable';

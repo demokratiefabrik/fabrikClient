@@ -51,7 +51,7 @@
 import { defineComponent } from 'vue';
 import useAuthComposable from 'src/composables/auth.composable';
 import AMs from 'src/pages/ArtificialModeration';
-import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import { mapGetters } from 'vuex';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 

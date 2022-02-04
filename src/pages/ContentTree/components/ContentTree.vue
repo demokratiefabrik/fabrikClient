@@ -221,10 +221,10 @@ body.screen--xs .q-gutter-x-sm > *,
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
+import AlgorithmDisclaimer from 'src/pages/components/AlgorithmDisclaimer.vue';
 import { mapGetters } from 'vuex';
 import ContentTreeQTreeHead from './ContentTreeQTreeHead.vue';
-import ArtificialModerationComponent from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import ArtificialModerationComponent from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import ContentTreeQTreeBody from './ContentTreeQTreeBody.vue';
 import AMs from '../ArtificialModeration.js';
 import useAssemblyComposable from 'src/composables/assembly.composable';

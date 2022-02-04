@@ -12,7 +12,7 @@
 <script lang="ts">
 // import StageMixin from 'src/mixins/stage';
 import AMs from './ArtificialModeration';
-import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 // import { LayoutEventBus } from 'src/utils/eventbus';
 import { defineComponent } from 'vue';
 import useLibraryComposable from 'src/utils/library';

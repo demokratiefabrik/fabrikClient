@@ -80,8 +80,8 @@
 // const {  } = useContenttreeComposable();
 import TextsheetCard from './components/TextsheetCard.vue';
 import AMs from './ArtificialModeration';
-import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
-import SideMenu from 'src/components/SideMenu.vue';
+import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
+import SideMenu from 'src/pages/components/SideMenu.vue';
 import localI18n from './i18n';
 import constants from 'src/utils/constants';
 import { defineComponent } from 'vue';

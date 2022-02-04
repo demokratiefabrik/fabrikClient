@@ -12,7 +12,7 @@ import { RouteRecordRaw } from 'vue-router';
 //   //   children: [
 //   //     // { path: 'swarm', component: () => import('pages/swarmplot.vue') },
 //   //     // { path: 'bar', component: () => import('pages/barplot.vue') },
-//   //     // { path: 'beeswarm', component: () => import('src/components/beeswarm/beeswarm.vue') },
+//   //     // { path: 'beeswarm', component: () => import('src/pages/components/beeswarm/beeswarm.vue') },
 //   //   ],
 //   // },
 
@@ -36,7 +36,7 @@ import plugin_routes from './plugin_routes'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('src/pages/layouts/MainLayout.vue'),
     children: [
 
       { path: '', name: 'home', component: () => import('pages/Index.vue') },

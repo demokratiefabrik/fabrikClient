@@ -29,7 +29,7 @@
 // import StageMixin from 'src/mixins/stage';
 import i18nPluginMixin from './i18n';
 import AMs from './ArtificialModeration';
-import ArtificialModeration from 'src/components/artificial_moderation/ArtificialModeration.vue';
+import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';

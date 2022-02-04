@@ -1,12 +1,16 @@
 /** DEMOKRATIFABRIK RUNTIME VARIABLES */
 import useEmitter from 'src/utils/emitter';
-import { useRouter, useRoute, RouteLocationRaw } from 'vue-router';
+// RouteLocationNormalizedLoaded
+import { useRouter, useRoute, RouteLocationRaw, RouteLocationNormalizedLoaded } from 'vue-router';
 import { ref } from 'vue';
 
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
 const assemblyIdentifier = ref<string | null>(null);
+const lastRouteString = ref<RouteLocationRaw | null>(null); // the last visited url 
+const currentRouteString = ref<RouteLocationRaw | null>(null); // the last visited url 
 const stageID = ref<number | null>(null);
+
 let output: null | any = null;
 
 export default function useRouterComposable() {
@@ -15,6 +19,14 @@ export default function useRouterComposable() {
 
     const router = useRouter();
     const currentRoute = useRoute();
+
+    
+    /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
+    // TODO: assure that this is only run once...
+    // watch(currentRoute, (_to, from) => {
+    //     lastRoute.value = from
+    //     // console.log(lastRoute, 'ROUTE CHANGED....')
+    // })
 
     // to enforce reload of page container!
     const reload = () => {
@@ -54,8 +66,22 @@ export default function useRouterComposable() {
       pushR({ name: 'profile' } as RouteLocationRaw);
     };
 
-    const setAssemblyIdentifier = (identifier: string | null) => assemblyIdentifier.value = identifier;
+    const setLastRoute = (route: RouteLocationNormalizedLoaded | null) => {
+      
+      if (route){
+        const newRoute = {
+          name: route.name,
+          params: route.params,
+        } as RouteLocationRaw
 
+        lastRouteString.value = currentRouteString.value
+        if (route) {
+          currentRouteString.value = newRoute
+          // router.resolve(route).href;
+        }
+      }
+    }
+    const setAssemblyIdentifier = (identifier: string | null) => assemblyIdentifier.value = identifier;
     const setStageID = (id: number | null) => (stageID.value = id);
 
     const clearSession = () => {
@@ -73,7 +99,9 @@ export default function useRouterComposable() {
       clearSession,
       setAssemblyIdentifier,
       setStageID,
+      setLastRoute,
       instanceNr,
+      lastRouteString,
       assemblyIdentifier,
       stageID,
     };

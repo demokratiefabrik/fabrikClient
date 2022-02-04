@@ -60,9 +60,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ChartBar from 'src/components/charts/ChartBar.vue';
-import ChartRadar from 'src/components/charts/ChartRadar.vue';
-import ChartPie from 'src/components/charts/ChartPie.vue';
+import ChartBar from 'src/pages/components/charts/ChartBar.vue';
+import ChartRadar from 'src/pages/components/charts/ChartRadar.vue';
+import ChartPie from 'src/pages/components/charts/ChartPie.vue';
 import useLibraryComposable from 'src/utils/library';
 import { INodeTuple } from 'src/models/content';
 

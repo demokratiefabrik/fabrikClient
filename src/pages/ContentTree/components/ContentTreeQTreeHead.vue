@@ -140,7 +140,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { mapGetters } from 'vuex';
-import UserAvatar from 'src/components/UserAvatar.vue';
+import UserAvatar from 'src/pages/components/UserAvatar.vue';
 import constants from 'src/utils/constants';
 import { INodeTuple } from 'src/models/content';
 

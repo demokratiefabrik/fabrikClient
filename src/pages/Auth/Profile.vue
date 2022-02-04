@@ -86,6 +86,7 @@
       />
     </div>
 
+    TEST DESTINATION ROUTE {{ destination_route }}
     <q-dialog v-model="confirmation" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>
@@ -126,33 +127,35 @@
 </template>
 
 <script lang="ts">
-// import Configuration from 'src/utils/configuration'
-// import ApiService from 'src/utils/xhr';
 import api from 'src/utils/api';
 import { mapGetters } from 'vuex';
-import AlgorithmDisclaimer from 'src/components/AlgorithmDisclaimer.vue';
+import AlgorithmDisclaimer from 'src/pages/components/AlgorithmDisclaimer.vue';
 import useAuthComposable from 'src/composables/auth.composable';
-import { PropType, defineComponent } from 'vue';
-import { RouteLocationRaw } from 'vue-router';
+import { defineComponent } from 'vue';
+import useRouterComposable from 'src/composables/router.composable';
+import { RouteLocationNormalizedLoaded, RouteLocationRaw } from 'vue-router';
 
 export default defineComponent({
   name: 'Profile',
-  props: {
-    destination_route: {
-      // right, left, center
-      type: Object as PropType<RouteLocationRaw>,
-    },
-  },
-
   setup() {
     const { currentUsernameDerivation, payload, markIndicatedEmail } =
       useAuthComposable();
-    return { payload, markIndicatedEmail, currentUsernameDerivation };
+
+    const { lastRouteString } = useRouterComposable();
+
+    // lastRoute
+    return {
+      payload,
+      markIndicatedEmail,
+      currentUsernameDerivation,
+      lastRouteString,
+    };
   },
   components: { AlgorithmDisclaimer },
 
   data() {
     return {
+      destination_route: null as RouteLocationNormalizedLoaded | null,
       confirmation: false,
       localprofile: {
         pseudonym: '',
@@ -168,20 +171,6 @@ export default defineComponent({
   },
 
   computed: {
-    // username_derivation(): string {
-    //   if (!this.profile) {
-    //     return '';
-    //   }
-    //   const altitude = this.profile.ALT;
-    //   const fullname = this.profile.FN;
-    //   const canton = this.profile.CA;
-    //   return this.$t('auth.name_derivation', {
-    //     fullname: fullname,
-    //     canton: canton,
-    //     altitude: altitude,
-    //   });
-    // },
-
     ...mapGetters({
       profile: 'profilestore/profile',
     }),
@@ -191,6 +180,7 @@ export default defineComponent({
     },
 
     isValidContact(): boolean {
+      // console.log('this.isPhone', this.isPhone)
       return this.isPhone ? this.isValidPhone : this.isValidEmail;
     },
 
@@ -206,9 +196,10 @@ export default defineComponent({
     isValidEmail(): boolean {
       const emailPattern =
         /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
-      if (this.localprofile.email) {
+      if (!this.localprofile.email) {
         return false;
       }
+
       return emailPattern.test(this.localprofile.email.trim());
     },
 
@@ -244,10 +235,12 @@ export default defineComponent({
     },
 
     skipProfile: function () {
-      const route = this.destination_route
-        ? this.destination_route
-        : ({ name: 'home' } as RouteLocationRaw);
-      this.$router.push(route);
+      if (this.destination_route) {
+        this.$router.push(this.destination_route);
+      } else {
+        const route = { name: 'home' } as RouteLocationRaw;
+        this.$router.push(route);
+      }
     },
 
     loadProfile: function () {
@@ -273,11 +266,12 @@ export default defineComponent({
         .then((response) => {
           if (response.data) {
             // Okay
-            this.localprofile.email = this.emailToSms(response.data.email);
-            // this.profile.last_name = response.data.last_name;
-            this.localprofile.original_email = this.emailToSms(
-              response.data.email
-            );
+            const email = this.emailToSms(response.data.email);
+            this.localprofile = {
+              email,
+              original_email: email,
+              pseudonym: this.profile.U,
+            };
             this.error = false;
           } else {
             // Error
@@ -307,8 +301,6 @@ export default defineComponent({
       }
 
       this.loading = true;
-      console.log('Save profile !!!');
-      console.log(this.localprofile);
 
       api.authProfile({ email: this.completedEmailOrSMS }).then((response) => {
         // ERROR RESPONSE
@@ -337,14 +329,19 @@ export default defineComponent({
 
   mounted() {
     if (!this.payload) {
+      // MUST NOT HAPPEN: Protect the route....!!!
       // not logged in
       this.$router.push({ name: 'home' });
       return;
     }
 
+    this.destination_route = this.lastRouteString;
     this.loadProfile();
   },
 
+  /**
+   * Ensure that all (error) messages disappear, when route changes...
+   **/
   watch: {
     profile() {
       // public profile changed

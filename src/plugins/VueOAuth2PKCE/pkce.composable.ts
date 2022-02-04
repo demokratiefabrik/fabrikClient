@@ -43,7 +43,7 @@ export interface IPayload {
   iss: string;
   roles: string[];
   sub: number;
-  userEmail: boolean;
+  userEmail: string | boolean;
 }
 
 /**
