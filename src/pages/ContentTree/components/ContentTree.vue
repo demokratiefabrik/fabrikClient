@@ -192,7 +192,7 @@ body.screen--xs .q-gutter-x-sm > *,
         <q-chip
           :clickable="qtree.expanded && qtree.expanded.length > 0"
           @click="expand_none_and_scroll"
-          :disabled="qtree.expanded !== null && qtree.expanded.length == 0"
+          :disabled="disabledExpandNoneChip" 
           align="right"
           icon="mdi-collapse-all"
         >
@@ -226,7 +226,7 @@ import { mapGetters } from 'vuex';
 import ContentTreeQTreeHead from './ContentTreeQTreeHead.vue';
 import ArtificialModerationComponent from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import ContentTreeQTreeBody from './ContentTreeQTreeBody.vue';
-import AMs from '../ArtificialModeration.js';
+import AMs from '../ArtificialModeration';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useQtreeComposable from 'src/composables/qtree.composable';
 import useLibraryComposable from 'src/utils/library';
@@ -296,6 +296,12 @@ export default defineComponent({
     };
   },
   computed: {
+
+    disabledExpandNoneChip() {
+      const disabled = (this.qtree.expanded !== null && this.qtree.expanded.length == 0)
+      return disabled ? true : null
+    },
+
     isReadNode(): boolean {
       return this.qtree.is_currently_expanded(this.node);
     },
@@ -437,7 +443,7 @@ export default defineComponent({
       'IsContributor',
       'IsObserver',
       'IsManager',
-      // "next_scheduled_stage",
+      // "nextScheduledStage",
     ]),
   },
 

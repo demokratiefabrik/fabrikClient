@@ -103,7 +103,7 @@ import { IArtificialModeration, IArtificialModerationButton } from './model';
         condition: (ctx) => ctx.salienceCompleted,
         buttons: [
           {
-            action: (ctx) => ctx.next_scheduled_stage(),
+            action: (ctx) => ctx.nextScheduledStage(),
             label: 'Ja, wir können weiterfahren!'
             // icon: null,
             // icon_rigth: null,
@@ -390,10 +390,6 @@ export default defineComponent({
         actorPartnerReference: this.actorPartnerReference,
       });
 
-      // if (!body) {
-      //   return null;
-      // }
-
       // string or list of strings.
       if (Array.isArray(body)) {
         // filter empty values
@@ -487,6 +483,19 @@ export default defineComponent({
       }
     },
 
+    //   testConfiguration() {
+
+    //     if (this.AMpatched && this.AMpatched.items) {
+    //       const items = this.AMpatched.items as IArtificialModeration[];
+    //       return items.filter(
+    //         (item) =>
+    //           !item.condition || item.condition(this.ctx, { role: this.role })
+    //       );
+
+    //       console.log('AM TEST ABSOLVED...')
+    //     }
+    //   },
+
     ...mapActions({
       setAMCache: 'profilestore/setAMCache',
     }),
@@ -506,5 +515,10 @@ export default defineComponent({
       );
     }
   },
+
+  // mounted() {
+  //   // TEST ONLY ON DEVELOPMENT SERVER
+  //   // this.testConfiguration()
+  // }
 });
 </script>

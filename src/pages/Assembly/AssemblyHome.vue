@@ -38,7 +38,7 @@
         :caption="getStepCaption(localStage)"
         :title="localStage.stage.title"
         :color="getColor(localStage)"
-        :disabled="!is_stage_accessible(localStage)"
+        :disabled="is_stage_accessible(localStage)  ? null : true"
         :done-icon="getIcon(localStage)"
         :active-icon="getIcon(localStage)"
       > -->
@@ -71,7 +71,7 @@
             align="right"
           >
 
-            <div v-if="localStageNr==stage_nr_last_visited && next_scheduled_stage">
+            <div v-if="localStageNr==stage_nr_last_visited && nextScheduledStage">
               <keep-alive>
                 <component
                   :is="componentStageTeaser"

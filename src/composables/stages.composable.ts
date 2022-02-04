@@ -57,9 +57,9 @@ export default function useStagesComposable() {
     const is_stage_accessible =
       store.getters['assemblystore/is_stage_accessible'];
 
-    const next_scheduled_stage = computed(
+    const nextScheduledStage = computed(
       (): IStageTuple | null =>
-        store.getters['assemblystore/next_scheduled_stage']
+        store.getters['assemblystore/nextScheduledStage']
     );
 
     const routed_stage = computed((): IStageTuple | null => {
@@ -175,7 +175,7 @@ export default function useStagesComposable() {
       groups,
       ready,
       routed_stage,
-      next_scheduled_stage,
+      nextScheduledStage,
       groupsScheduled,
       groupsAccessible,
       stages_by_groups,

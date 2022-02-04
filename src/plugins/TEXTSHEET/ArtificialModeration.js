@@ -7,7 +7,7 @@ export default {
       {
         id: 10,
         prosa: 'Irgendwann, nachdem rundgang zu Ende ist.',
-        condition: (ctx) => !ctx.next_scheduled_stage.value,
+        condition: (ctx) => !ctx.nextScheduledStage.value,
         body: () => 'Sie können sich das ruhig nochmal anschauen.',
         buttons: [
           {
@@ -24,7 +24,7 @@ export default {
         condition: (ctx) =>
           ctx.is_stage_alerted(ctx.routed_stage) &&
           ctx.isFirstText &&
-          ctx.next_scheduled_stage,
+          ctx.nextScheduledStage,
         body: () =>
           'Wir beginnen mit folgendem Text. Bitte lesen Sie diese Informationen zum Projekt kurz durch.',
       },
@@ -34,7 +34,7 @@ export default {
         condition: (ctx) =>
           ctx.is_stage_alerted(ctx.routed_stage) &&
           !ctx.isFirstText &&
-          ctx.next_scheduled_stage.value,
+          ctx.nextScheduledStage.value,
         body: () =>
           'Auch dieser Text ist uns wichtig. Bitte lesen Sie auch diesen kurz durch.',
       },
@@ -42,13 +42,13 @@ export default {
         id: 3,
         prosa: ' Zweiter Besuch',
         condition: (ctx) =>
-          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.next_scheduled_stage.value,
+          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.nextScheduledStage.value,
         body: () => 'Sie können sich das ruhig nochmal anschauen.',
         buttons: [
           {
             action: (ctx) => {
               ctx.markUnAlert();
-              ctx.gotoStage(ctx.next_scheduled_stage.value);
+              ctx.gotoStage(ctx.nextScheduledStage.value);
             },
             label: () => 'Lieber jetzt gleich weiterfahren',
           },
@@ -65,7 +65,7 @@ export default {
       {
         id: 10,
         prosa: 'Irgendwann, nachdem Rundgang zu Ende ist.',
-        condition: (ctx) => !ctx.next_scheduled_stage.value,
+        condition: (ctx) => !ctx.nextScheduledStage.value,
         body: () => 'Hier geht es zurück zum Programm.',
         buttons: [
           {
@@ -80,13 +80,13 @@ export default {
         id: 1,
         prosa: ' Erster Besuch am ersten Tag!.',
         condition: (ctx) =>
-          ctx.is_stage_alerted(ctx.routed_stage) && ctx.next_scheduled_stage.value,
+          ctx.is_stage_alerted(ctx.routed_stage) && ctx.nextScheduledStage.value,
         body: () => 'Sie haben den Text gelesen? Dann folgen Sie mir bitte.',
         buttons: [
           {
             action: (ctx) => {
               ctx.markUnAlert();
-              ctx.gotoStage(ctx.next_scheduled_stage.value);
+              ctx.gotoStage(ctx.nextScheduledStage.value);
             },
             label: () => 'Ja, bitte!',
           },
@@ -96,13 +96,13 @@ export default {
         id: 2,
         prosa: ' Zweiter Besuch',
         condition: (ctx) =>
-          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.next_scheduled_stage.value,
+          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.nextScheduledStage.value,
         body: () => 'Wollen wir weiterfahren? Dann folgen Sie mir bitte.',
         buttons: [
           {
             action: (ctx) => {
               ctx.markUnAlert();
-              ctx.gotoStage(ctx.next_scheduled_stage.value);
+              ctx.gotoStage(ctx.nextScheduledStage.value);
             },
             label: () => 'Ja, bitte!',
           },
@@ -119,7 +119,7 @@ export default {
       {
         id: 10,
         prosa: 'Irgendwann, nachdem Rundgang zu Ende ist.',
-        condition: (ctx) => !ctx.next_scheduled_stage.value,
+        condition: (ctx) => !ctx.nextScheduledStage.value,
         body: () => 'Hier geht es zurück zum Programm.',
         buttons: [
           {
@@ -134,7 +134,7 @@ export default {
         id: 1,
         prosa: ' Erster Besuch am ersten Tag!.',
         condition: (ctx) =>
-          ctx.is_stage_alerted(ctx.routed_stage) && ctx.next_scheduled_stage.value,
+          ctx.is_stage_alerted(ctx.routed_stage) && ctx.nextScheduledStage.value,
         body: () => [
           'Um die Demokratiefabrik zu benutzen, müssen Sie dem Verhaltenskodex zustimmen.',
           'Stimmen Sie dem Verhaltenskodex zu?',
@@ -164,7 +164,7 @@ export default {
         id: 2,
         prosa: ' Zweiter Besuch',
         condition: (ctx) =>
-          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.next_scheduled_stage.value,
+          !ctx.is_stage_alerted(ctx.routed_stage) && ctx.nextScheduledStage.value,
         body: () => [
           'Sie haben dem Kodex bereits zugestimmt.',
           'Wollen wir weiterfahren? Dann folgen Sie mir bitte.',

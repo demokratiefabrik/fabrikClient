@@ -20,4 +20,5 @@ export interface IStage {
 
 export interface IStageProgression {
     stage_id: number
+    number_of_day_sessions: number
 }

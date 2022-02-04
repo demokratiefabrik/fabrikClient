@@ -1,7 +1,7 @@
 // import cir_pros_and_cons_routes from 'src/plugins/CIR_PROS_AND_CONS/routes.js'
 // import textsheet_AMs from 'src/plugins/TEXTSHEET/ArtificialModeration.js'
 // import vaa_topics_AMs from 'src/plugins/VAA/ArtificialModeration.js';
-import cir_topics_AMs from 'src/plugins/CIR/ArtificialModeration.js';
+import cir_topics_AMs from 'src/plugins/CIR/ArtificialModeration';
 // import survey_AMs from 'src/plugins/SURVEY/ArtificialModeration.js';
 
 // TODO: AUTO IMPORT

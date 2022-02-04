@@ -1,27 +1,42 @@
+import { IStageGroup } from 'src/composables/stages.composable';
+import { IStageTuple } from 'src/models/stage';
+// import { Ref} from 'vue';
+
+export interface IAmToc {
+  groupsScheduled: IStageGroup[];
+  assemblyMenuItems: IStageGroup[]
+  stages_by_groups: Record<string, IStageTuple[]>
+  nextScheduledStage: IStageTuple
+  nextScheduledStageGroup: IStageGroup
+  gotoStage: (IStageTuple) => void
+  // [x: string]: any, 
+}
+
+
 const AMs = {
 
   toc: {
     id: 'toc',
     prosa: ' Wird bei der Tagesübersicht angzeigt.',
-    loading: (ctx) => ctx.stages_by_groups === null || ctx.stages_by_groups === undefined,
+    loading: (ctx: IAmToc) => !ctx.assemblyMenuItems?.length || !ctx.stages_by_groups,
     items: [
       {
         id: 1,
         prosa: ' ... gibt nichts mehr zu tun',
-        condition: (ctx) => !ctx.groupsScheduled?.length,
+        condition: (ctx: IAmToc) => !ctx.groupsScheduled.length,
         body: () => 'Sie haben heute bereits alle wichtigsten Traktanden erledigt. Erst morgen früh halten wir hier wieder neue Aufgaben für Sie bereit.',
       },
       {
         id: 3,
         prosa: ' ... VORBEREITUNG: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx) => ctx.next_scheduled_stage && ctx.scheduledItem.name == 'preparation',
+        condition: (ctx: IAmToc) => { console.log('dddd', ctx.nextScheduledStageGroup); return ctx.nextScheduledStage && ctx.nextScheduledStage.stage.group == 'preparation'},
         body: (ctx) => {
-          const chapter = ctx.next_scheduled_stage.stage.title
+          const chapter = ctx.nextScheduledStage.stage.title
           return `Wir möchten, dass Sie sich nun das Kapitel «${chapter}» ansehen. Machen Sie mit? `
         },
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
+            action: (ctx: IAmToc) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Ich komme mit!'
           }
         ]
@@ -29,14 +44,14 @@ const AMs = {
       {
         id: 21,
         prosa: ' ... TOPICS: Day X: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx) => ctx.next_scheduled_stage && ctx.scheduledItem.name == 'topics' && (ctx.next_scheduled_stage.progression && ctx.next_scheduled_stage.progression.number_of_day_sessions > 1),
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'topics' && (ctx.nextScheduledStage.progression && ctx.nextScheduledStage.progression.number_of_day_sessions > 1),
         body: () => {
-          // const chapter = ctx.scheduledItem.toc_label ? ctx.scheduledItem.toc_label : ctx.scheduledItem.label
+          // const chapter = ctx.nextScheduledStageGroup.toc_label ? ctx.nextScheduledStageGroup.toc_label : ctx.nextScheduledStageGroup.label
           return 'Kommen Sie doch nochmals mit zu den smartvote-Themen.'
         },
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
+            action: (ctx: IAmToc) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Ja, gern.'
           }
         ]
@@ -44,14 +59,14 @@ const AMs = {
       {
         id: 212,
         prosa: ' ... TOPICS: Day 1: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx) => ctx.next_scheduled_stage && ctx.scheduledItem.name == 'topics' && (!ctx.next_scheduled_stage.progression || ctx.next_scheduled_stage.progression.number_of_day_sessions == 1),
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'topics' && (!ctx.nextScheduledStage.progression || ctx.nextScheduledStage.progression.number_of_day_sessions == 1),
         body: () => {
-          // const chapter = ctx.scheduledItem.toc_label ? ctx.scheduledItem.toc_label : ctx.scheduledItem.label
+          // const chapter = ctx.nextScheduledStageGroup.toc_label ? ctx.nextScheduledStageGroup.toc_label : ctx.nextScheduledStageGroup.label
           return 'Sie haben nun alle Vorbereitungen beendet und es kann richtig los gehen.'
         },
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
+            action: (ctx: IAmToc) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Weiterfahren'
           }
         ]
@@ -59,11 +74,11 @@ const AMs = {
       {
         id: 22,
         prosa: ' ... QUESTIONS: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx) => ctx.next_scheduled_stage && ctx.scheduledItem.name == 'questions',
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'questions',
         body: () => 'Wir brauchen Ihre Hilfe drüben bei den smartvote-Fragen.',
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
+            action: (ctx: IAmToc) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Ja, ich komme mit!'
           }
         ]
@@ -71,20 +86,20 @@ const AMs = {
       {
         id: 2,
         prosa: ' ... CONCLUSION: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx) => ctx.next_scheduled_stage && ctx.scheduledItem.name == 'conclusion',
+        condition: (ctx: IAmToc) => ctx.nextScheduledStageGroup?.name == 'conclusion',
         body: () => 'Sehr schön! Sie haben unsere Fragen alle beantwortet. Vielen Dank. Sie können sich nun noch den Zwischenstand ansehen.',
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.next_scheduled_stage),
+            action: (ctx: IAmToc) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Zum Zwischenstand'
           }
         ]
       },
 
-      {
-        body: () => 'PS: Natürlich können Sie nochmals einen Blick auf die Informationen werfen, wenn Sie das möchten.',
-        condition: (ctx) => ctx.stageTypes && ctx.stageTypes.includes('TEXTSHEET'),
-      },
+      // {
+      //   body: () => 'PS: Natürlich können Sie nochmals einen Blick auf die Informationen werfen, wenn Sie das möchten.',
+      //   condition: (ctx: IAmToc) => ctx.stageTypes && ctx.stageTypes.includes('TEXTSHEET'),
+      // },
     ]
   },
 

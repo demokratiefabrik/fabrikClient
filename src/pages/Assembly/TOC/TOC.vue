@@ -29,16 +29,26 @@
 import { defineComponent } from 'vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import TOCItem from './TOCItem.vue';
-import AMs from 'src/pages/Assembly/ArtificialModeration.js';
+import AMs from 'src/pages/Assembly/ArtificialModeration';
+
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
-import { IStageGroup } from 'src/composables/stages.composable';
+import useStagesComposable, {
+  IStageGroup,
+} from 'src/composables/stages.composable';
+// import { IAmToc } from 'src/plugins/CIR/ArtificialModeration';
 
 export default defineComponent({
   setup() {
-    const { assembly, assemblyMenu } = useAssemblyComposable();
+    const { assembly, assemblyMenu, gotoStage } = useAssemblyComposable();
+    const { groupsScheduled, stages_by_groups, nextScheduledStage } = useStagesComposable();
+
     return {
       assemblyMenu,
+      groupsScheduled,
       assembly,
+      nextScheduledStage,
+      gotoStage,
+      stages_by_groups
     };
   },
   name: 'AssemblyTOC',
@@ -49,7 +59,7 @@ export default defineComponent({
   data() {
     return {
       AMs: AMs,
-      that: this,
+      that: this
     };
   },
 
@@ -58,6 +68,14 @@ export default defineComponent({
       return true;
     },
 
+    nextScheduledStageGroup(): null | IStageGroup {
+      const group = this.nextScheduledStage?.stage.group;
+      if (!group) {
+        return null;
+      }
+      return this.assemblyMenu[group];
+    },
+    
     assemblyMenuItems(): IStageGroup[] {
       return Object.values(this.assemblyMenu);
     },

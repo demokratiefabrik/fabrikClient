@@ -14,13 +14,12 @@ export default function useCIRComposable() {
   // };
   const setup = () => {
     const { assemblyIdentifier } = useAssemblyComposable('');
-    const { next_scheduled_stage, getFirstOrRoutedStageIDByGroup } =
+    const { nextScheduledStage, getFirstOrRoutedStageIDByGroup } =
       useStagesComposable();
 
     const assemblyMenu: Record<string, IStageGroup> = {
       preparation: {
         name: 'preparation',
-        // disabled: this.groupsAccessible?.includes("preparation"),
         label: 'Programm',
         toc_label: 'Vorbereitung',
         description:
@@ -28,7 +27,7 @@ export default function useCIRComposable() {
         icon: 'mdi-information-outline',
         tooltip: 'Sie finden hier das Demokratiefabrik-Programm.',
         expanded: (item) =>
-          next_scheduled_stage?.stage.group == 'preparation' ||
+          nextScheduledStage?.stage.group == 'preparation' ||
           item.manual_expanded,
         expandable: true,
         manual_expanded: false,
@@ -42,43 +41,39 @@ export default function useCIRComposable() {
 
       topics: {
         name: 'topics',
-        label: 'Themengebiete',
+        label: 'Meinungsaustausch',
         icon: constants.ICONS.VAA_TOPIC,
         description:
-          'Welche Themen sind Ihnen wichtig? Wie viel Gewicht soll den einzelnen politischen Themen im smartvote-Fragebogen beigemessen werden?',
+          'Erfahren Sie alles über die Position der anderen Teilnehmenden. Sie sind mir deren Meinung einverstanden?',
         tooltip:
-          'Welche Themen sind Ihnen wichtig? Wie viel Gewicht soll den einzelnen politischen Themen im smartvote-Fragebogen beigemessen werden?',
-        // disabled: this.groupsAccessible?.includes("topics"),
-        // tooltip: "Setzen Sie die Themen des Wahlkampfs.",
+          'Erfahren Sie alles über die Position der anderen Teilnehmenden. Sie sind mir deren Meinung einverstanden?',
         expanded: () => false,
         to: () => {
           return {
-            name: 'VAA_TOPICS',
+            name: 'CIR_VOICE',
             params: {
               assemblyIdentifier,
-              stageID: getFirstOrRoutedStageIDByGroup('topics'),
+              stageID: getFirstOrRoutedStageIDByGroup('voice'),
             },
           };
         },
       },
 
       questions: {
-        name: 'questions',
-        label: 'Fragenkatalog',
+        name: 'arguments',
+        label: 'Argumentarium',
         description:
-          'Nun wird es konkret: Was möchten Sie von den Kandidatinnen und Kandidaten der Könizer Gemeindewahlen wissen, bevor Sie sie wählen?',
+          'Nun wird es konkret: Was genau sind für Sie die wichtigsten Argumente die Vorlage anzunehmen oder abzulehnen. Für welche Argumente bringen Sie am meisten Verständnis auf?',
         icon: constants.ICONS.VAA_QUESTION,
         expanded: () => false,
         tooltip:
-          'Bei welchen Sachfragen müssen die Kandidatinnen und Kandidaten mit Ihnen übereinstimmen, damit Sie sie wählen würden.',
-        // tooltip:
-        //   "Entscheiden, Sie über welche konkreten Fragen im Wahlkampf diskutiert werden soll.",
+        'Nun wird es konkret: Was genau sind für Sie die wichtigsten Argumente die Vorlage anzunehmen oder abzulehnen. Für welche Argumente bringen Sie am meisten Verständnis auf?',
         to: () => {
           return {
-            name: 'VAA_QUESTIONS',
+            name: 'CIR_ARGUMENTS',
             params: {
               assemblyIdentifier: assemblyIdentifier,
-              stageID: getFirstOrRoutedStageIDByGroup('questions'),
+              stageID: getFirstOrRoutedStageIDByGroup('arguments'),
             },
           };
         },
@@ -88,17 +83,15 @@ export default function useCIRComposable() {
         name: 'conclusion',
         label: 'Zwischenstand',
         description:
-          'Hier stellen wir Ihnen erste, provisorische Resultate zusammen. Welche Fragen liegen vorn? Welche Themen sind den bisherigen Mitgliedern der Demokratiefabrik besonders wichtig?',
+        'Hier stellen wir Ihnen erste, provisorische Resultate zusammen. Welche Argumente liegen vorn? Welche anderen Teilnehmende stimmen mit Ihner Position am meisten überein?',
         tooltip:
-          'Hier stellen wir Ihnen erste, provisorische Resultate zusammen. Welche Fragen liegen vorn? Welche Themen sind den bisherigen Mitgliedern der Demokratiefabrik besonders wichtig?',
+        'Hier stellen wir Ihnen erste, provisorische Resultate zusammen. Welche Argumente liegen vorn? Welche anderen Teilnehmende stimmen mit Ihner Position am meisten überein?',
         // disabled: this.groupsAccessible?.includes("conclusion"),
         icon: 'mdi-flag-checkered',
         expanded: () => false,
-        // tooltip:
-        //   "Sie finden eine Übersicht über den aktuellen Stand der Online-Versammlung",
         to: () => {
           return {
-            name: 'VAA_CONCLUSION',
+            name: 'CIR_CONCLUSION',
             params: {
               assemblyIdentifier: assemblyIdentifier,
               stageID: getFirstOrRoutedStageIDByGroup('conclusion'),

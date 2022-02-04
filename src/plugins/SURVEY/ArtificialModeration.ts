@@ -18,7 +18,7 @@ export default {
         body: (ctx) => ctx.$t('survey.survey_completed'),
         buttons: [
           {
-            action: (ctx) => { ctx.markUnAlert(); ctx.gotoStage(ctx.next_scheduled_stage) },
+            action: (ctx) => { ctx.markUnAlert(); ctx.gotoStage(ctx.nextScheduledStage) },
             label: () => 'Ja, bitte weiterfahren'
           }
         ]

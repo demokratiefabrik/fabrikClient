@@ -57,7 +57,7 @@
         :loading="loading"
         color="primary"
         :label="$t('auth.profile_update_action')"
-        :disabled="!isEnabledSubmitButton"
+        :disabled="isEnabledSubmitButton ? null : true"
         @click="saveProfile"
       >
         <template v-slot:loading>
@@ -86,7 +86,6 @@
       />
     </div>
 
-    TEST DESTINATION ROUTE {{ destination_route }}
     <q-dialog v-model="confirmation" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>

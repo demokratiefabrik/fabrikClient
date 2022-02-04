@@ -8,28 +8,29 @@
   <q-item
     clickable
     v-ripple
-    :disabled="!stage_accessible"
+    :disabled="stage_accessible ? null : true"
     class="text-subitle2 q-pl-xl"
     :class="{
       'cursor-pointer': stage_accessible,
       hovercraft: stage_accessible,
-      'bg-blue-1': stage == next_scheduled_stage,
+      'bg-blue-1': stage == nextScheduledStage,
     }"
-    @click="stage_accessible && gotoStage"
+    @click="stage_accessible && gotoStage(stage)"
   >
-    <q-tooltip max-width="300px" v-if="is_stage_scheduled && !stage_accessible">
+
+    <q-tooltip max-width="300px" v-if="stage_scheduled && !stage_accessible">
       {{ $t('menu.items.locked.tooltip') }}
     </q-tooltip>
 
     <q-item-section avatar top middle class="q-pt-sm">
-      <q-icon v-if="!is_stage_scheduled" color="green" name="mdi-check-bold" />
+      <q-icon v-if="!stage_scheduled" color="green" name="mdi-check-bold" />
       <q-icon
-        v-if="stage == next_scheduled_stage"
+        v-if="stage == nextScheduledStage"
         color="blue"
         name="mdi-bell"
       />
       <q-icon
-        v-if="is_stage_scheduled && !stage_accessible"
+        v-if="stage_scheduled && !stage_accessible"
         color="orange"
         name="mdi-clock-time-eleven-outline"
       />
@@ -45,11 +46,11 @@
     <q-item-section side>
       <q-btn
         flat
-        v-if="is_stage_accessible"
-        :color="stage == next_scheduled_stage.value ? 'blue' : 'green'"
+        v-if="stage_accessible"
+        :color="stage == nextScheduledStage ? 'blue' : 'green'"
         icon="mdi-send"
         style="width: 100px"
-        :label="stage == next_scheduled_stage.value ? 'Öffnen' : 'Nochmals Ansehen'"
+        :label="stage == nextScheduledStage ? 'Öffnen' : 'Nochmals Ansehen'"
       />
     </q-item-section>
   </q-item>
@@ -64,9 +65,9 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 export default defineComponent({
   setup() {
     const { gotoStage } = useAssemblyComposable('');
-    const { next_scheduled_stage } = useStagesComposable();
+    const { nextScheduledStage } = useStagesComposable();
     return {
-      next_scheduled_stage,
+      nextScheduledStage,
       gotoStage,
     };
   },

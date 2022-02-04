@@ -235,7 +235,7 @@ export const assembly_sorted_stages = (
 };
 
 /** Which stage is  the next scheduled stage (if empty, no stages available or no scheduled stage available) */
-export const next_scheduled_stage = (_state, getters): IStageTuple | null => {
+export const nextScheduledStage = (_state, getters): IStageTuple | null => {
   const stages = getters.assembly_sorted_stages;
   if (!stages) {
     console.log('assemmbly is not yet loaded');
@@ -256,7 +256,7 @@ export const next_scheduled_stage = (_state, getters): IStageTuple | null => {
 
 /** Which stage is  the last one that is freely open / accessible */
 export const last_accessible_stage = (_state, getters): IStageTuple | null => {
-  const nextScheduledStage = getters.next_scheduled_stage;
+  const nextScheduledStage = getters.nextScheduledStage;
   const stages = getters.assembly_sorted_stages;
 
   if (!stages) {
@@ -323,7 +323,7 @@ export const assembly_accessible_stage_ids = (_state, getters): number[] | null 
 };
 
 export const get_stage_number_by_stage =
-  (getters) =>
+  (_state, getters) =>
   (stage): number => {
     console.assert(stage);
     const sorted_stages = getters.assembly_sorted_stages;
@@ -429,7 +429,7 @@ export const is_stage_alerted =
   };
 
 export const is_stage_idle =
-  (getters) =>
+  (_state,getters) =>
   (stage): boolean => {
     console.assert(stage);
     return (
@@ -461,19 +461,15 @@ export const is_stage_completed =
   };
 
 export const is_stage_accessible =
-  (getters) =>
+  (_state, getters) =>
   (stage): boolean => {
-    console.assert(stage);
-    // console.log(stage, 'ttttt', assembly_accessible_stage_ids)
     const accessible_stage_ids = getters.assembly_accessible_stage_ids;
     return accessible_stage_ids?.includes(stage.stage.id);
   };
 
 export const is_stage_done =
-  (getters) =>
+  (_state,getters) =>
   (stage): boolean => {
-    console.log(stage);
-    console.assert(stage);
     return (
       getters.is_stage_accessible(stage) || getters.is_stage_completed(stage)
     );

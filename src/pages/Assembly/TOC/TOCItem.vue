@@ -8,7 +8,7 @@
   <q-card
     flat
     :class="{
-      'cursor-pointer': isAccessible || expanded || item.expandable,
+      'cursor-pointer': isAccessible && (!expanded || item.expandable), // or: ||
       hovercraft: isAccessible,
       'bg-blue-1': isFocused && !expanded,
     }"
@@ -92,7 +92,7 @@ export default defineComponent({
   setup() {
     const { push } = useRouter();
     const {
-      next_scheduled_stage,
+      nextScheduledStage,
       groupsAccessible,
       groupsScheduled,
       stages_by_groups,
@@ -101,7 +101,7 @@ export default defineComponent({
     return {
       groupsScheduled,
       groupsAccessible,
-      next_scheduled_stage,
+      nextScheduledStage,
       stages_by_groups,
       push,
       // gotoAssemblyHome,
@@ -114,13 +114,7 @@ export default defineComponent({
   components: { TOCSubItem },
 
   computed: {
-    // scheduledItem(): null | IStageGroup {
-    //   const group = this.next_scheduled_stage?.stage.group;
-    //   if (!group) {
-    //     return null;
-    //   }
-    //   return this.assemblyMenu[group];
-    // },
+    
 
     subStages(): IStageTuple[] {
       if (!this.stages_by_groups) {
@@ -156,8 +150,8 @@ export default defineComponent({
         return null;
       }
       return (
-        this.next_scheduled_stage &&
-        this.next_scheduled_stage.stage.group == this.item.name
+        this.nextScheduledStage &&
+        this.nextScheduledStage.stage.group == this.item.name
       );
     },
 
