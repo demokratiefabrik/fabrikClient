@@ -1,6 +1,7 @@
 
 export interface INode {
     id: number | null;
+    parent_id?: number | null;
     contenttree_id: number | null;
     reviewed: boolean;
     private_property: boolean;
@@ -25,7 +26,7 @@ export interface INodeProgression {
 }
 
 export interface INodeTuple {
-  content?: INode;
+  content: INode | null;
   progression?: INodeProgression;
   path: number[];
   children: INodeTuple[];

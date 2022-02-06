@@ -92,7 +92,7 @@
 // import { mapGetters } from 'vuex';
 import { defineComponent, PropType, ComponentPublicInstance } from 'vue';
 import { mapActions, mapGetters } from 'vuex';
-import { IArtificialModeration, IArtificialModerationButton } from './model';
+import { IArtificialModeration, IArtificialModerationButton, IArtificialModerationGroup } from './model';
 
 /** EXAMPLE OF A AM-CONFIGURATION OBJECT
   topics_after_saliencing: {
@@ -133,7 +133,7 @@ export default defineComponent({
   // },
   data() {
     return {
-      AMpatched: null as null | IArtificialModeration,
+      AMpatched: null as null | IArtificialModerationGroup,
     };
   },
 
@@ -346,7 +346,7 @@ export default defineComponent({
       return items.filter((item) => max === item.priority);
     },
 
-    selectedItem(): IArtificialModeration | undefined {
+    selectedItem(): IArtificialModerationGroup | undefined {
       if (!this.AMpatched || this.loading || !this.validItems) {
         // not yet loaded
         return undefined;

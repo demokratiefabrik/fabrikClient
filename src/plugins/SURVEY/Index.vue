@@ -39,10 +39,7 @@ import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   setup() {
-    // console.log('DEBUG: INDEX:VUE');
-    // const { gotoAssemblyHome } = useAssemblyComposable('');
     const { userid } = useAuthComposable();
-    // const routed_stage = u;
     const {routed_stage} = useStageComposable()
     const { gotoAssemblyHome, assemblyIdentifier, stageID } =
       useAssemblyComposable('');
@@ -52,15 +49,13 @@ export default defineComponent({
   components: {
     ArtificialModeration,
   },
-  // mixins: [StageMixin, i18nPluginMixin],
-
   data() {
     return {
       AMs,
     };
   },
   computed: {
-    redirecting() {
+    redirecting(): boolean {
       return (
         this.routed_stage &&
         this.check_data &&
@@ -68,11 +63,10 @@ export default defineComponent({
       );
     },
 
-    check_data: function () {
+    check_data (): boolean | null {
       console.log('check survey data..');
 
       if (this.routed_stage === undefined) {
-        // not yet loaded...
         return null;
       }
 
@@ -89,9 +83,9 @@ export default defineComponent({
       return true;
     },
 
-    is_a_survey_response() {
+    is_a_survey_response(): boolean | undefined {
       if (!this.$route.query.completed) {
-        return;
+        return undefined;
       }
       if (this.userid != this.$route.query.U) {
         return false;

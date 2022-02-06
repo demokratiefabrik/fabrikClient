@@ -261,17 +261,14 @@ export default defineComponent({
     },
 
     topics(): INodeTuple[] | undefined {
-      // TODO interface
-      if (!this.topicContentTree) {
+      const tree = this.topicContentTree
+
+      if (!tree || !tree.rootElementIds || !tree.entries) {
         return;
       }
 
-      if (!this.topicContentTree?.rootElementIds) {
-        return;
-      }
-
-      return this.topicContentTree.rootElementIds.map(
-        (x) => this.topicContentTree.entries[x]
+      return this.topicContentTree?.rootElementIds?.map(
+        (x) => tree.entries[x]
       );
     },
 

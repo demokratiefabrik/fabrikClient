@@ -32,15 +32,14 @@ import TOCItem from './TOCItem.vue';
 import AMs from 'src/pages/Assembly/ArtificialModeration';
 
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
-import useStagesComposable, {
-  IStageGroup,
-} from 'src/composables/stages.composable';
+import useStageComposable from 'src/composables/stage.composable';
+import { IStageGroup } from 'src/models/stage';
 // import { IAmToc } from 'src/plugins/CIR/ArtificialModeration';
 
 export default defineComponent({
   setup() {
     const { assembly, assemblyMenu, gotoStage } = useAssemblyComposable();
-    const { groupsScheduled, stages_by_groups, nextScheduledStage } = useStagesComposable();
+    const { groupsScheduled, stages_by_groups, nextScheduledStage } = useStageComposable();
 
     return {
       assemblyMenu,

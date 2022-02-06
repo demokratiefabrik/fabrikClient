@@ -2,26 +2,16 @@
   <q-page class="doc_content" v-if="ready">
     <!-- AM-CONCLUSION -->
     <ArtificialModeration :AM="index_top" alignment="center" :ctx="this" />
-    <!-- </div> -->
-    <div class="text-vessel">
+    
+    <div class="text-vessel" v-if="mainTopics?.length">
       <h2>{{ routed_stage.stage.title }}</h2>
-      <!-- <p
-        class="text-body1"
-        v-if="routed_stage.stage.info!=='@HIDDEN@'"
-      >{{routed_stage.stage.info}}</p> -->
 
       <div
         class="row justify-between"
         v-for="(nodeL1, keyL1) in mainTopics"
-        :key="`L1${nodeL1.content.id}`"
+        :key="`L1${nodeL1?.content?.id}`"
       >
-        <!-- <div class="seperator">
-          <q-icon
-            name="mdi-star-four-points-outline"
-            v-if="routed_stage.stage.info!=='@HIDDEN@'"
-          />
-        </div> -->
-        <a :name="`ANCHOR${nodeL1.content.id}`" />
+        <a :name="`ANCHOR${nodeL1.content?.id}`" />
 
         <TextsheetCard
           :level="1"
@@ -31,34 +21,36 @@
           :heading_number="keyL1 + 1"
         />
 
-        <div
-          class="row justify-between"
-          v-for="(nodeL2, keyL2) in textChildrenEntries(nodeL1)"
-          :key="`L2${nodeL2.content.id}`"
-        >
-          <!--{{keyL2}}-->
-          <TextsheetCard
-            :level="2"
-            :filterTypes="DISCUSSIONTYPES"
-            :node="nodeL2"
-            :discussionAM="discussionAM"
-            :heading_number="`${keyL1 + 1}.${keyL2 + 1}`"
-          />
-
+        <template v-if="nodeL1?.content">
           <div
             class="row justify-between"
-            v-for="(nodeL3, keyL3) in textChildrenEntries(nodeL2)"
-            :key="`L3${nodeL3.content.id}`"
+            v-for="(nodeL2, keyL2) in textChildrenEntries(nodeL1 as INodeTuple)"
+            :key="`L2${nodeL2.content?.id}`"
           >
-            <span>{{ keyL3 }}</span>
             <TextsheetCard
+              :level="2"
               :filterTypes="DISCUSSIONTYPES"
-              :node="nodeL3"
-              :level="3"
+              :node="nodeL2"
               :discussionAM="discussionAM"
+              :heading_number="`${keyL1 + 1}.${keyL2 + 1}`"
             />
+            <template v-if="nodeL2?.content">
+              <div
+                class="row justify-between"
+                v-for="(nodeL3, keyL3) in textChildrenEntries(nodeL2 as INodeTuple)"
+                :key="`L3${nodeL3.content.id}`"
+              >
+                <span>{{ keyL3 }}</span>
+                <TextsheetCard
+                  :filterTypes="DISCUSSIONTYPES"
+                  :node="nodeL3"
+                  :level="3"
+                  :discussionAM="discussionAM"
+                />
+              </div>
+            </template>
           </div>
-        </div>
+        </template>
       </div>
     </div>
 
@@ -74,10 +66,6 @@
 </template>
 
 <script lang="ts">
-// import ContentTreeMixin from "src/mixins/stage.contenttree";
-// import ComponentStageEditor from "src/pages/ContentTree/components/StageEditor";
-// import { LayoutEventBus } from "src/utils/eventbus";
-// const {  } = useContenttreeComposable();
 import TextsheetCard from './components/TextsheetCard.vue';
 import AMs from './ArtificialModeration';
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
@@ -87,17 +75,23 @@ import constants from 'src/utils/constants';
 import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import useLibraryComposable from 'src/utils/library';
-import useStagesComposable from 'src/composables/stages.composable';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useEmitter from 'src/utils/emitter';
 import { INodeTuple } from 'src/models/content';
+import useStageComposable from 'src/composables/stage.composable';
+import { ISideMenuItem, ISideMenuItems } from 'src/models/layout';
+import { IArtificialModerationGroup } from 'src/pages/components/artificial_moderation/model';
+import useAssemblyComposable from 'src/composables/assembly.composable';
+import { mapGetters } from 'vuex';
 
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { routed_stage } = useStagesComposable();
-    const { contenttree } = useContenttreeComposable();
-    const emitter = useEmitter()
+    const { contenttreeID, routed_stage, gotoStage, isFirstText, markUnAlert, nextScheduledStage } = useStageComposable();
+    const { contenttree, filter_entries } = useContenttreeComposable();
+    const { gotoAssemblyHome, assembly } = useAssemblyComposable();
+    
+    const emitter = useEmitter();
 
     // extend i18n
     const i18n = useI18n();
@@ -116,7 +110,16 @@ export default defineComponent({
       index_top,
       routed_stage,
       loaded,
+      filter_entries,
       emitter,
+      nextScheduledStage,
+      gotoAssemblyHome,
+      assembly,
+      // is_stage_alerted,
+      markUnAlert,
+      gotoStage,
+      contenttreeID,
+      isFirstText,
       contenttree,
     };
   },
@@ -139,11 +142,15 @@ export default defineComponent({
   },
 
   computed: {
+    
+    ...mapGetters('assemblystore', ['is_stage_alerted']),
+
     ready(): boolean {
-      const ready =
+      console.log('READY?', this.routed_stage.stage, this.contenttree);
+      const contenttreeLoaded =
         this.loaded(this.routed_stage) && this.loaded(this.contenttree);
-      console.log('READY?', ready);
-      if (ready) {
+      console.log('READY?', contenttreeLoaded);
+      if (contenttreeLoaded) {
         this.emitter.emit('hideLoading');
 
         // Everything loaded...
@@ -151,43 +158,47 @@ export default defineComponent({
         //   this.todays_first_visit = this.is_stage_alerted(this.routed_stage);
         // }
       }
-      return ready;
+      return contenttreeLoaded;
     },
 
     // isStageAlerted() {
     //   return this.is_stage_alerted(this.routed_stage);
     // },
 
-    mainTopics(): any {
-      console.log('run mainTOpics? (computed)');
+    mainTopics(): INodeTuple[] | undefined {
+      // console.log('run mainTOpics? (computed)', this.textChildrenEntries());
       return this.textChildrenEntries();
     },
 
-    textEntries(): any {
+    textEntries(): INodeTuple[] | null {
       console.log('run textEntries (computed)');
-      return this.filter_entries(
-        Object.values(this.contenttree.entries),
-        this.TEXTTYPES
-      );
+      if (this.contenttree.entries) {
+        return this.filter_entries(
+          Object.values(this.contenttree.entries),
+          this.TEXTTYPES
+        );
+      }
+
+      return null
     },
 
-    sideMenuItems(): any {
+    sideMenuItems(): ISideMenuItems {
       if (!this.mainTopics) {
         return [];
       }
 
       const topics = this.mainTopics.filter(
-        (x) => x.content.title !== '@HIDDEN@'
+        (x) => x.content?.title !== '@HIDDEN@'
       );
       return topics.map((node) => {
         return {
-          label: node.content.title,
-          anchor: `ANCHOR${node.content.id}`,
-        };
+          label: node.content?.title,
+          anchor: `ANCHOR${node.content?.id}`,
+        } as ISideMenuItem;
       });
     },
 
-    AM_index_bottom(): any {
+    AM_index_bottom(): IArtificialModerationGroup {
       console.log('CONSENT REQUEST...', this.routed_stage.stage.custom_data);
       if (this.routed_stage.stage.custom_data?.REQUEST_CONSENT) {
         console.log('CONSENT REQUEST...!!');
@@ -197,17 +208,19 @@ export default defineComponent({
       }
     },
 
-    discussionAM(): any {
+    discussionAM(): IArtificialModerationGroup {
       return this.discussion_index_top;
     },
   },
 
   methods: {
-    textChildrenEntries(node: INodeTuple | null = null): null | any[] {
-      const node_id = node ? node.content.id : null;
+    textChildrenEntries(
+      node: INodeTuple | null = null
+    ): undefined | INodeTuple[] {
+      const node_id = node ? node.content?.id : null;
       console.log('look for children of ', node_id);
-      let children = this.textEntries.filter(
-        (child) => child.content.parent_id === node_id
+      let children = this.textEntries?.filter(
+        (child) => child.content?.parent_id === node_id
       );
       return children;
     },

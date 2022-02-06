@@ -2,10 +2,9 @@
 
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import constants from 'src/utils/constants';
-import useStagesComposable, {
-  IStageGroup,
-} from 'src/composables/stages.composable';
+import useStageComposable from 'src/composables/stage.composable';
 import { ref } from 'vue';
+import { IStageGroup } from 'src/models/stage';
 
 const output = ref<null | any>(null);
 
@@ -15,7 +14,7 @@ export default function useCIRComposable() {
   const setup = () => {
     const { assemblyIdentifier } = useAssemblyComposable('');
     const { nextScheduledStage, getFirstOrRoutedStageIDByGroup } =
-      useStagesComposable();
+      useStageComposable();
 
     const assemblyMenu: Record<string, IStageGroup> = {
       preparation: {

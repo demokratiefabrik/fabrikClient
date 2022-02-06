@@ -167,13 +167,17 @@ Timelag: postpone update call by one second...
     commit('deleteContentStore');
   }
 
- export const  syncContenttree = ({ state, dispatch }, { assemblyIdentifier, contenttreeID, oauthUserID }) => {
+ export const  syncContenttree = ({ commit, dispatch, state }, { assemblyIdentifier, contenttreeID, oauthUserID }) => {
 
     // wrong user? and renew cache all x- minutes!
     const wrongUser = state.contenttree[contenttreeID] && oauthUserID != state.contenttree[contenttreeID]?.access_sub
     if (wrongUser) {
       // console.log('wrong user:-(')
-      state.contenttree = {}
+      // state.contenttree = {}
+      // contenttreeID: contenttreeID,
+      // contenttree: response.data.contenttree,
+      // configuration: configuration
+      commit('add_or_update_contenttree', { contenttreeID, contenttree: {}, configuration: {} });
     }
 
     const emptyContenttree = !(state.contenttree[contenttreeID])

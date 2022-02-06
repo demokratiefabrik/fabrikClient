@@ -58,14 +58,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import useStagesComposable from 'src/composables/stages.composable';
+import useStageComposable from 'src/composables/stage.composable';
 import { mapGetters } from 'vuex';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   setup() {
     const { gotoStage } = useAssemblyComposable('');
-    const { nextScheduledStage } = useStagesComposable();
+    const { nextScheduledStage } = useStageComposable();
     return {
       nextScheduledStage,
       gotoStage,

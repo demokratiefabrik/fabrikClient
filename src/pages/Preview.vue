@@ -82,7 +82,7 @@ export default defineComponent({
 
   computed: {
     ...mapGetters({
-      get_profile: 'publicprofilestore/get_profile',
+      // get_profile: 'profilestore/get_profile',
       IsUserDelegateOfOngoingAssembly:
         'publicindexstore/IsUserDelegateOfOngoingAssembly',
       IsUserObserverOfOngoingAssembly:

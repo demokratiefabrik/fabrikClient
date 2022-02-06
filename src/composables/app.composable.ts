@@ -46,6 +46,7 @@ export default function useAppComposable() {
     const authComposable = useAuthComposable();
     const monitorComposable = useMonitorComposable();
     const routerComposable = useRouterComposable();
+    const store = useStore();
     const currentRoute = useRoute();
     const { getOffsetTop } = useLibraryComposable();
     const { t } = useI18n();
@@ -347,7 +348,6 @@ export default function useAppComposable() {
 
         // // Update transmitted Data...
         if (authorized.value && !logoutState.value) {
-          const store = useStore();
           // Write newest data to the store!
           store.dispatch('appstore/updateStore', { data: data.response });
           // see if there are new notifications...

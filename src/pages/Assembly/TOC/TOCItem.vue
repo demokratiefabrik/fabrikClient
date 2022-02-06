@@ -85,7 +85,7 @@
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import TOCSubItem from './TOCSubItem.vue';
-import useStagesComposable from 'src/composables/stages.composable';
+import useStageComposable from 'src/composables/stage.composable';
 import { IStageTuple } from 'src/models/stage';
 
 export default defineComponent({
@@ -96,7 +96,7 @@ export default defineComponent({
       groupsAccessible,
       groupsScheduled,
       stages_by_groups,
-    } = useStagesComposable();
+    } = useStageComposable();
 
     return {
       groupsScheduled,

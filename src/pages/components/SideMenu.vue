@@ -115,10 +115,9 @@ import { dom } from 'quasar';
 
 // import { colors } from 'quasar';
 import useAppComposable from 'src/composables/app.composable';
-import {
-  ISideMenuItems,
-  ISideMenuItem,
-} from 'src/pages/Assembly/AssemblyManageSummary.vue';
+import { ISideMenuItem, ISideMenuItems } from 'src/models/layout';
+// import {
+// } from 'src/pages/Assembly/AssemblyManageSummary.vue';
 
 // const { changeAlpha } = colors;
 const { offset } = dom;
@@ -163,7 +162,7 @@ export default defineComponent({
     },
 
     ...mapGetters({
-      public_profile: 'publicprofilestore/get_public_profile',
+      public_profile: 'profilestore/profile',
     }),
   },
   methods: {

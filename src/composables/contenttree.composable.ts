@@ -12,7 +12,7 @@ import { computed } from 'vue';
 // import useAppComposable from './app.composable';
 import useMonitorComposable from './monitor.composable';
 import { useStore } from 'vuex';
-import useStagesComposable from './stages.composable';
+import useStageComposable from './stage.composable';
 import { INodeTuple } from 'src/models/content';
 
 
@@ -24,34 +24,33 @@ export default function useContenttreeComposable() {
   // const { gotoAssemblyHome } = useAssemblyComposable('');
   const { loaded, pushSorted} = useLibraryComposable();
   const { monitorLog } = useMonitorComposable();
-  const { routed_stage } = useStagesComposable();
-  const get_contenttree = store.getters['contentstore/get_contenttree']
+  const { routed_stage } = useStageComposable();
+  const get_contenttree = store.getters['contenttreestore/get_contenttree']
 
   const contenttreeID = computed(() => {
     // Mixin is only usable for pages with assemblyIdentifier in the URL
-    console.log('load contenttreeID in contentree.computed');
 
-    // console.log("RETRIEVE contenttreeID..", routed_stage)
-    if (!routed_stage.value || !routed_stage?.value.stage?.contenttree_id) {
-      // console.log(' routed_stage not loaded');
+    if (!routed_stage || !routed_stage.stage?.contenttree_id) {
+      console.log(' routed_stage not loaded');
       return null;
     }
     // console.log('contenttreeID', routed_stage.value.stage?.contenttree_id);
-    return routed_stage.value.stage?.contenttree_id;
+    return routed_stage.stage?.contenttree_id;
   });
 
   const contenttree = computed(() => {
-    console.log('load contenttree in contentree.computed');
     if (!contenttreeID.value) {
       return null;
     }
 
     // retrieve from localStorage
     const contenttree = get_contenttree ({
-      contenttreeID
+      contenttreeID: contenttreeID.value
     });
+    console.log('load contenttree in contentree.computed', contenttreeID.value);
 
-    // console.log('contenttree', contenttree);
+
+    console.log('contenttree l', contenttree);
     return contenttree;
   });
 
@@ -71,6 +70,7 @@ export default function useContenttreeComposable() {
     return {
       id: null,
       path: [],
+      content: null,
       children: rootElements.value,
     } as INodeTuple;
   });

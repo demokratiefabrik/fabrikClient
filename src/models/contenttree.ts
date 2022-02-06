@@ -3,7 +3,7 @@ import { INodeTuple } from './content';
 export interface IContentTree {
     date_last_tree_modification?: Date | string;
     id: number;
-    entries: INodeTuple[];
+    entries: Record<string, INodeTuple>;
     rootElementIds: number[];
 }
 

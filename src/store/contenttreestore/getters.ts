@@ -1,14 +1,12 @@
 export const get_contenttree =
   (state) =>
   ({ contenttreeID }) => {
-    // return state.things.find(thing => thing.identifier === id)
-    // console.log(contenttreeID)
-    console.assert(contenttreeID);
-    if (!(contenttreeID in state.contenttree)) {
+    const key = `${contenttreeID}`
+    if (!(Object.keys(state.contenttree).includes(key))) {
       return null;
     }
 
-    return state.contenttree[contenttreeID];
+    return state.contenttree[key];
   };
 
 export const get_content =

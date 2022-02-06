@@ -58,7 +58,7 @@ export default function useQtreeComposable(props) {
   const treeFilter = ref<ITreeFilter>({});
   const highlightedNodeID = ref<number | null>(null);
   const expanded_filter = ref<any>(null);
-  const public_profile = computed(() => store.getters['publicprofilestore/get_public_profile'])
+  const public_profile = computed(() => store.getters['profilestore/profile'])
   const IsManager = computed(() => store.getters['assemblystore/IsManager'])
   const getExpandedBranches = store.getters['contentstore/getExpandedBranches']
 
