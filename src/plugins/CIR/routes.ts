@@ -11,6 +11,13 @@ const routes: RouteRecordRaw[] = [
       // Note: Define a route for each stageGroup/=> /stageID/<stage.group>
       // { path: ':stageID/conclusion', name: 'CIR_CONCLUSION', component: () => import('./Conclusion'), meta: meta4AssemblyDelegates },
       // { path: ':stageID/arguments', name: 'CIR_ARGUMENTS', component: () => import('./Arguments'), meta: meta4AssemblyDelegates },
+
+      {
+        path: 'textsheet/:stageID/:contenttreeID/',
+        name: 'TEXTSHEET', component: () => import('/src/plugins/TEXTSHEET/Index.vue'), meta: { ...meta4AssemblyDelegates }
+      },
+    
+
       { path: ':stageID/voice', name: 'CIR_VOICE', component: () => import('./voice.vue'), meta: meta4AssemblyDelegates },
       { path: '', name: 'CIR', component: () => import('/src/pages/Assembly/TOC/TOC.vue'), meta: { hideAssemblyMenu: true, ...meta4AssemblyDelegates } }
     ]

@@ -1,5 +1,13 @@
 <template>
   <q-page class="doc_content side_menu">
+
+    TEST
+
+    <!-- <teleport :to="teleportTo" :disabled="disableTeleport">
+      <TeleportChild:imagePath="imagePath" />
+    </teleport> -->
+
+
     <router-view></router-view>
   </q-page>
 </template>

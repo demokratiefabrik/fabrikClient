@@ -21,6 +21,7 @@ export default function useAssemblyComposable(caller = '') {
     console.log('DEBUG: useAssemblyComposable::SETUP', caller);
     const store = useStore();
 
+
     // REturn the composabe Function of the currently active assembly plugin.
     // return null, if no funciton is available...
     const pluginComposableFunction = computed(() => {
@@ -28,6 +29,8 @@ export default function useAssemblyComposable(caller = '') {
       console.log('LOAD PLUGIN COMPOS BY ASSEMBLY TYPE', type);
       if (type) {
         const app = getCurrentInstance(); // works
+        // TODO: DOES THIS WORK?
+
         const pluginComposables =
           app?.appContext.config.globalProperties.$pluginComposables;
         if (pluginComposables) {
@@ -61,7 +64,7 @@ export default function useAssemblyComposable(caller = '') {
     const get_stage_number_by_stage =
       store.getters['assemblystore/get_stage_number_by_stage'];
     const assemblyStages = computed(
-      () => store.getters['assemblystore/assemblyStages']
+      (): Record<number, IStageTuple> => store.getters['assemblystore/assemblyStages']
     );
     const last_accessible_stage = computed(
       () => store.getters['assemblystore/last_accessible_stage']
@@ -284,6 +287,7 @@ export default function useAssemblyComposable(caller = '') {
       console.assert(stage);
       const params = {
         assemblyIdentifier: assemblyIdentifier.value,
+        assemblyType: assembly.value?.type,
         stageID: stage.stage.id,
         contenttreeID: stage.stage.contenttree_id,
       };

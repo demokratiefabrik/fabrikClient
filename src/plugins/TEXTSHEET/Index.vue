@@ -2,7 +2,7 @@
   <q-page class="doc_content" v-if="ready">
     <!-- AM-CONCLUSION -->
     <ArtificialModeration :AM="index_top" alignment="center" :ctx="this" />
-    
+
     <div class="text-vessel" v-if="mainTopics?.length">
       <h2>{{ routed_stage.stage.title }}</h2>
 
@@ -87,10 +87,17 @@ import { mapGetters } from 'vuex';
 export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
-    const { contenttreeID, routed_stage, gotoStage, isFirstText, markUnAlert, nextScheduledStage } = useStageComposable();
+    const {
+      contenttreeID,
+      routed_stage,
+      isFirstText,
+      isRoutedStageAlerted,
+      markUnAlert,
+      nextScheduledStage,
+    } = useStageComposable();
     const { contenttree, filter_entries } = useContenttreeComposable();
-    const { gotoAssemblyHome, assembly } = useAssemblyComposable();
-    
+    const { gotoAssemblyHome, gotoStage, assembly } = useAssemblyComposable();
+
     const emitter = useEmitter();
 
     // extend i18n
@@ -111,11 +118,11 @@ export default defineComponent({
       routed_stage,
       loaded,
       filter_entries,
+      isRoutedStageAlerted,
       emitter,
       nextScheduledStage,
       gotoAssemblyHome,
       assembly,
-      // is_stage_alerted,
       markUnAlert,
       gotoStage,
       contenttreeID,
@@ -125,7 +132,6 @@ export default defineComponent({
   },
 
   name: 'TextsheetDefault',
-  // mixins: [ContentTreeMixin, i18nPluginMixin],
   components: {
     TextsheetCard,
     SideMenu,
@@ -136,27 +142,17 @@ export default defineComponent({
     return {
       TEXTTYPES: constants.TEXTTYPES,
       DISCUSSIONTYPES: constants.DISCUSSIONTYPES,
-      // todays_first_visit: null,
-      // sideMenuItems: null,
     };
   },
 
   computed: {
-    
     ...mapGetters('assemblystore', ['is_stage_alerted']),
 
     ready(): boolean {
-      console.log('READY?', this.routed_stage.stage, this.contenttree);
       const contenttreeLoaded =
         this.loaded(this.routed_stage) && this.loaded(this.contenttree);
-      console.log('READY?', contenttreeLoaded);
       if (contenttreeLoaded) {
         this.emitter.emit('hideLoading');
-
-        // Everything loaded...
-        // if (!this.loaded(this.todays_first_visit)) {
-        //   this.todays_first_visit = this.is_stage_alerted(this.routed_stage);
-        // }
       }
       return contenttreeLoaded;
     },
@@ -179,7 +175,7 @@ export default defineComponent({
         );
       }
 
-      return null
+      return null;
     },
 
     sideMenuItems(): ISideMenuItems {
@@ -225,5 +221,15 @@ export default defineComponent({
       return children;
     },
   },
+
+  // DONT HAVE TO UNALERT: is done by AM buttons
+  // watch: {
+  //   ready(to) {
+  //     // TODO: Everything loaded...
+  //     if (to && !this.isRoutedStageAlerted) {
+  //       console.log('DE-ALERT!')
+  //     }
+  //   },
+  // },
 });
 </script>

@@ -48,7 +48,7 @@ export default function useQtreeComposable(props) {
   // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable('');
   // const { loaded } = useLibraryComposable();
 
-  // ...mapActions("contentstore", ["'update_expanded_branches']),
+  // ...mapActions("contenttreestore", ["'update_expanded_branches']),
 
   // LOCAL REFS (must not be global, right? ) only one instance at time...
   const tempBufferForJustReadContent = ref<any[]>([]);
@@ -60,7 +60,7 @@ export default function useQtreeComposable(props) {
   const expanded_filter = ref<any>(null);
   const public_profile = computed(() => store.getters['profilestore/profile'])
   const IsManager = computed(() => store.getters['assemblystore/IsManager'])
-  const getExpandedBranches = store.getters['contentstore/getExpandedBranches']
+  const getExpandedBranches = store.getters['contenttreestore/getExpandedBranches']
 
   /*
     Which <label> should be displayed on top of the ContentTree?
@@ -255,10 +255,10 @@ export default function useQtreeComposable(props) {
       expanded: expanded,
     });
 
-    store.dispatch('contentstore/syncContenttree', {
+    store.dispatch('contenttreestore/syncContenttree', {
       assemblyIdentifier: assemblyIdentifier,
       contenttreeID: contenttree.value.id,
-      oauthUserID: userid,
+      oauthUserID: userid.value,
     });
   };
 

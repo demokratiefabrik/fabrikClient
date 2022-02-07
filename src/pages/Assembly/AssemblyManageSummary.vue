@@ -253,11 +253,14 @@ export default defineComponent({
     },
 
     topicContentTreeID(): number {
-      const topicStage = Object.values(this.assemblyStages).find(
-        (stageTuple) => (stageTuple as IStageTuple).stage?.type === 'VAA_TOPICS'
-      );
-      console.assert(topicStage);
-      return (topicStage as IStageTuple).stage.contenttree_id;
+      // TODO: temp: only take one contenttree
+      const stages = Object.values(this.assemblyStages) as IStageTuple[];
+      // .find(
+      //   (stageTuple) => (stageTuple as IStageTuple).stage?.type === 'VAA_TOPICS'
+      // );
+      // console.assert(topicStage);
+      console.log('NOT ONLY ONE STAGE...')
+      return stages[0].stage?.contenttree_id;
     },
 
     topics(): INodeTuple[] | undefined {
@@ -390,7 +393,7 @@ export default defineComponent({
     },
 
     ...mapGetters({
-      get_contenttree: 'contentstore/get_contenttree',
+      get_contenttree: 'contenttreestore/get_contenttree',
       peerreviews: 'peerreviewstore/all_peerreviews',
     }),
   },
@@ -405,7 +408,7 @@ export default defineComponent({
     // LOAD TOPICS
     topicContentTreeID(to) {
       if (to) {
-        this.store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contenttreestore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID: to,
           oauthUserID: this.userid,
@@ -422,7 +425,7 @@ export default defineComponent({
 
   mounted() {
     // when stage has been loaded already
-    this.store.dispatch('contentstore/syncContenttree', {
+    this.store.dispatch('contenttreestore/syncContenttree', {
       assemblyIdentifier: this.assemblyIdentifier,
       contenttreeID: this.topicContentTreeID,
       oauthUserID: this.userid,

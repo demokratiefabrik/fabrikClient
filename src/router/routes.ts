@@ -106,4 +106,7 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
+
+console.log(routes, 'DEBUG ROUTES..')
+
 export default routes

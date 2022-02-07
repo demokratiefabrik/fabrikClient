@@ -451,12 +451,12 @@ export default defineComponent({
 
     ...mapGetters({
       IsManager: 'assemblystore/IsManager',
-      get_allowed_node_types: 'contentstore/get_allowed_node_types',
+      get_allowed_node_types: 'contenttreestore/get_allowed_node_types',
       get_node_types_with_add_permission:
-        'contentstore/get_node_types_with_add_permission',
-      get_content_text_max_length: 'contentstore/get_content_text_max_length',
-      get_content_title_max_length: 'contentstore/get_content_title_max_length',
-      isCommonPropertyByConentType: 'contentstore/isCommonPropertyByConentType',
+        'contenttreestore/get_node_types_with_add_permission',
+      get_content_text_max_length: 'contenttreestore/get_content_text_max_length',
+      get_content_title_max_length: 'contenttreestore/get_content_title_max_length',
+      isCommonPropertyByConentType: 'contenttreestore/isCommonPropertyByConentType',
     }),
   },
 
@@ -690,9 +690,9 @@ export default defineComponent({
     },
 
     ...mapActions({
-      update_discussed: 'contentstore/update_discussed',
-      add_or_update_contenttree: 'contentstore/add_or_update_contenttree',
-      update_content: 'contentstore/update_content',
+      update_discussed: 'contenttreestore/update_discussed',
+      add_or_update_contenttree: 'contenttreestore/add_or_update_contenttree',
+      update_content: 'contenttreestore/update_content',
     }),
   },
 });

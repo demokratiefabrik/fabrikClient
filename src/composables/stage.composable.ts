@@ -54,6 +54,11 @@ export default function useStageComposable() {
 
     const is_stage_alerted = store.getters['assemblystore/is_stage_alerted'];
 
+    const isRoutedStageAlerted =  computed((): boolean | null => {
+      // console.log('ssssssssssssssss', routed_stage.value, is_stage_alerted( {stage: routed_stage.value}))
+      return is_stage_alerted( {stage: routed_stage.value})
+    });
+
     const nextScheduledStage = computed(
       (): IStageTuple | null =>
         store.getters['assemblystore/nextScheduledStage']
@@ -129,7 +134,7 @@ export default function useStageComposable() {
         return;
       }
 
-      store.dispatch('storeStageProgressionAlertFlag', {
+      store.dispatch('assemblystore/storeStageProgressionAlertFlag', {
         stageID: stage.stage.id,
         alerted: false,
       });
@@ -175,7 +180,7 @@ export default function useStageComposable() {
         store.dispatch('contenttreestore/syncContenttree', {
           assemblyIdentifier: assemblyIdentifier,
           contenttreeID: contenttreeID.value,
-          oauthUserID: userid,
+          oauthUserID: userid.value,
         });
       }
     });
@@ -186,7 +191,7 @@ export default function useStageComposable() {
       store.dispatch('contenttreestore/syncContenttree', {
         assemblyIdentifier,
         contenttreeID: routed_stage.value.stage.contenttree_id,
-        oauthUserID: userid,
+        oauthUserID: userid.value,
       });
 
       // earlier: in created section of mixin
@@ -262,6 +267,8 @@ export default function useStageComposable() {
 
     const getFirstOrRoutedStageIDByGroup = (group): number => {
       console.assert(stages_by_groups);
+
+      console.log(group, routed_stage.value, 'debug.lll', stages_by_groups)
       if (routed_stage.value) {
         if (
           stages_by_groups[group].find(
@@ -432,6 +439,7 @@ export default function useStageComposable() {
       getFirstOrRoutedStageIDByGroup,
       is_stage_first_shown,
       is_stage_last_shown,
+      isRoutedStageAlerted
     };
   };
 

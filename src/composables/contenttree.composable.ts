@@ -125,7 +125,7 @@ export default function useContenttreeComposable() {
   });
 
   // ...mapGetters({
-  //   get_contenttree: 'contentstore/get_contenttree'
+  //   get_contenttree: 'contenttreestore/get_contenttree'
   // })
 
   /** Filter nodes by type (positive list) */
@@ -160,7 +160,7 @@ export default function useContenttreeComposable() {
     monitorLog(constants.MONITOR_SET_CONTENT_READ, data);
 
     // immediatly update vuex store
-    store.dispatch('contentstore/update_read', {
+    store.dispatch('contenttreestore/update_read', {
       contenttreeID,
       contentID: content.content.id,
     });
@@ -191,7 +191,7 @@ export default function useContenttreeComposable() {
     };
 
     monitorLog(constants.MONITOR_SET_CONTENT_DISCUSSED, data);
-    store.dispatch('contentstore/update_discussed', {
+    store.dispatch('contenttreestore/update_discussed', {
       contenttreeID,
       contentID: node.content.id,
     });

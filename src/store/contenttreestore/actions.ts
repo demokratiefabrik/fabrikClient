@@ -169,23 +169,27 @@ Timelag: postpone update call by one second...
 
  export const  syncContenttree = ({ commit, dispatch, state }, { assemblyIdentifier, contenttreeID, oauthUserID }) => {
 
-    // wrong user? and renew cache all x- minutes!
-    const wrongUser = state.contenttree[contenttreeID] && oauthUserID != state.contenttree[contenttreeID]?.access_sub
+  // empty contenttree?  
+  const emptyContenttree = !(state.contenttree[contenttreeID])
+
+  // wrong user? and renew cache all x- minutes!
+  const wrongUser = !emptyContenttree && oauthUserID != state.contenttree[contenttreeID]?.access_sub
     if (wrongUser) {
+      console.log(oauthUserID, ' no match? ', state.contenttree[contenttreeID]?.access_sub)
       // console.log('wrong user:-(')
       // state.contenttree = {}
       // contenttreeID: contenttreeID,
       // contenttree: response.data.contenttree,
       // configuration: configuration
+
+      // DELETE CACHE IMMEDIATELY...
       commit('add_or_update_contenttree', { contenttreeID, contenttree: {}, configuration: {} });
     }
 
-    const emptyContenttree = !(state.contenttree[contenttreeID])
-    const expired = !emptyContenttree && api.expiredCacheDate(state.contenttree[contenttreeID]?.access_date)
+    const expired = !emptyContenttree && !wrongUser && api.expiredCacheDate(state.contenttree[contenttreeID]?.access_date)
     if (!expired && !emptyContenttree && !wrongUser) {
       // CACHE IS UP TO DATE!
       // console.log('Contenttree Cache IS UP TO DATE')
-
       // console.log("CONTENTREE CACHE IS STILL VALID! DO WE NEED TO CHECK FOR NEW CONTENT? ")
       dispatch('checkToUpdateContenttree', { assemblyIdentifier, contenttreeID })
       return (true)

@@ -5,6 +5,7 @@ import contenttreestore from './contenttreestore';
 import assemblystore from './assemblystore';
 import publicindexstore from './publicindexstore';
 import profilestore from './profilestore';
+import peerreviewstore from './peerreviewstore';
 
 export default function (/* { ssrContext } */) {
   const Store = createStore({
@@ -12,6 +13,7 @@ export default function (/* { ssrContext } */) {
       appstore,
       profilestore,
       assemblystore,
+      peerreviewstore,
       contenttreestore,
       publicindexstore
     },

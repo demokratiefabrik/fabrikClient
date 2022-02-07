@@ -12,7 +12,7 @@ export default {
         body: () => 'Die Kontaktinformation sind eingetragen. Sie können sie jederzeit über das Hauptmenü ändern.',
         buttons: [
           {
-            action: (ctx) => ctx.gotoStage(ctx.nextScheduledStage.value),
+            action: (ctx) => ctx.gotoStage(ctx.nextScheduledStage),
             label: () => 'Ok. Nun bitte weiterfahren'
           }
         ]

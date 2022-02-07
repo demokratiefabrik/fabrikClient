@@ -32,14 +32,14 @@ export default function useCIRComposable() {
         manual_expanded: false,
         to: () => {
           return {
-            name: 'VAA',
+            name: 'CIR',
             params: { assemblyIdentifier },
           };
         },
       },
 
-      topics: {
-        name: 'topics',
+      voice: {
+        name: 'voice',
         label: 'Meinungsaustausch',
         icon: constants.ICONS.VAA_TOPIC,
         description:
@@ -58,7 +58,7 @@ export default function useCIRComposable() {
         },
       },
 
-      questions: {
+      arguments: {
         name: 'arguments',
         label: 'Argumentarium',
         description:

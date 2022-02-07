@@ -29,7 +29,7 @@ const AMs = {
       {
         id: 3,
         prosa: ' ... VORBEREITUNG: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx: IAmToc) => { console.log('dddd', ctx.nextScheduledStageGroup); return ctx.nextScheduledStage && ctx.nextScheduledStage.stage.group == 'preparation'},
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStage.stage.group == 'preparation',
         body: (ctx) => {
           const chapter = ctx.nextScheduledStage.stage.title
           return `Wir möchten, dass Sie sich nun das Kapitel «${chapter}» ansehen. Machen Sie mit? `
@@ -44,7 +44,7 @@ const AMs = {
       {
         id: 21,
         prosa: ' ... TOPICS: Day X: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'topics' && (ctx.nextScheduledStage.progression && ctx.nextScheduledStage.progression.number_of_day_sessions > 1),
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup?.name == 'voice' && (ctx.nextScheduledStage.progression && ctx.nextScheduledStage.progression.number_of_day_sessions > 1),
         body: () => {
           // const chapter = ctx.nextScheduledStageGroup.toc_label ? ctx.nextScheduledStageGroup.toc_label : ctx.nextScheduledStageGroup.label
           return 'Kommen Sie doch nochmals mit zu den smartvote-Themen.'
@@ -59,7 +59,7 @@ const AMs = {
       {
         id: 212,
         prosa: ' ... TOPICS: Day 1: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'topics' && (!ctx.nextScheduledStage.progression || ctx.nextScheduledStage.progression.number_of_day_sessions == 1),
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup?.name == 'voice' && (!ctx.nextScheduledStage.progression || ctx.nextScheduledStage.progression.number_of_day_sessions == 1),
         body: () => {
           // const chapter = ctx.nextScheduledStageGroup.toc_label ? ctx.nextScheduledStageGroup.toc_label : ctx.nextScheduledStageGroup.label
           return 'Sie haben nun alle Vorbereitungen beendet und es kann richtig los gehen.'
@@ -74,7 +74,7 @@ const AMs = {
       {
         id: 22,
         prosa: ' ... QUESTIONS: die bitte dort weiterzufarhen wo, es was zu tun gibt.',
-        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup.name == 'questions',
+        condition: (ctx: IAmToc) => ctx.nextScheduledStage && ctx.nextScheduledStageGroup?.name == 'arguments',
         body: () => 'Wir brauchen Ihre Hilfe drüben bei den smartvote-Fragen.',
         buttons: [
           {
@@ -94,12 +94,7 @@ const AMs = {
             label: () => 'Zum Zwischenstand'
           }
         ]
-      },
-
-      // {
-      //   body: () => 'PS: Natürlich können Sie nochmals einen Blick auf die Informationen werfen, wenn Sie das möchten.',
-      //   condition: (ctx: IAmToc) => ctx.stageTypes && ctx.stageTypes.includes('TEXTSHEET'),
-      // },
+      }
     ]
   },
 

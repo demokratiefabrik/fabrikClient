@@ -71,7 +71,7 @@ export default defineComponent({
       });
     },
 
-    ...mapActions('contentstore', ['update_review']),
+    ...mapActions('contenttreestore', ['update_review']),
   },
 
   // created() {

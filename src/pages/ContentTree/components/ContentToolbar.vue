@@ -235,7 +235,7 @@ export default defineComponent({
     },
 
     ...mapActions({
-      add_or_update_contenttree: 'contentstore/add_or_update_contenttree',
+      add_or_update_contenttree: 'contenttreestore/add_or_update_contenttree',
     }),
   },
 });

@@ -157,7 +157,7 @@ export default defineComponent({
       this.$emit('item-saliencing', this.content);
     },
 
-    ...mapActions('contentstore', ['update_salience']),
+    ...mapActions('contenttreestore', ['update_salience']),
   },
 
   created() {

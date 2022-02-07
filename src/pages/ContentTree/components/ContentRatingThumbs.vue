@@ -117,7 +117,7 @@ export default defineComponent({
       });
     },
 
-    ...mapActions('contentstore', ['update_rating']),
+    ...mapActions('contenttreestore', ['update_rating']),
   },
 
   created() {

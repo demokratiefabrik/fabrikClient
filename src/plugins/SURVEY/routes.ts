@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
 
 
   {
-    path: '/:assemblyIdentifier/survey/:stageID', name: 'SURVEY', component: () => import('/src/plugins/SURVEY/Index.vue'), meta: { assemblyAcl: 'delegate' }
+    path: '/:assemblyIdentifier/:assemblyType/survey/:stageID', name: 'SURVEY', component: () => import('/src/plugins/SURVEY/Index.vue'), meta: { assemblyAcl: 'delegate' }
   }
 ]
 

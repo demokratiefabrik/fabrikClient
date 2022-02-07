@@ -182,7 +182,7 @@ export default defineComponent({
 
     ...mapGetters({
       // get_peerreview: "peerreviewstore/get_peerreview",
-      // get_content: "contentstore/get_content",
+      // get_content: "contenttreestore/get_content",
       notifications: 'profilestore/notifications',
     }),
   },
@@ -230,7 +230,7 @@ export default defineComponent({
       });
 
       preloadContenttrees.forEach((contenttreeID) => {
-        this.store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contenttreestore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID,
           oauthUserID: this.userid.value,

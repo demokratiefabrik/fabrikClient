@@ -245,7 +245,7 @@ export default defineComponent({
 
     contenttree(): IContentTree | null {
       if (this.contenttreeID) {
-        this.store.dispatch('contentstore/syncContenttree', {
+        this.store.dispatch('contenttreestore/syncContenttree', {
           assemblyIdentifier: this.assemblyIdentifier,
           contenttreeID: this.contenttreeID,
           oauthUserID: this.userid,
@@ -270,8 +270,8 @@ export default defineComponent({
     // },
 
     ...mapGetters({
-      assemblystore: 'contentstore/assembly_sorted_stages',
-      get_contenttree: 'contentstore/get_contenttree',
+      assemblystore: 'contenttreestore/assembly_sorted_stages',
+      get_contenttree: 'contenttreestore/get_contenttree',
     }),
   },
 
