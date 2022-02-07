@@ -94,13 +94,14 @@ module.exports = configure(function (ctx) {
           .end()
           .type('javascript/auto')
           .use('i18n-resource')
-          .loader('@intlify/vue-i18n-loader')
+          .loader('vue-loader')
         chain.module
           .rule('i18n')
           .resourceQuery(/blockType=i18n/)
           .type('javascript/auto')
           .use('i18n')
-          .loader('@intlify/vue-i18n-loader')
+          .loader('vue-loader')
+          // vue-i18n-loader
       },
     },
 

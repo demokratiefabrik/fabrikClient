@@ -1,6 +1,7 @@
 import api from 'src/utils/api';
 import useEmitter from 'src/utils/emitter';
 import { date } from 'quasar';
+import { IAssemblyTupleByApi } from 'src/models/assembly';
 const { getDateDiff } = date;
 const emitter = useEmitter();
 
@@ -27,8 +28,11 @@ export const monitorExit = ({ commit }) => {
   commit('monitor_update_date', { now });
 };
 
-export const monitorReset = ({ commit }) => {
+export const monitorReset = ({ commit }, {notifyBackend, full}) => {
   /* resets the counter to zero */
+  if (notifyBackend) {
+    api.apireset(full)
+  }
   console.log('API Monitored. => Clear Buffer');
   commit('monitor_reset', {});
 };
@@ -99,18 +103,19 @@ export const monitorLog = (
 
 /* monitor request in any case.. */
 export const updateStore = ({ dispatch, commit }, { data }) => {
-  // console.log(".", data)
+  console.log('DEBUG... UPDATE STORE.', data)
 
+  
   if ('assemblies' in data) {
     Object.keys(data.assemblies).map((assemblyIdentifier) => {
       const container = data.assemblies[assemblyIdentifier];
       if ('assembly' in container) {
-        const assembly = container.assembly;
+        const assemblyTupleByApi = container.assembly as IAssemblyTupleByApi;
         commit(
           'assemblystore/storeAssemblyObject',
           {
             assemblyIdentifier,
-            assembly,
+            assemblyTupleByApi
           },
           { root: true }
         );

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "^2.13.0",
+    "@intlify/bundle-utils": "^2.2.0",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -21,7 +22,7 @@
     "mitt": "^3.0.0",
     "quasar": "^2.0.0",
     "vue-dompurify-html": "^3.0.0-beta.2",
-    "vue-i18n": "^9.2.0-beta.26",
+    "vue-i18n": "^9.2.0-beta.30",
     "vuex": "^4.0.1",
     "vuex-persistedstate": "^4.1.0",
     "webcrypto-shim": "^0.1.7",
@@ -35,8 +36,7 @@
     "@typescript-eslint/parser": "^4.16.1",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-vue": "^7.0.0",
-    "@intlify/vue-i18n-loader":"^4.1.0"
+    "eslint-plugin-vue": "^7.0.0"
   },
   "browserslist": [
     "last 10 Chrome versions",

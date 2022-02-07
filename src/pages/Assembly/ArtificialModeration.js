@@ -13,7 +13,7 @@ const AMs = {
           ctx.is_stage_new(ctx.currentSelectedStage) &&
           ctx.is_stage_first_shown(ctx.currentSelectedStage) &&
           !ctx.is_stage_last_shown(ctx.currentSelectedStage) &&
-          !ctx.is_stage_completed(ctx.currentSelectedStage),
+          !ctx.isStageCompleted(ctx.currentSelectedStage),
         body: (ctx) => ctx.$t('stages.am.enter_first'),
       },
       {

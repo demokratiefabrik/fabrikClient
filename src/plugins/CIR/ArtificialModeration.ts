@@ -23,7 +23,7 @@ const AMs = {
       {
         id: 1,
         prosa: ' ... gibt nichts mehr zu tun',
-        condition: (ctx: IAmToc) => !ctx.groupsScheduled.length,
+        condition: (ctx: IAmToc) => !ctx.groupsScheduled?.length,
         body: () => 'Sie haben heute bereits alle wichtigsten Traktanden erledigt. Erst morgen früh halten wir hier wieder neue Aufgaben für Sie bereit.',
       },
       {

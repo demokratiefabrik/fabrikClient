@@ -1,12 +1,9 @@
 <template>
-  <q-page class="doc_content" v-if="ready">
+  <q-page class="doc_content">
     <ArtificialModeration :AM="AMs.survey" alignment="center" :ctx="this" />
-
-    <!-- MISCONFIGURATION ERROR -->
     <div v-if="routed_stage">
-      <div v-if="!is_stage_completed(routed_stage) && !check_data">
+      <div v-if="!isRoutedStageCompleted && !check_data">
         <h2>{{ routed_stage.stage.title }}</h2>
-
         <q-banner class="bg-grey-3 q-mb-lg">
           <template v-slot:avatar>
             <q-icon name="mdi-alert-circle-outline" color="primary" />
@@ -30,20 +27,43 @@
 import i18nPluginMixin from './i18n';
 import AMs from './ArtificialModeration';
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
-
+import localI18n from './i18n';
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+import { useI18n } from 'vue-i18n';
 import useAuthComposable from 'src/composables/auth.composable';
 import useStageComposable from 'src/composables/stage.composable';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
   setup() {
+    const i18n = useI18n();
+    i18n.mergeLocaleMessage('de-ch', localI18n['de-ch']);
     const { userid } = useAuthComposable();
-    const {routed_stage} = useStageComposable()
-    const { gotoAssemblyHome, assemblyIdentifier, stageID } =
+    const {
+      routed_stage,
+      markUnAlert,
+      gotoStage,
+      markCompleted,
+      nextScheduledStage,
+      isRoutedStageCompleted,
+    } = useStageComposable();
+    const { gotoAssemblyHome, assemblyIdentifier, assembly, stageID } =
       useAssemblyComposable('');
-    return { userid, gotoAssemblyHome, routed_stage, assemblyIdentifier, stageID, ...i18nPluginMixin };
+
+    return {
+      userid,
+      assembly,
+      gotoAssemblyHome,
+      routed_stage,
+      markUnAlert,
+      gotoStage,
+      markCompleted,
+      nextScheduledStage,
+      isRoutedStageCompleted,
+      assemblyIdentifier,
+      stageID,
+      ...i18nPluginMixin,
+    };
   },
   name: 'Survey',
   components: {
@@ -57,29 +77,26 @@ export default defineComponent({
   computed: {
     redirecting(): boolean {
       return (
-        this.routed_stage &&
-        this.check_data &&
-        !this.is_stage_completed(this.routed_stage)
+        this.routed_stage && this.check_data && !this.isRoutedStageCompleted
       );
     },
 
-    check_data (): boolean | null {
+    check_data(): boolean | null {
       console.log('check survey data..');
 
       if (this.routed_stage === undefined) {
         return null;
       }
 
-      // TODO: uncomment
-      // if (
-      //   !this.routed_stage.stage.custom_data ||
-      //   !this.routed_stage.stage.custom_data.provider ||
-      //   !this.routed_stage.stage.custom_data.SID
-      // ) {
-      //   console.log('no survey data provided at this stage..');
-      //   console.log(this.routed_stage.stage.custom_data);
-      //   return false;
-      // }
+      if (
+        !this.routed_stage.stage.custom_data ||
+        !this.routed_stage.stage.custom_data.provider ||
+        !this.routed_stage.stage.custom_data.SID
+      ) {
+        console.error('no survey data provided at this stage..');
+        console.error(this.routed_stage.stage.custom_data);
+        return false;
+      }
       return true;
     },
 
@@ -90,19 +107,17 @@ export default defineComponent({
       if (this.userid != this.$route.query.U) {
         return false;
       }
-
       return true;
     },
-
-    ...mapGetters('assemblystore', ['is_stage_completed']),
   },
 
   methods: {
-    redirectToSurveyProvider: function () {
+    redirectToSurveyProvider() {
       // all data available
       const SID = this.routed_stage.stage.custom_data.SID;
       // this.$router.currentRoute.path
       let url = process.env.ENV_SURVEY_URL as string;
+      console.log(url, 'DEBUGGGGG');
       var re = /:SID:/g;
       var newurl = url.replace(re, SID);
       re = /:USERID:/g;
@@ -119,10 +134,11 @@ export default defineComponent({
 
   created: function () {
     // Completed Response?
-    if (!this.is_stage_completed(this.routed_stage)) {
+    if (!this.isRoutedStageCompleted) {
       if (this.is_a_survey_response) {
-        // TODO: uncomment
-        // this.markCompleted();
+        // Seems to be a survey response: survey is finished...
+        console.log('aooos')
+        this.markCompleted();
       } else {
         this.redirectToSurveyProvider();
       }

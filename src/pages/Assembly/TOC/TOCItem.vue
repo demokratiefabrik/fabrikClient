@@ -103,10 +103,7 @@ export default defineComponent({
       groupsAccessible,
       nextScheduledStage,
       stages_by_groups,
-      push,
-      // gotoAssemblyHome,
-      // assemblyIdentifier,
-      // assemblyMenu,
+      push
     };
   },
   name: 'AssemblyTOCItem',

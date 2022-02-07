@@ -1,6 +1,7 @@
 import useEmitter from 'src/utils/emitter';
 const emitter = useEmitter();
 import api from 'src/utils/api';
+import { IAssemblyTupleByApi } from 'src/models/assembly';
 // import useAppComposable from 'src/composables/app.composable';
 // import useAssemblyComposable from 'src/composables/assembly.composable';
 
@@ -52,8 +53,9 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
   api
     .retrieveAssembly(assemblyIdentifier)
     .then((response) => {
-      const data = response.data;
+      const data = response.data as IAssemblyTupleByApi;
       console.assert(data);
+      console.log('DEBUG after retreieveAssembly,', data)
       commit('storeAssembly', { assemblyIdentifier, data });
       console.log(
         'EVENT: AssemblyLoaded: Assembly retrieved from Resource Server'
@@ -68,33 +70,17 @@ export const retrieveAssembly = ({ commit }, { assemblyIdentifier }) => {
 };
 
 export const addOrUpdateStage = ({ commit }, { assemblyIdentifier, stage }) => {
-  // const appComposable = useAppComposable();
-  // const {assemblyIdentifier} = useAssemblyComposable('');
   console.log('stage: ', stage, assemblyIdentifier);
   api
     .addOrUpdateStage(assemblyIdentifier, stage)
     .then((response) => {
       console.log(response.data);
-      const data = response.data;
+      const data = response.data as IAssemblyTupleByApi;
 
       // Store result
       console.assert(!!data.assembly);
       console.assert(!!data.stages);
-
-      // UPDATE ASSEMBLY DATA and STAGE DATA
-      // storeAssembly(state, { assemblyIdentifier, data }) => {
-      // commit('storeAssembly', { assemblyIdentifier, data })
       commit('storeAssemblyStage', { assemblyIdentifier, data });
-
-      // ADD Stage Relations
-      // if (stage.id) {
-      // if (data.stages) {
-      //   Object.values(data.stages).forEach((stage) => {
-      //     console.assert(stage)
-      //     console.log(stage)
-      //     commit('updateStageContent', { stage })
-      //   });
-      // }
     })
     .catch((error) => {
       console.warn(error);
@@ -104,9 +90,6 @@ export const addOrUpdateStage = ({ commit }, { assemblyIdentifier, stage }) => {
 };
 
 export const updateAssembly = ({ commit }, { assembly }) => {
-  // const {assemblyIdentifier} = useAppComposable()
-  // const assemblyIdentifier = appComposable.assemblyIdentifier.value
-  // console.log('assembly: ', assembly)
   const assemblyIdentifier: string = assembly.identifier;
   api
     .updateAssembly(assemblyIdentifier, assembly)

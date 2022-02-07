@@ -1,8 +1,20 @@
 
 export interface IAssemblyTuple {
+    access_date: Date;
+    access_sub: number;
     assembly: IAssembly;
     progression: IAssemblyProgression;
     configuration: IAssemblyConfiguration;
+    stage_keys?: number[]
+}
+
+export interface IAssemblyTupleByApi {
+    access_date: Date;
+    access_sub: number;
+    assembly: IAssembly;
+    progression: IAssemblyProgression;
+    configuration: IAssemblyConfiguration;
+    stages: Record<number, number>
 }
 
 export interface IAssembly {

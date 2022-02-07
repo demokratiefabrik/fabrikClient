@@ -16,10 +16,14 @@
         text-color="grey"
         class="q-mt-md"
       >
-        demokratiefabrik.ch ({{lastRouteString}})
+        demokratiefabrik.ch ({{ lastRouteString }})
       </q-chip>
 
       <MainMenu />
+
+      <!-- Assembly MENU -->
+      <!-- <div id="assemblyMenuContainer"></div> -->
+      <!-- END DYNAMIC MENU -->
     </q-header>
 
     <!-- CONTENT -->
@@ -48,7 +52,7 @@ import NotificationBanner from './components/NotificationBanner.vue';
 import { mapGetters } from 'vuex';
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
-// import useAuthComposable from 'src/composables/auth.composable';
+// import useAssemblyComposable from 'src/composables/assembly.composable';
 import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
@@ -68,17 +72,17 @@ export default defineComponent({
       loadingGifVisible.value = stack.length > 0;
     });
 
-    // console.log('DEBUG setup mainLayout ends')
     return {
       emitter,
       store,
       gotoHome,
       lastRouteString,
       pushR,
-      loadingGifVisible
+      loadingGifVisible,
     };
   },
 
+  // TODO: to delete, probably,...
   data() {
     return {
       menuOffset: [0, 3] as number[],
@@ -86,10 +90,6 @@ export default defineComponent({
   },
 
   computed: {
-    frontpage(): boolean {
-      return this.$route.name == 'home';
-    },
-
     ...mapGetters({
       profileColor: 'profilestore/profileColor',
       lightProfileColor: 'profilestore/lightProfileColor',

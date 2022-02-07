@@ -2,36 +2,34 @@ import { deCH } from 'src/i18n';
 import { createI18n } from 'vue-i18n';
 import { boot } from 'quasar/wrappers';
 
-// export default boot({ app }) => {
 export default boot(({ app }) => {
-  // console.log('DEBUG boot i18n start')
-
   // Setup I18n instance
   const i18n = createI18n({
-    // locale: 'en-US',
-    // messages,
-    // legacy: false, // you must set `false`, to use Composition API
-    // globalInjection: true,
-    // fullInstall: false,
-    // fallbackLocale: 'de', // set fallback locale
-    // locale: 'en-US',
-    // messages,
-    // legacy: false, // you must set `false`, to use Composition API
-    // globalInjection: true,
-    // fullInstall: false,
-    // fallbackLocale: 'de', // set fallback locale
-
-    locale: 'de_CH',
+    locale: 'de-ch',
     legacy: false, // you must set `false`, to use Composition API
     globalInjection: true,
-    // locale: process.env.ENV_I18N_LOCALE, // set locale
     fullInstall: true,
-    // fallbackLocale: process.env.ENV_I18N_FALLBACK_LOCALE, // set fallback locale
-    messages: { de_CH: deCH },
+    messages: { 'de-ch': deCH },
   });
 
   app.use(i18n);
 });
+
+// locale: 'en-US',
+// messages,
+// legacy: false, // you must set `false`, to use Composition API
+// globalInjection: true,
+// fullInstall: false,
+// fallbackLocale: 'de', // set fallback locale
+// locale: 'en-US',
+// messages,
+// legacy: false, // you must set `false`, to use Composition API
+// globalInjection: true,
+// fullInstall: false,
+// fallbackLocale: 'de', // set fallback locale
+
+// locale: process.env.ENV_I18N_LOCALE, // set locale
+// fallbackLocale: process.env.ENV_I18N_FALLBACK_LOCALE, // set fallback locale
 
 // export default boot(({ app }) => {
 //   const i18n = createI18n({

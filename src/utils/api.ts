@@ -233,7 +233,7 @@ export default {
   },
 
 
-  async updatePeerreviews(assemblyIdentifier, contenttreeID, update_date, timelag=0) {
+  async updatePeerreviews(assemblyIdentifier, contenttreeID, update_date) {
 
     console.log('API updatePeerreviews')
     await refresh_token_if_required()

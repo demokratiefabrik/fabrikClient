@@ -20,7 +20,8 @@ export default function useStageComposable() {
     const emitter = useEmitter();
     const { loaded } = useLibraryComposable();
     const { userid } = usePKCEComposable();
-    const { gotoAssemblyHome, stageID } = useAssemblyComposable('stage.comp');
+    const { gotoAssemblyHome, stageID, gotoStage } =
+      useAssemblyComposable('stage.comp');
     const { monitorLog } = useMonitorComposable();
     const { assemblyIdentifier } = useRouterComposable();
 
@@ -53,10 +54,20 @@ export default function useStageComposable() {
       store.getters['assemblystore/is_stage_accessible'];
 
     const is_stage_alerted = store.getters['assemblystore/is_stage_alerted'];
+    const is_stage_completed =
+      store.getters['assemblystore/is_stage_completed'];
 
-    const isRoutedStageAlerted =  computed((): boolean | null => {
-      // console.log('ssssssssssssssss', routed_stage.value, is_stage_alerted( {stage: routed_stage.value}))
-      return is_stage_alerted( {stage: routed_stage.value})
+    const isRoutedStageAlerted = computed((): boolean | null => {
+      if (!routed_stage.value) {
+        return null;
+      }
+      return is_stage_alerted(routed_stage.value);
+    });
+    const isRoutedStageCompleted = computed((): boolean | null => {
+      if (!routed_stage.value) {
+        return null;
+      }
+      return is_stage_completed(routed_stage.value as IStageTuple);
     });
 
     const nextScheduledStage = computed(
@@ -71,6 +82,12 @@ export default function useStageComposable() {
       if (!assemblyStages.value) {
         return null;
       }
+      console.log(
+        'routed stage debug................',
+        stageID.value,
+        assemblyStages.value,
+        assemblyStages.value[stageID.value]
+      );
       return assemblyStages.value[stageID.value];
     });
 
@@ -239,7 +256,7 @@ export default function useStageComposable() {
       return groups;
     });
 
-    const currentGroup = computed((): string => {
+    const routedStageGroup = computed((): string => {
       console.log('get Stage Group');
       if (!stageID.value || !routed_stage.value) {
         return 'preparation';
@@ -266,171 +283,45 @@ export default function useStageComposable() {
     };
 
     const getFirstOrRoutedStageIDByGroup = (group): number => {
-      console.assert(stages_by_groups);
+      // console.assert(stages_by_groups);
+      if (!stages_by_groups.value) {
+        throw Error(
+          'Could not find stage: stage groups are not yet loaded. refresh?'
+        );
+      }
+      if (!Object.keys(stages_by_groups.value).includes(group)) {
+        throw Error('Could not find stage: invalid stage group');
+      }
 
-      console.log(group, routed_stage.value, 'debug.lll', stages_by_groups)
+      const localStageGroups: IStageTuple[] = stages_by_groups.value[group];
+      if (!localStageGroups.length) {
+        throw Error('Could not find stage: no stage found in given group');
+      }
       if (routed_stage.value) {
         if (
-          stages_by_groups[group].find(
+          localStageGroups.find(
             (x) => routed_stage.value?.stage.id === x.stage.id
           )
         ) {
           return routed_stage.value.stage.id;
         }
       }
-      console.assert(stages_by_groups[group]);
-      console.assert(stages_by_groups[group][0]);
-      return stages_by_groups[group][0].stage.id;
+
+      // Get first stage wihtin group
+      const stage: IStageTuple = localStageGroups[0];
+      return stage.stage.id;
     };
-
-    //     /**
-    //      * Clear all the data, that is linked to a certain user. => performed at logout
-    //      */
-    //     this.$root.clearUserData = () => {
-    //       this.$root.clearSession()
-    //       this.clearUserData()
-    //     }
-
-    //     this.$root.getAssemblyManageRoute = (assembly) => {
-    //       return ({
-    //         name: 'assembly_manage',
-    //         params: {
-    //           assemblyIdentifier: assembly.identifier
-    //         }
-    //       })
-    //     }
-
-    //     this.$root.gotoAssemblyManage = (assembly) => {
-    //       var route = this.$root.getAssemblyManageRoute(assembly);
-    //       this.$pushR(route)
-    //     }
-
-    // applyCssVarProfileColor(): Record<string, unknown> {
-    //   // This code apply writes the profile color into the css variable profilecolor.
-    //   // the variable is used for the css classes: .bg-profilecolor and .profilecolor
-    //   return {
-    //     '--profilecolor': this.profileColor,
-    //     '--profilecolor-light': this.lightProfileColor,
-    //   };
-    // },
-
-    // TODO: disabled due to vue 3 migration
-    // https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
-    // AssemblyMenuComponentLoader() {
-    //   if (this.showAssemblyMenu) {
-    //     // TODO: disabled. due to error
-    //     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    //     // return () => import(`../plugins/${this.assemblyType}/Menu.vue`);
-    //   }
-    //   return () => null;
-    // },
-    // is_assembly_page: function () {
-    //   return (
-    //     this.$route.name === 'assemblies' ||
-    //     !!this.$route.params.assemblyIdentifier
-    //   );
-    // },
-
-    // mounted() {
-
-    // if (this.is_assembly_page) {
-    // loadComponent();
-    // }
-
-    // enable or disable AssemblyMenu
-    // TODO: DW:
-    // this.showAssemblyMenu = false;
-    // const current = this.$router.currentRoute as any
-    // this.showAssemblyMenu = this.assemblyType &&
-    //   !current?.meta?.hideAssemblyMenu &&
-    //   !this.IsManager;
-    // }
-
-    //   <!-- MAIN MENU -->
-    //   <!-- TODO <div v-if="showAssemblyMenu">
-    //     <component
-    //       :is="AssemblyMenuComponentLoader"
-    //       :menuOffset="menuOffset"
-    //       v-if="is_assembly_page"
-    //     />
-    //   </div> -->
-    //   <!-- END DYNAMIC MENU -->
-
-    // <!-- MENU: for assembly views  -->
-    // <q-btn
-    //   size="lg"
-    //   flat
-    //   icon="mdi-menu"
-    //   label=""
-    //   v-if="is_assembly_page || $q.screen.lt.sm"
-    // >
-    //   <q-menu>
-    //     <q-list style="min-width: 100px">
-    //       <q-item
-    //         v-for="item in menu"
-    //         clickable
-    //         :key="item.text"
-    //         :class="
-    //           item.to.name == currentRoute
-    //             ? 'topmenuSelected'
-    //             : 'topmenuDefault'
-    //         "
-    //         @click="pushR(item.to)"
-    //         v-close-popup
-    //       >
-    //         <q-item-section>{{ item.text }}</q-item-section>
-    //       </q-item>
-    //     </q-list>
-    //   </q-menu>
-    // </q-btn>
-
-    // <!-- Left-Align: Small PAges -->
-    // <!-- <q-toolbar-title
-    //   v-if="$q.screen.lt.md && assemblyName"
-    //   @click="gotoAssemblyHome(assembly)"
-    //   class="cursor-pointer"
-    //   style=" font-weight:400"
-    // >
-    //   {{assemblyName}}
-    // </q-toolbar-title> -->
-    // <!-- {{assemblyName}} -->
-    // <!-- v-if="$q.screen.gt.xs "  -->
-    // <!-- Center: Large Pages -->
-    // <!-- v-if="$q.screen.gt.sm && assemblyName" -->
-
-    // <!-- TODO uncomment-->
-    // <!-- @click="$root.gotoAssemblyHome(assembly)" -->
-
-    // <q-toolbar-title
-    // shrink
-    // v-if="$q.screen.gt.sm && assemblyName"
-    // class="cursor-pointer"
-    // style="font-weight: 400"
-    // >
-    // {{ assemblyName }}
-    // </q-toolbar-title>
-
-    // // TODO: methods exist twice!!
-    // is_assembly_page: function () {
-    //   return (
-    //     this.$route.name === 'assemblies' ||
-    //     !!this.$route.params.assemblyIdentifier
-    //   );
-    // },
-
-    // frontpage: function () {
-    //   return this.$route.name == 'home';
-    // },
 
     return {
       ready,
       routed_stage,
+      gotoStage,
       isFirstText,
       contenttreeID,
       milestone,
       markUnAlert,
       markCompleted,
-      currentGroup,
+      routedStageGroup,
       groups,
       nextScheduledStage,
       groupsScheduled,
@@ -439,7 +330,8 @@ export default function useStageComposable() {
       getFirstOrRoutedStageIDByGroup,
       is_stage_first_shown,
       is_stage_last_shown,
-      isRoutedStageAlerted
+      isRoutedStageCompleted,
+      isRoutedStageAlerted,
     };
   };
 
@@ -449,3 +341,118 @@ export default function useStageComposable() {
 
   return output.value;
 }
+
+//     /**
+//      * Clear all the data, that is linked to a certain user. => performed at logout
+//      */
+//     this.$root.clearUserData = () => {
+//       this.$root.clearSession()
+//       this.clearUserData()
+//     }
+
+//     this.$root.getAssemblyManageRoute = (assembly) => {
+//       return ({
+//         name: 'assembly_manage',
+//         params: {
+//           assemblyIdentifier: assembly.identifier
+//         }
+//       })
+//     }
+
+//     this.$root.gotoAssemblyManage = (assembly) => {
+//       var route = this.$root.getAssemblyManageRoute(assembly);
+//       this.$pushR(route)
+//     }
+
+// applyCssVarProfileColor(): Record<string, unknown> {
+//   // This code apply writes the profile color into the css variable profilecolor.
+//   // the variable is used for the css classes: .bg-profilecolor and .profilecolor
+//   return {
+//     '--profilecolor': this.profileColor,
+//     '--profilecolor-light': this.lightProfileColor,
+//   };
+// },
+
+// TODO: disabled due to vue 3 migration
+// https://medium.com/@codetheorist/using-vuejs-computed-properties-for-dynamic-module-imports-2046743afcaf
+
+//   return () => null;
+// },
+// is_assembly_page: function () {
+//   return (
+//     this.$route.name === 'assemblies' ||
+//     !!this.$route.params.assemblyIdentifier
+//   );
+// },
+
+// mounted() {
+
+// if (this.is_assembly_page) {
+// loadComponent();
+// }
+
+// <!-- MENU: for assembly views  -->
+// <q-btn
+//   size="lg"
+//   flat
+//   icon="mdi-menu"
+//   label=""
+//   v-if="is_assembly_page || $q.screen.lt.sm"
+// >
+//   <q-menu>
+//     <q-list style="min-width: 100px">
+//       <q-item
+//         v-for="item in menu"
+//         clickable
+//         :key="item.text"
+//         :class="
+//           item.to.name == currentRoute
+//             ? 'topmenuSelected'
+//             : 'topmenuDefault'
+//         "
+//         @click="pushR(item.to)"
+//         v-close-popup
+//       >
+//         <q-item-section>{{ item.text }}</q-item-section>
+//       </q-item>
+//     </q-list>
+//   </q-menu>
+// </q-btn>
+
+// <!-- Left-Align: Small PAges -->
+// <!-- <q-toolbar-title
+//   v-if="$q.screen.lt.md && assemblyName"
+//   @click="gotoAssemblyHome(assembly)"
+//   class="cursor-pointer"
+//   style=" font-weight:400"
+// >
+//   {{assemblyName}}
+// </q-toolbar-title> -->
+// <!-- {{assemblyName}} -->
+// <!-- v-if="$q.screen.gt.xs "  -->
+// <!-- Center: Large Pages -->
+// <!-- v-if="$q.screen.gt.sm && assemblyName" -->
+
+// <!-- TODO uncomment-->
+// <!-- @click="$root.gotoAssemblyHome(assembly)" -->
+
+// <q-toolbar-title
+// shrink
+// v-if="$q.screen.gt.sm && assemblyName"
+// class="cursor-pointer"
+// style="font-weight: 400"
+// >
+// {{ assemblyName }}
+// </q-toolbar-title>
+
+// // TODO: methods exist twice!!
+// is_assembly_page: function () {
+//   return (
+//     this.$route.name === 'assemblies' ||
+//     !!this.$route.params.assemblyIdentifier
+//   );
+// },
+
+// frontpage: function () {
+//   return this.$route.name == 'home';
+// },

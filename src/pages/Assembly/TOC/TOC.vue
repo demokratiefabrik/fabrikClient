@@ -13,7 +13,7 @@
 
     <ArtificialModeration :AM="AMs.toc" alignment="right" :ctx="that" />
 
-    <template v-if="assemblyMenu && assemblyMenuItems?.length">
+    <template v-if="assemblyMenuItems?.length">
       <TOCItem
         v-for="(item, index) in assemblyMenuItems"
         :key="index"
@@ -34,20 +34,23 @@ import AMs from 'src/pages/Assembly/ArtificialModeration';
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import useStageComposable from 'src/composables/stage.composable';
 import { IStageGroup } from 'src/models/stage';
-// import { IAmToc } from 'src/plugins/CIR/ArtificialModeration';
+import useLibraryComposable from 'src/utils/library';
 
 export default defineComponent({
   setup() {
-    const { assembly, assemblyMenu, gotoStage } = useAssemblyComposable();
-    const { groupsScheduled, stages_by_groups, nextScheduledStage } = useStageComposable();
+    const { loaded } = useLibraryComposable();
+    const { assembly, assemblyMenuData, gotoStage } = useAssemblyComposable();
+    const { groupsScheduled, stages_by_groups, nextScheduledStage } =
+      useStageComposable();
 
     return {
-      assemblyMenu,
+      assemblyMenuData,
       groupsScheduled,
       assembly,
+      loaded,
       nextScheduledStage,
       gotoStage,
-      stages_by_groups
+      stages_by_groups,
     };
   },
   name: 'AssemblyTOC',
@@ -58,13 +61,14 @@ export default defineComponent({
   data() {
     return {
       AMs: AMs,
-      that: this
+      that: this,
     };
   },
 
   computed: {
     ready(): boolean {
-      return true;
+      // console.log(this.assemblyMenu)
+      return this.loaded(this.assemblyMenuData);
     },
 
     nextScheduledStageGroup(): null | IStageGroup {
@@ -72,11 +76,13 @@ export default defineComponent({
       if (!group) {
         return null;
       }
-      return this.assemblyMenu[group];
+
+      console.log('DEBUG; ', group, this.assemblyMenuData);
+      return this.assemblyMenuData[group];
     },
-    
+
     assemblyMenuItems(): IStageGroup[] {
-      return Object.values(this.assemblyMenu);
+      return Object.values(this.assemblyMenuData);
     },
   },
 });

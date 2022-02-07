@@ -10,7 +10,6 @@ const plugin_routes: RouteRecordRaw[] = []
 // plugin_routes.push(...vaa_topics_routes)
 plugin_routes.push(...textsheet_routes)
 plugin_routes.push(...cir_routes)
-// plugin_routes.push(...cir_pros_and_cons_routes)
 plugin_routes.push(...survey_routes)
 plugin_routes.push(...profileupdate_routes)
 

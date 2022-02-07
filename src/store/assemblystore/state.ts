@@ -1,7 +1,11 @@
+import { IAssemblyTuple } from 'src/models/assembly';
+import { IStageTuple } from 'src/models/stage';
+
+
 export default function () {
   return {
-    assemblydata: {},
-    stages: {},
+    assemblydata: {} as Record<string, IAssemblyTuple>,
+    stages: {} as Record<string, IStageTuple>,
     milestones: {}
     }
 }

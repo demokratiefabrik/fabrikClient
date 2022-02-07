@@ -1,19 +1,23 @@
 /**
  * Store full assembly Response (with configuration and stuff)
  */
-export const storeAssembly = (state, { assemblyIdentifier, data }) => {
-  // console.log(`Store assembly ${assemblyIdentifier}`)
 
-  // data.stages.forEach(stage)
-  const stages = state.stages;
-  state.stages = Object.assign({}, stages, data.stages);
+import { IAssemblyTuple, IAssemblyTupleByApi } from 'src/models/assembly';
 
-  // Vue.set  makes the change reactive!!
-  // console.log(data.stages, "TESTTEST")
-  data.stages = Object.keys(data.stages);
-  // .map(stage => stage.stage.id)
-  // console.log(data.stages, "TESTTEST")
-  state.assemblydata[assemblyIdentifier] = data;
+type IData = {
+  assemblyIdentifier: string; 
+  data: IAssemblyTupleByApi
+}
+export const storeAssembly = (state, { assemblyIdentifier, data }: IData ) => {
+  state.stages = Object.assign({},  state.stages, data.stages);
+  const stageKeys = Object.keys(data.stages);
+
+  const copy = data as any;
+  delete copy.stages
+  const assemblyTuple = copy as IAssemblyTuple
+  
+  assemblyTuple.stage_keys = stageKeys.map(Number);
+  state.assemblydata[assemblyIdentifier] = assemblyTuple as IAssemblyTuple;
 };
 
 export const storeAssemblyStage = (state, { assemblyIdentifier, data }) => {

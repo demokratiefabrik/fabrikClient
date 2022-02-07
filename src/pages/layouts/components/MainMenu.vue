@@ -119,6 +119,38 @@
             <q-item-label caption>Demokratiefabrik verlassen.</q-item-label>
           </q-item-section>
         </q-item>
+
+
+
+<!-- DEBUG FUNCTIONALITY -->
+        <q-item
+          @click="apireset()"
+          clickable
+          v-if="is_in_testing_phase"
+          class=""
+          v-close-popup
+        >
+          <q-item-section v-if="authorized">
+            <q-item-label>_day reset</q-item-label>
+            <q-item-label caption>TESTING</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          @click="apireset(true)"
+          clickable
+          v-if="is_in_testing_phase"
+          class=""
+          v-close-popup
+        >
+          <q-item-section v-if="authorized">
+            <q-item-label>_full reset</q-item-label>
+            <q-item-label caption>TESTING</q-item-label>
+          </q-item-section>
+        </q-item>
+
+
+
       </q-list>
     </q-btn-dropdown>
   </q-toolbar>
@@ -143,12 +175,13 @@ export default defineComponent({
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setup() {
-    const { setHeaderOffset } = useAppComposable();
+    const { setHeaderOffset, apireset } = useAppComposable();
     const { pushR, gotoProfile } = useRouterComposable();
     const {
       logout,
       authorized,
       getUsernameDerivation,
+      is_in_testing_phase
       // payload,
       // loginToCurrentPage,
     } = useAuthComposable();
@@ -156,7 +189,9 @@ export default defineComponent({
       setHeaderOffset,
       logout,
       pushR,
+      is_in_testing_phase,
       gotoProfile,
+      apireset,
       authorized,
       // payload,
       getUsernameDerivation,
@@ -209,7 +244,6 @@ export default defineComponent({
 
     ...mapGetters({
       profile: 'profilestore/profile',
-      is_in_testing_phase: 'profilestore/is_in_testing_phase',
       UsersDelegateAssemblies: 'publicindexstore/UsersDelegateAssemblies',
       assemblyName: 'assemblystore/assemblyName',
       assembly: 'assemblystore/assembly',
@@ -222,16 +256,6 @@ export default defineComponent({
       // username_derivate: "profilestore/username_derivate",
     }),
 
-    // apireset(full) {
-    //   // TESTING: reset user data of the day or the full assembly session...
-    //   if (this.is_in_testing_phase) {
-    //     api.apireset(full);
-    //     this.$store.dispatch("monitorReset");
-    //     setTimeout(() => {
-    //       this.logout();
-    //     }, 10);
-    //   }
-    // },
   },
 });
 </script>

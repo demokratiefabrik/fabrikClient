@@ -43,7 +43,7 @@ export default function useAppComposable() {
     console.log('DEBUG: APP COMPOSABLE - START');
 
     const assemblyComposable = useAssemblyComposable('app.comp');
-    const authComposable = useAuthComposable();
+    const {authorized, logoutState, logout, is_in_testing_phase, initialize: authInitialize} = useAuthComposable();
     const monitorComposable = useMonitorComposable();
     const routerComposable = useRouterComposable();
     const store = useStore();
@@ -55,6 +55,11 @@ export default function useAppComposable() {
     /* LOADING GIF: give a label to facilitate debugging... 
     -------------------------
   */
+
+
+
+
+
     const showLoadingGif = (label) => {
       // const extlabel = `${label}${timestamp()}`
       loadingGifStack.value.push(label);
@@ -207,7 +212,7 @@ export default function useAppComposable() {
       );
       showNotification(banner);
       //       setBrokenSession()
-      authComposable.logout(null, {}, true);
+      logout(null, {}, true);
     };
 
     const showTooManyRequestsError = (
@@ -264,6 +269,17 @@ export default function useAppComposable() {
       showNotification(banner);
     };
 
+
+    const apireset = (full: boolean) => {
+      // TESTING: reset user data of the day or the full assembly session...
+      if (is_in_testing_phase.value) {
+        store.dispatch('appstore/monitorReset', {notifyBackend: true, full});
+        setTimeout(() => {
+          logout();
+        }, 10);
+      }
+    }
+
     // const appExitState = () => {
     //     return appExitState.value
     // },
@@ -274,7 +290,7 @@ export default function useAppComposable() {
       // installedAssemblyPlugins
       // assemblyComposable.installAssemblyPlugin('CIR')
 
-      authComposable.initialize();
+      authInitialize();
       // START MONITOR ENGINE
       monitorComposable.initialize();
       // START ASSEMBLY ENGINE
@@ -311,7 +327,6 @@ export default function useAppComposable() {
         if (!data.ok) {
           return null;
         }
-        const { logoutState, authorized } = useAuthComposable();
         if (logoutState.value) {
           console.log(
             'LOGOUT PROCESS IS GOING ON: DO NOT PROCESS NEW INCOMING DATA.'
@@ -406,6 +421,7 @@ export default function useAppComposable() {
       showAuthorizationInvalidToken,
       showAuthorizationError,
       exitApp,
+      apireset,
       initialize,
       setHeaderOffset,
       hideLoadingGif,

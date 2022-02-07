@@ -2,13 +2,13 @@
 import { RouteLocationRaw } from 'vue-router';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
-import { readonly, getCurrentInstance, Ref, computed } from 'vue';
+import { readonly, Ref, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import useRouterComposable from './router.composable';
 import useEmitter from 'src/utils/emitter';
 import useLibraryComposable from 'src/utils/library';
 import { useRouter } from 'vue-router';
-import { IStageTuple } from 'src/models/stage';
+import { IStageGroup, IStageTuple } from 'src/models/stage';
 import { IContributionLimits } from 'src/models/layout';
 
 const oauthEmitter = useOAuthEmitter();
@@ -16,46 +16,57 @@ const { userid } = usePKCEComposable();
 
 let output: null | any = null;
 
+const assemblyMenuData = ref<Record<string, IStageGroup> | null>(null);
+const assemblyType = ref<string | null>(null);
+
 export default function useAssemblyComposable(caller = '') {
   const setup = () => {
     console.log('DEBUG: useAssemblyComposable::SETUP', caller);
     const store = useStore();
 
-
     // REturn the composabe Function of the currently active assembly plugin.
     // return null, if no funciton is available...
-    const pluginComposableFunction = computed(() => {
-      const type = assembly?.value?.type;
-      console.log('LOAD PLUGIN COMPOS BY ASSEMBLY TYPE', type);
-      if (type) {
-        const app = getCurrentInstance(); // works
-        // TODO: DOES THIS WORK?
+    // const pluginComposableFunction = computed(() => {
 
-        const pluginComposables =
-          app?.appContext.config.globalProperties.$pluginComposables;
-        if (pluginComposables) {
-          if (Object.keys(pluginComposables).includes(type)) {
-            return pluginComposables[type];
-          }
-        }
-      }
+    //   // console.log('AASSSSEMBLY?', assembly, assemblyIdentifier)
 
-      return null;
-    });
+    //   // const type = assembly?.value?.type;
+    //   // console.log('LOAD PLUGIN COMPOS BY ASSEMBLY TYPE', type);
+    //   // if (type) {
+    //   //   // const app = getCurrentInstance(); // works
+    //   //   // TODO: DOES THIS WORK?
+
+    //   //   // const pluginComposables =
+    //   //   //   app?.appContext.config.globalProperties.$pluginComposables;
+    //   //   // if (pluginComposables) {
+    //   //   //   if (Object.keys(pluginComposables).includes(type)) {
+    //   //   //     return pluginComposables[type];
+    //   //   //   }
+    //   //   // }
+    //   // }
+
+    //   return null;
+    // });
 
     // LOAD PLUGIN COMPOSABLE FUNCTION
-    const assemblyMenu = computed((): null | any => {
-      if (pluginComposableFunction.value) {
-        const { assemblyMenu } = pluginComposableFunction.value();
-        return assemblyMenu;
-      }
+    // const assemblyMenu = computed((): null | any => {
+    //   if (pluginComposableFunction.value) {
+    //     const { assemblyMenu } = pluginComposableFunction.value();
+    //     return assemblyMenu;
+    //   }
 
-      return null;
-    });
+    //   return null;
+    // });
 
     const emitter = useEmitter();
-    const { pushR, assemblyIdentifier, stageID, clearSession, setStageID } =
-      useRouterComposable();
+    const {
+      pushR,
+      assemblyIdentifier,
+      currentRouteMeta,
+      stageID,
+      clearSession,
+      setStageID,
+    } = useRouterComposable();
     const { loaded } = useLibraryComposable();
     const { push } = useRouter();
 
@@ -64,7 +75,8 @@ export default function useAssemblyComposable(caller = '') {
     const get_stage_number_by_stage =
       store.getters['assemblystore/get_stage_number_by_stage'];
     const assemblyStages = computed(
-      (): Record<number, IStageTuple> => store.getters['assemblystore/assemblyStages']
+      (): Record<number, IStageTuple> =>
+        store.getters['assemblystore/assemblyStages']
     );
     const last_accessible_stage = computed(
       () => store.getters['assemblystore/last_accessible_stage']
@@ -80,8 +92,16 @@ export default function useAssemblyComposable(caller = '') {
       () => store.getters['assemblystore/assemblyConfiguration']
     );
     const assembly = computed(() => store.getters['assemblystore/assembly']);
+
     const find_next_accessible_stage = computed(
       () => store.getters['assemblystore/find_next_accessible_stage']
+    );
+
+    const showAssemblyMenu = computed(
+      (): boolean => 
+        !!assemblyType.value &&
+        !currentRouteMeta.value?.hideAssemblyMenu &&
+        !IsManager.value
     );
 
     const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
@@ -287,7 +307,7 @@ export default function useAssemblyComposable(caller = '') {
       console.assert(stage);
       const params = {
         assemblyIdentifier: assemblyIdentifier.value,
-        assemblyType: assembly.value?.type,
+        assemblyType: assemblyType.value,
         stageID: stage.stage.id,
         contenttreeID: stage.stage.contenttree_id,
       };
@@ -365,6 +385,15 @@ export default function useAssemblyComposable(caller = '') {
       syncUserAssembly();
     };
 
+    const initializePlugin = (
+      localAssemblyType: string,
+      localAssemblyMenuData: Record<string, IStageGroup>
+    ) => {
+      // assemblyType
+      assemblyType.value = localAssemblyType;
+      assemblyMenuData.value = localAssemblyMenuData;
+    };
+
     return {
       assemblyIdentifier,
       // assembly: toRefs(assembly),
@@ -378,8 +407,9 @@ export default function useAssemblyComposable(caller = '') {
       overallLimitForAddingProposalsReached,
       limitForAddingProposalsReached,
       limitForAddingCommentsReached,
-      pluginComposableFunction,
-      assemblyMenu,
+      // pluginComposableFunction,
+
+      // All other functions
       syncUserAssembly,
       gotoAssemblyHome,
       initialize,
@@ -389,15 +419,18 @@ export default function useAssemblyComposable(caller = '') {
       clickBackToAssemblyListButton,
       gotoNextStageNr,
       gotoStage,
+
+      // Plugin // assemblyMenu
+      initializePlugin,
+      showAssemblyMenu, // should assembly menu be shown?
+      assemblyMenuData,
+      assemblyType,
     };
   };
 
   if (output === null) {
     output = setup();
-    // testt.value = 2;
   }
-
-  // console.log(output.value.testt);
 
   return output;
 }

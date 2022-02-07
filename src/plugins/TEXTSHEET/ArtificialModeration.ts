@@ -1,21 +1,26 @@
 import { IAssemblyTuple } from 'src/models/assembly';
+import { INodeTuple } from 'src/models/content';
 import { IStageTuple } from 'src/models/stage';
-import { IArtificialModeration, IArtificialModerationFile, IArtificialModerationGroup } from 'src/pages/components/artificial_moderation/model';
-import {Ref} from 'vue'
+import {
+  IArtificialModeration,
+  IArtificialModerationFile,
+  IArtificialModerationGroup,
+} from 'src/pages/components/artificial_moderation/model';
+import { Ref } from 'vue';
 
 export interface ICtx {
+  $q: any
   routed_stage: IStageTuple | null;
   nextScheduledStage: Ref<IStageTuple>;
-  gotoAssemblyHome: (IAssemblyTuple) => void
-  assembly: IAssemblyTuple
-  isFirstText: boolean
-  is_stage_alerted: (IStageTuple) => boolean
-  gotoStage: (IStageTuple) => boolean
-  markUnAlert: () => void
-  loaded: (any) => boolean
-  [x: string]: any, 
+  isRoutedStageAlerted: boolean;
+  gotoAssemblyHome: (IAssemblyTuple) => void;
+  assembly: IAssemblyTuple;
+  isFirstText: boolean;
+  gotoStage: (IStageTuple) => void;
+  markUnAlert: () => void;
+  loaded: (any) => boolean;
+  node: INodeTuple;
 }
-
 
 export default {
   index_top: {
@@ -41,9 +46,7 @@ export default {
         id: 1,
         prosa: ' Erste Stage, Erster Besuch am ersten Tag!.',
         condition: (ctx: ICtx) =>
-          ctx.isRoutedStageAlerted &&
-          ctx.isFirstText &&
-          ctx.nextScheduledStage,
+          ctx.isRoutedStageAlerted && ctx.isFirstText && ctx.nextScheduledStage,
         body: () =>
           'Wir beginnen mit folgendem Text. Bitte lesen Sie diese Informationen zum Projekt kurz durch.',
       },
@@ -61,8 +64,7 @@ export default {
         id: 3,
         prosa: ' Zweiter Besuch',
         condition: (ctx: ICtx) =>
-          !ctx.isRoutedStageAlerted &&
-          ctx.nextScheduledStage,
+          !ctx.isRoutedStageAlerted && ctx.nextScheduledStage,
         body: () => 'Sie können sich das ruhig nochmal anschauen.',
         buttons: [
           {
@@ -75,7 +77,7 @@ export default {
         ],
       },
     ] as IArtificialModeration[],
-  }  as IArtificialModerationGroup,
+  } as IArtificialModerationGroup,
 
   index_bottom: {
     id: 'index_bottom',
@@ -85,8 +87,10 @@ export default {
       {
         id: 10,
         prosa: 'Irgendwann, nachdem Rundgang zu Ende ist.',
-        condition: (ctx: ICtx) => !ctx.isRoutedStageAlerted && !ctx.nextScheduledStage,
-        body: (ctx) => `Hier geht es zurück zum Programm. ${ctx.isRoutedStageAlerted} - ${ctx.nextScheduledStage}`,
+        condition: (ctx: ICtx) =>
+          !ctx.isRoutedStageAlerted && !ctx.nextScheduledStage,
+        body: (ctx) =>
+          `Hier geht es zurück zum Programm. ${ctx.isRoutedStageAlerted} - ${ctx.nextScheduledStage}`,
         buttons: [
           {
             action: (ctx: ICtx) => {
@@ -100,8 +104,7 @@ export default {
         id: 1,
         prosa: ' Erster Besuch am ersten Tag!.',
         condition: (ctx: ICtx) =>
-          ctx.isRoutedStageAlerted &&
-          ctx.nextScheduledStage,
+          ctx.isRoutedStageAlerted && ctx.nextScheduledStage,
         body: () => 'Sie haben den Text gelesen? Dann folgen Sie mir bitte.',
         buttons: [
           {
@@ -117,8 +120,7 @@ export default {
         id: 2,
         prosa: ' Zweiter Besuch',
         condition: (ctx: ICtx) =>
-          !ctx.isRoutedStageAlerted &&
-          ctx.nextScheduledStage,
+          !ctx.isRoutedStageAlerted && ctx.nextScheduledStage,
         body: () => 'Wollen wir weiterfahren? Dann folgen Sie mir bitte.',
         buttons: [
           {
@@ -156,8 +158,7 @@ export default {
         id: 1,
         prosa: ' Erster Besuch am ersten Tag!.',
         condition: (ctx: ICtx) =>
-          ctx.isRoutedStageAlerted &&
-          ctx.nextScheduledStage,
+          ctx.isRoutedStageAlerted && ctx.nextScheduledStage,
         body: () => [
           'Um die Demokratiefabrik zu benutzen, müssen Sie dem Verhaltenskodex zustimmen.',
           'Stimmen Sie dem Verhaltenskodex zu?',
@@ -187,8 +188,7 @@ export default {
         id: 2,
         prosa: ' Zweiter Besuch',
         condition: (ctx: ICtx) =>
-          !ctx.isRoutedStageAlerted &&
-          ctx.nextScheduledStage,
+          !ctx.isRoutedStageAlerted && ctx.nextScheduledStage,
         body: () => [
           'Sie haben dem Kodex bereits zugestimmt.',
           'Wollen wir weiterfahren? Dann folgen Sie mir bitte.',
@@ -204,7 +204,7 @@ export default {
         ],
       },
     ],
-  }  as IArtificialModerationGroup,
+  } as IArtificialModerationGroup,
 
   discussion_index_top: {
     id: 'discussion_index_top',
@@ -216,5 +216,5 @@ export default {
           'Sie können hier eine Frage stellen. Die anderen Teilnehmenden oder die Organisatoren werden sie sehr bald beantworten.',
       },
     ] as IArtificialModeration[],
-  }  as IArtificialModerationGroup,
+  } as IArtificialModerationGroup,
 } as IArtificialModerationFile;

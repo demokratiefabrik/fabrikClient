@@ -97,7 +97,7 @@ export default function useAuthComposable() {
       });
 
       // clear user data...
-      store.dispatch('clearUserData');
+      store.dispatch('appstore/clearUserData');
 
       // logout pkce
       pkce.logout(silent);
@@ -128,9 +128,13 @@ export default function useAuthComposable() {
       return getUsername(profile);
     });
 
+    const is_in_testing_phase = computed(
+      () => store.getters['profilestore/is_in_testing_phase']
+    );
+
     /* Page Permission */
     const checkPagePermission = (currentRoute): void => {
-      // check permission: allow for all general pages.
+      // allow for all general pages.
       if (!currentRoute.meta.assemblyAcl) {
         return;
       }
@@ -143,8 +147,13 @@ export default function useAuthComposable() {
       // Wrongly configured....
       if (!currentRoute.params.assemblyIdentifier) {
         console.error('assemblyIdentifier is missing in the route params');
-        router.push({ name: 'home' });
-        throw new Error("Oops! You don't seem to have access to that page.");
+        throw new Error('MISCONFIGURATION');
+      }
+
+      // All other pages require login
+      if (!pkce.payload.value) {
+        // NOt logged in
+        throw new Error('LOGIN_REQUIRED');
       }
 
       // find first permission that is allowed.
@@ -154,32 +163,35 @@ export default function useAuthComposable() {
       });
       if (!allowed) {
         router.push({ name: 'home' });
-        throw new Error("Oops! You don't seem to have access to that page.");
+        throw new Error('AUTHORIZATION_FAILED');
       }
     };
 
     const addRoutePermisionWatcher = async () => {
-      try {
-        watch(
-          () => currentRoute,
-          (currentRoute) => {
-            // Add Watcher for Authorization Check (client-side)
+      // try {
+      watch(
+        () => currentRoute,
+        (currentRoute) => {
+          // Add Watcher for Authorization Check (client-side)
+          try {
             checkPagePermission(currentRoute);
-          },
-          { deep: true }
-        );
-      } catch (error) {
-        console.log('error in oauth initialization...', error);
-        switch ((error as any).message) {
-          case 'ErrorInvalidGrant':
-            oauthEmitter.emit('showAuthorizationInvalidToken');
-            break;
-          default:
-            console.error(error);
-            emitter.emit('showServiceError', { nobuttons: true });
-            break;
-        }
-      }
+          } catch (error) {
+            router.push({ name: 'home' });
+
+            // Show error message...
+            switch ((error as any).message) {
+              case 'ErrorInvalidGrant':
+                oauthEmitter.emit('showAuthorizationInvalidToken');
+                break;
+              default:
+                console.error(error);
+                emitter.emit('showServiceError', { nobuttons: true });
+                break;
+            }
+          }
+        },
+        { deep: true }
+      );
     };
 
     // -------
@@ -264,6 +276,7 @@ export default function useAuthComposable() {
       currentUsernameDerivation,
       currentUsername,
       getUsername,
+      is_in_testing_phase,
       emailIsAvailable,
       markIndicatedEmail,
     };

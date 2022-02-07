@@ -84,8 +84,7 @@ export const updatePeerreviews = (
       .updatePeerreviews(
         assemblyIdentifier,
         contenttreeID,
-        update_date,
-        timelag
+        update_date
       )
       .then((response) => {
         console.log(

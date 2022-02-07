@@ -16,17 +16,19 @@ export const assemblies = (state): IAssemblyTuple[] | null => {
 
 export const assemblyTuple = (state): IAssemblyTuple | null => {
   const { assemblyIdentifier } = useRouterComposable();
+
   if (!assemblyIdentifier.value) {
     return null;
   }
-
+  //   console.log(assemblyIdentifier.value, 'assemblyIdentifier assemblyIdentifier', Object.keys(state.assemblydata[assemblyIdentifier.value]))
   return state.assemblydata[assemblyIdentifier.value];
 };
 
 export const assembly = (_state, getters): IAssembly | null => {
-  if (!getters.assemblyTuple ) {
+  if (!getters.assemblyTuple) {
     return null;
   }
+  // console.log('RECALC ASSEMBLY in STORE', getters.assemblyTuple.assembly)
   return getters.assemblyTuple.assembly;
 };
 
@@ -47,7 +49,7 @@ export const assemblyConfiguration = (
   getters
 ): IAssemblyConfiguration | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready (configuration)');
+    // console.log('...assemblyTuple not ready (configuration)');
     return null;
   }
   return getters.assemblyTuple.configuration;
@@ -55,7 +57,7 @@ export const assemblyConfiguration = (
 
 export const assembly_userid = (state, getters): number | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready (assembly userid...');
+    // console.log('...assemblyTuple not ready (assembly userid...');
     return null;
   }
 
@@ -78,18 +80,18 @@ export const assemblyStages = (
   getters
 ): Record<number, IStageTuple> | null => {
   if (!getters.assemblyTuple) {
-    console.log('...assemblyTuple not ready (stages)');
+    // console.log('...assemblyTuple not ready (stages)');
     return null;
   }
 
-  const stage_keys = getters.assemblyTuple.stages;
+  const stage_keys = getters.assemblyTuple.stage_keys;
 
   /**
    * filter only the stages of the specific assembly
    * */
   // TODO: use filter (defined in boot/index)
   const stages = Object.keys(state.stages)
-    .filter((key) => stage_keys.includes(`${key}`))
+    .filter((key) => stage_keys?.includes(parseInt(key)))
     .reduce((obj, key) => {
       obj[key] = state.stages[key];
       return obj;
@@ -149,11 +151,11 @@ export const IsDelegate = (_state, getters): boolean | null => {
 };
 
 export const stageMilestones = (state, getters) => {
-  console.log('>> NOTE: stageMilestones');
+  // console.log('>> NOTE: stageMilestones');
 
   const { stageID } = useRouterComposable();
   if (!stageID.value) {
-    console.log('...stageID not ready');
+    // console.log('...stageID not ready');
     return null;
   }
   const day = getters.assemblyProgression?.number_of_day_sessions;
@@ -169,7 +171,7 @@ export const stageMilestones = (state, getters) => {
 export const stageMilestoneLabels = (_state, getters) => {
   const milestones = getters.stageMilestones;
   if (!milestones) {
-    console.log('empty milestoness...............sldfls');
+    // console.log('empty milestoness...............sldfls');
     return [];
   }
   return milestones.map((milestone) => milestone.label);
@@ -241,7 +243,6 @@ export const nextScheduledStage = (_state, getters): IStageTuple | null => {
     console.log('assemmbly is not yet loaded');
     return null;
   }
-  // console.log("sorted stages,", stages)
   // console.log(getters.is_stage_scheduled(stages[1]))
   const last_accessible_stage = stages.find(
     (stage) =>
@@ -313,7 +314,10 @@ export const assembly_accessible_stages = (
 };
 
 /** Which stages are freely open / accessible */
-export const assembly_accessible_stage_ids = (_state, getters): number[] | null => {
+export const assembly_accessible_stage_ids = (
+  _state,
+  getters
+): number[] | null => {
   const accessible_stages = getters.assembly_accessible_stages;
   if (!accessible_stages) {
     return null;
@@ -429,7 +433,7 @@ export const is_stage_alerted =
   };
 
 export const is_stage_idle =
-  (_state,getters) =>
+  (_state, getters) =>
   (stage): boolean => {
     console.assert(stage);
     return (
@@ -448,9 +452,10 @@ export const is_stage_skipped =
 
 export const is_stage_disabled =
   () =>
-  (stage: IStageTuple): boolean => {   
-    const disabled = stage.stage.disabled !== undefined && stage.stage.disabled === true
-    return (disabled)
+  (stage: IStageTuple): boolean => {
+    const disabled =
+      stage.stage.disabled !== undefined && stage.stage.disabled === true;
+    return disabled;
   };
 
 export const is_stage_completed =
@@ -468,7 +473,7 @@ export const is_stage_accessible =
   };
 
 export const is_stage_done =
-  (_state,getters) =>
+  (_state, getters) =>
   (stage): boolean => {
     return (
       getters.is_stage_accessible(stage) || getters.is_stage_completed(stage)

@@ -2,7 +2,7 @@
 import useEmitter from 'src/utils/emitter';
 // RouteLocationNormalizedLoaded
 import { useRouter, useRoute, RouteLocationRaw, RouteLocationNormalizedLoaded } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
@@ -19,6 +19,7 @@ export default function useRouterComposable() {
 
     const router = useRouter();
     const currentRoute = useRoute();
+    
 
     
     /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
@@ -66,6 +67,11 @@ export default function useRouterComposable() {
       pushR({ name: 'profile' } as RouteLocationRaw);
     };
 
+    const currentRouteMeta = computed(
+      () => currentRoute?.meta
+    );
+
+
     const setLastRoute = (route: RouteLocationNormalizedLoaded | null) => {
       
       if (route){
@@ -104,6 +110,7 @@ export default function useRouterComposable() {
       lastRouteString,
       assemblyIdentifier,
       stageID,
+      currentRouteMeta
     };
   };
 
