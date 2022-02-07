@@ -1011,7 +1011,7 @@
   "resolved" "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   "version" "1.2.1"
 
-"@intlify/bundle-utils@^2.2.0":
+"@intlify/bundle-utils@^2.2.0", "@intlify/bundle-utils@next":
   "integrity" "sha512-qVuN7+c84UB6rlLHSued2J9R86LG1rHg6ZibCghGMyPXnW0nOuIfkUFf1F7tXIqfMXjIPeJzlbpmzjWTI2z9Kw=="
   "resolved" "https://registry.npmjs.org/@intlify/bundle-utils/-/bundle-utils-2.2.0.tgz"
   "version" "2.2.0"
@@ -1059,6 +1059,17 @@
   dependencies:
     "@intlify/core-base" "9.2.0-beta.30"
     "@intlify/shared" "9.2.0-beta.30"
+
+"@intlify/vue-i18n-loader@^4.1.0":
+  "integrity" "sha512-Khf0CXi2rVjL4dWNk5WemoRSs20t7C7R+WhDrcpIIhAxJ2VQ7bjW4mLEmvvC7dc4uFyXI4q+WYaoFTVFzo90aA=="
+  "resolved" "https://registry.npmjs.org/@intlify/vue-i18n-loader/-/vue-i18n-loader-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "@intlify/bundle-utils" "next"
+    "@intlify/shared" "beta"
+    "js-yaml" "^4.1.0"
+    "json5" "^2.2.0"
+    "loader-utils" "^2.0.0"
 
 "@jridgewell/resolve-uri@^3.0.3":
   "integrity" "sha512-cz8HFjOFfUBtvN+NXYSFMHYRdxZMaEl0XypVrhzxBgadKIXhIkRd8aMeHhmF56Sl7SuS8OnUpQ73/k9LE4VnLg=="
@@ -1884,6 +1895,11 @@
   "version" "1.0.10"
   dependencies:
     "sprintf-js" "~1.0.2"
+
+"argparse@^2.0.1":
+  "integrity" "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q=="
+  "resolved" "https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz"
+  "version" "2.0.1"
 
 "array-flatten@^2.1.0":
   "integrity" "sha512-hNfzcOV8W4NdualtqBFPyVO+54DSJuZGY9qT4pRroB6S9e3iiido2ISIC5h9R2sPJ8H3FHCIiEnsv1lPXO3KtQ=="
@@ -3938,6 +3954,13 @@
     "argparse" "^1.0.7"
     "esprima" "^4.0.0"
 
+"js-yaml@^4.1.0":
+  "integrity" "sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA=="
+  "resolved" "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "argparse" "^2.0.1"
+
 "jsesc@^2.5.1":
   "integrity" "sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA=="
   "resolved" "https://registry.npmjs.org/jsesc/-/jsesc-2.5.2.tgz"
@@ -3985,7 +4008,7 @@
   dependencies:
     "minimist" "^1.2.0"
 
-"json5@^2.1.2":
+"json5@^2.1.2", "json5@^2.2.0":
   "integrity" "sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA=="
   "resolved" "https://registry.npmjs.org/json5/-/json5-2.2.0.tgz"
   "version" "2.2.0"
@@ -6088,7 +6111,7 @@
     "lodash" "^4.17.21"
     "semver" "^6.3.0"
 
-"vue-i18n@^9.2.0-beta.30":
+"vue-i18n@^9.0.0", "vue-i18n@^9.2.0-beta.30":
   "integrity" "sha512-5DqrgG9ffgC7j3RRAfViC0WUcdz0C3Ix1qq1AyQItpF7UkSB6iSJGEjBG6KdspbRQq/8t1YzDx4JRXbL05l6ow=="
   "resolved" "https://registry.npmjs.org/vue-i18n/-/vue-i18n-9.2.0-beta.30.tgz"
   "version" "9.2.0-beta.30"

@@ -16,7 +16,7 @@
         text-color="grey"
         class="q-mt-md"
       >
-        demokratiefabrik.ch ({{ lastRouteString }})
+        demokratiefabrik.ch
       </q-chip>
 
       <MainMenu />
@@ -66,7 +66,7 @@ export default defineComponent({
   setup() {
     const emitter = useEmitter();
     const store = useStore();
-    const { pushR, gotoHome, lastRouteString } = useRouterComposable();
+    const { pushR, gotoHome } = useRouterComposable();
     const loadingGifVisible = ref<boolean>(false);
     emitter.on('loadingGifStackChange', (stack: any) => {
       loadingGifVisible.value = stack.length > 0;
@@ -76,7 +76,6 @@ export default defineComponent({
       emitter,
       store,
       gotoHome,
-      lastRouteString,
       pushR,
       loadingGifVisible,
     };

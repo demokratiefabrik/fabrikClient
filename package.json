@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
+    "@intlify/vue-i18n-loader": "^4.1.0",
     "@quasar/app": "^3.0.0",
     "@types/node": "^12.20.21",
     "@typescript-eslint/eslint-plugin": "^4.16.1",

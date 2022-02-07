@@ -47,6 +47,7 @@ export default function useAppComposable() {
     const monitorComposable = useMonitorComposable();
     const routerComposable = useRouterComposable();
     const store = useStore();
+    const $q = useQuasar();
     const currentRoute = useRoute();
     const { getOffsetTop } = useLibraryComposable();
     const { t } = useI18n();
@@ -323,7 +324,6 @@ export default function useAppComposable() {
         console.log('RESPONSE MONITORED');
 
         // Shortcuts
-        const $q = useQuasar();
         if (!data.ok) {
           return null;
         }

@@ -11,7 +11,6 @@
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 module.exports = configure(function (ctx) {
-
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: {
@@ -86,7 +85,7 @@ module.exports = configure(function (ctx) {
       // https://quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 
-      chainWebpack: chain => {
+      chainWebpack: (chain) => {
         chain.module
           .rule('i18n-resource')
           .test(/\.(json5?|ya?ml)$/)
@@ -94,14 +93,30 @@ module.exports = configure(function (ctx) {
           .end()
           .type('javascript/auto')
           .use('i18n-resource')
-          .loader('vue-loader')
+          .loader('@intlify/vue-i18n-loader');
         chain.module
           .rule('i18n')
           .resourceQuery(/blockType=i18n/)
           .type('javascript/auto')
           .use('i18n')
-          .loader('vue-loader')
-          // vue-i18n-loader
+          .loader('@intlify/vue-i18n-loader');
+          // TODO: how to install: 
+          // npm i --save-dev @intlify/vue-i18n-loader --force
+        // chain.module
+        //   .rule('i18n-resource')
+        //   .test(/\.(json5?|ya?ml)$/)
+        //   .include.add(path.resolve(__dirname, './src/i18n'))
+        //   .end()
+        //   .type('javascript/auto')
+        //   .use('i18n-resource')
+        //   .loader('vue-i18n-loader')
+        // chain.module
+        //   .rule('i18n')
+        //   .resourceQuery(/blockType=i18n/)
+        //   .type('javascript/auto')
+        //   .use('i18n')
+        //   .loader('vue-loader')
+        //   // vue-i18n-loader
       },
     },
 
@@ -120,7 +135,6 @@ module.exports = configure(function (ctx) {
       lang: 'de', // Quasar language pack
       config: {},
 
-
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
@@ -132,9 +146,10 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify',
+      plugins: [
+        'Notify',
         // 'BottomSheet'
-      ]
+      ],
     },
 
     // animations: 'all', // --- includes all animations
