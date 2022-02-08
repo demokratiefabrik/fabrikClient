@@ -5,15 +5,7 @@ import Constants from 'src/utils/constants';
 import library  from 'src/utils/library';
 import { pluginNames } from 'src/plugins';
 
-// import {
-//   useRoute,
-//   useRouter,
-//   NavigationFailure,
-//   RouteLocationRaw,
-// } from 'vue-router';
-
 const emitter = useEmitter();
-// const library = useLibraryComposable();
 
 /** extend global property */
 

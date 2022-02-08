@@ -109,7 +109,6 @@ export default defineComponent({
 
   methods: {
     gotoStageGroup(item: IStageGroup) {
-      // console.log('ddddddddddddddd')
       this.push(item.to());
     },
 

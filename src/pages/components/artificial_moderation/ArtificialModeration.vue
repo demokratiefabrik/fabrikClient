@@ -89,36 +89,10 @@
 </template>
 
 <script lang="ts">
-// import { mapGetters } from 'vuex';
+import library from 'src/utils/library';
 import { defineComponent, PropType, ComponentPublicInstance } from 'vue';
 import { mapActions, mapGetters } from 'vuex';
 import { IArtificialModeration, IArtificialModerationButton, IArtificialModerationGroup } from './model';
-
-/** EXAMPLE OF A AM-CONFIGURATION OBJECT
-  topics_after_saliencing: {
-    condition: (ctx) => ctx.routed_stage,
-    items: [
-      {
-        body: `Sie sehen hier nun Ihre persönliche Prioritätenliste der Wahlthemen. Sind Sie mit Ihrer Priorisierung vorerst einmal einverstanden?`,
-        condition: (ctx) => ctx.salienceCompleted,
-        buttons: [
-          {
-            action: (ctx) => ctx.nextScheduledStage(),
-            label: 'Ja, wir können weiterfahren!'
-            // icon: null,
-            // icon_rigth: null,
-          }
-        ]
-      }
-    ]
-  }
- * 
- */
-
-// interface IArtificialModerationSet{
-//   buttons: IArtificialModerationButton[];
-//   items: IArtificialModeration[]
-// }
 
 const numberOfActors = 2;
 // TODO: AMcache does only work with one AM per page...
@@ -128,9 +102,10 @@ export default defineComponent({
   "this.amGroup" -Prop allows to specify whether the ArtificialModerators are played by
     distinct actors or the same actors. (If not specified, it is a random choice)
   */
-  // setup() {
-  //   return {};
-  // },
+  setup() {
+    const {sample} = library
+    return {sample};
+  },
   data() {
     return {
       AMpatched: null as null | IArtificialModerationGroup,
@@ -370,7 +345,7 @@ export default defineComponent({
 
       // RANDOM DRAW
       if (this.validMaxPriorityItems.length) {
-        const selected = this.$library.sample(this.validMaxPriorityItems);
+        const selected = this.sample(this.validMaxPriorityItems);
         console.log('SELECTED', selected);
         return selected as IArtificialModeration;
       }
