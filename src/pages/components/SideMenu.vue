@@ -1,7 +1,6 @@
 <style>
 /* body.screen--xs  */
 </style>
-
 <template>
   <div v-if="items">
     <div
@@ -28,7 +27,7 @@
           :style="
             selectedItemsAnchor.includes(item.anchor) ? selectedStyle : ''
           "
-          @click="scrollToAnchor(item.anchor)"
+          @click="scrollToAnchor(item.anchor, headerOffset)"
           v-ripple
         >
           <q-item-section
@@ -116,15 +115,16 @@ import { dom } from 'quasar';
 // import { colors } from 'quasar';
 import useAppComposable from 'src/composables/app.composable';
 import { ISideMenuItem, ISideMenuItems } from 'src/models/layout';
+import library from 'src/utils/library';
 // import {
 // } from 'src/pages/Assembly/AssemblyManageSummary.vue';
-
 // const { changeAlpha } = colors;
 const { offset } = dom;
 
 export default defineComponent({
   setup() {
-    const { headerOffset, scrollToAnchor } = useAppComposable();
+    const { scrollToAnchor } = library;
+    const { headerOffset } = useAppComposable();
     return { headerOffset, scrollToAnchor };
   },
   name: 'SideMenu',
@@ -187,7 +187,7 @@ export default defineComponent({
         return (
           dom &&
           dom?.item(0) &&
-          offset(dom.item(0)).top < this.headerOffset + 350
+          offset(dom.item(0)).top < this.headerOffset + 150
         );
       });
       if (!selected) {
@@ -203,8 +203,6 @@ export default defineComponent({
       this.scrollSelectedItemAnchor = this.items[0].anchor;
       this.enabledAnchors = this.getEnabledAnchors();
     }
-
-    // console.log(this.highlightedItem, 'll' )
   },
 });
 </script>

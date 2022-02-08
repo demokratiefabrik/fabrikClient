@@ -10,18 +10,17 @@ import useRouterComposable from './router.composable';
 import useAuthComposable from './auth.composable';
 import useMonitorComposable from './monitor.composable';
 import constants from 'src/utils/constants';
-import { scroll, useQuasar } from 'quasar';
-const { setVerticalScrollPosition } = scroll;
-import { dom } from 'quasar';
+import { useQuasar } from 'quasar';
+// const { setVerticalScrollPosition } = scroll;
+// import { dom } from 'quasar';
+// const { offset } = dom;
 import { useStore } from 'vuex';
 import { INotificationBanner } from 'src/models/layout';
 import useStoreComposable from './store.composable';
-const { offset } = dom;
 
 const { removeItem } = library;
 const headerOffset = ref<number>(150); // default header is minimized within assembly sections
 const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
-const fixedSelectedItem = ref<HTMLElement | null>(null); // Fixed Element (TODO: describe better what this is for!)
 
 export interface INotificationConfig {
   settimer?: boolean;
@@ -61,7 +60,7 @@ export default function useAppComposable() {
     const store = useStore();
     const $q = useQuasar();
     const currentRoute = useRoute();
-    const { getOffsetTop } = library;
+    // const { getOffsetTop } = library;
     const { t } = useI18n();
     const exitApp = () => (appExitState.value = true);
 
@@ -91,53 +90,6 @@ export default function useAppComposable() {
       loadingGifStack.value = [];
     };
 
-    /* SCROLLING */
-    // ----------------------
-    // const getOffsetTop = (element) => {
-    //   let offsetTop = 0;
-    //   while (element) {
-    //     offsetTop += element.offsetTop;
-    //     element = element.offsetParent;
-    //   }
-    //   return offsetTop;
-    // };
-
-    const scrollToAnchor = (anchor, duration = 300, lag = 0) => {
-      const dom = document.getElementsByName(anchor);
-      const ele = dom?.item(0);
-      const scrollFnc = () => {
-        fixedSelectedItem.value = anchor;
-        const elOffset = getOffsetTop(ele) - headerOffset.value;
-        setVerticalScrollPosition(window, elOffset, duration);
-        setTimeout(() => (fixedSelectedItem.value = null), duration);
-      };
-      if (lag) {
-        setTimeout(scrollFnc, lag);
-      } else {
-        scrollFnc();
-      }
-    };
-    const scrollToAnchorIfNecessary = (anchor, duration = 300, lag = 0) => {
-      const dom = document.getElementsByName(anchor);
-      const ele = dom?.item(0);
-      if (offset(ele).top < 50) {
-        scrollToAnchor(anchor, duration, lag);
-      }
-    };
-    /* Scroll To #Anchor */
-    // NOT USED
-    // const anchor = (anchor: string) => {
-    //   // scroll to element
-    //   const el = document.querySelector(`a[name=${anchor}]`);
-    //   el && el.scrollIntoView();
-
-    //   // account for fixed header
-    //   const headerHeight = 200;
-    //   const scrolledY = window.scrollY;
-    //   if (scrolledY) {
-    //     window.scroll(0, scrolledY - headerHeight);
-    //   }
-    // };
 
     /* NOTIFICATIONS 
   -------------------------*/
@@ -403,8 +355,8 @@ export default function useAppComposable() {
       appExitState: readonly(appExitState),
       headerOffset: readonly(headerOffset),
       instanceNr: readonly(instanceNr),
-      scrollToAnchorIfNecessary,
-      scrollToAnchor,
+      // scrollToAnchorIfNecessary,
+      // scrollToAnchor,
       showAuthenticationError,
       showServiceError,
       showAuthenticationWarning,

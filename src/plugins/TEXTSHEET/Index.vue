@@ -4,7 +4,7 @@
     <ArtificialModeration :AM="index_top" alignment="center" :ctx="this" />
 
     <div class="text-vessel" v-if="mainTopics?.length">
-      <h2>{{ routed_stage.stage.title }}</h2>
+      <h2>{{ routed_stage?.stage.title }}</h2>
 
       <div
         class="row justify-between"
@@ -74,7 +74,6 @@ import localI18n from './i18n';
 import constants from 'src/utils/constants';
 import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
-// import useLibraryComposable from 'src/utils/library';
 import library  from 'src/utils/library';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useEmitter from 'src/utils/emitter';
@@ -120,18 +119,18 @@ export default defineComponent({
       discussion_index_top,
       index_top,
       routed_stage,
-      loaded,
-      filter_entries,
       isRoutedStageAlerted,
       emitter,
       nextScheduledStage,
-      gotoAssemblyHome,
       assembly,
-      markUnAlert,
-      gotoStage,
       contenttreeID,
       isFirstText,
       contenttree,
+      loaded,
+      filter_entries,
+      gotoAssemblyHome,
+      markUnAlert,
+      gotoStage,
     };
   },
 

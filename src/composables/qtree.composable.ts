@@ -39,11 +39,11 @@ export interface ITreeFilter {
 export default function useQtreeComposable(props) {
   console.log('DEBUG: useQtreeComposable::SETUP');
   const store = useStore();
-  const { getOffsetTop, loaded } = library;
+  const { scrollToAnchor, getOffsetTop, loaded } = library;
   const { contenttree, markRead, isRead } = useContenttreeComposable();
   const { assemblyIdentifier } = useAssemblyComposable('qtree.comp');
   const { userid } = usePKCEComposable();
-  const { scrollToAnchor } = useAppComposable();
+  const { headerOffset } = useAppComposable();
 
   // const currentRoute = useRoute();
   // const { gotoAssemblyHome, stageID, assemblyIdentifier } = useAssemblyComposable('');
@@ -188,7 +188,7 @@ export default function useQtreeComposable(props) {
   };
 
   const focus_on_branch = (node) => {
-    scrollToAnchor(`NODE${node.content.id}`, 0);
+    scrollToAnchor(`NODE${node.content.id}`, headerOffset.value, 0);
     expanded_filter.value = false;
     expand_node(node);
     console.assert(node.content.id);

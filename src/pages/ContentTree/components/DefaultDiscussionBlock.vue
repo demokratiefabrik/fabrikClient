@@ -93,12 +93,13 @@ type IPath = number[]; //array of cells
 export default defineComponent({
   setup() {
     const { monitorLog } = useMonitorComposable();
-    const { pushSorted } = library;
-    const { scrollToAnchor } = useAppComposable();
+    const { pushSorted, scrollToAnchor } = library;
+    const { headerOffset } = useAppComposable();
     const { contenttree, isRead, isAlerted } = useContenttreeComposable();
 
     return {
       scrollToAnchor,
+      headerOffset,
       pushSorted,
       monitorLog,
       isAlerted,
@@ -317,6 +318,7 @@ export default defineComponent({
           `CONTENTTREE${this.contenttree.id}CONTENT${
             this.node ? this.node.content?.id : ''
           }`,
+          this.headerOffset.value,
           50
         );
 

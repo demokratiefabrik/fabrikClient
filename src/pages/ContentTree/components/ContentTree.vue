@@ -238,10 +238,10 @@ export default defineComponent({
   setup(props) {
     const { getDailyContributionLimits } = useAssemblyComposable('');
     const qtree = useQtreeComposable(props);
-    const { sample } = library;
+    const { sample, scrollToAnchor } = library;
     const { contenttree, isRead } = useContenttreeComposable();
     const { limitForAddingCommentsReached } = useAssemblyComposable('');
-    const { scrollToAnchor } = useAppComposable();
+    const { headerOffset } = useAppComposable();
     const content_editor = ref();
 
     return {
@@ -251,6 +251,7 @@ export default defineComponent({
       sample,
       isRead,
       scrollToAnchor,
+      headerOffset,
       contenttree,
       limitForAddingCommentsReached,
     };
@@ -466,6 +467,7 @@ export default defineComponent({
         `CONTENTTREE${this.contenttree.id}CONTENT${
           this.node && this.node.id ? this.node.id : ''
         }`,
+        this.headerOffset.value,
         50
       );
 
