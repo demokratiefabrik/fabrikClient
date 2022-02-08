@@ -151,7 +151,8 @@ import { IStageTuple } from 'src/models/stage';
 
 import StageEditor from 'src/pages/Assembly/components/StageEditor.vue';
 import AssemblyEditor from 'src/pages/Assembly/components/AssemblyEditor.vue';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import { useStore } from 'vuex';
@@ -161,7 +162,7 @@ import { useStore } from 'vuex';
 
 export default defineComponent({
   setup() {
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const { assemblyIdentifier, assembly_sorted_stages, assembly, ready } =
       useAssemblyComposable('');
     // const { contenttree } = useContenttreeComposable();

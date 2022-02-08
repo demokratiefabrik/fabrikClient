@@ -11,7 +11,8 @@ import { useStore } from 'vuex';
 // import { useRoute} from 'vue-router';
 // import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useContenttreeComposable from './contenttree.composable';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import constants from 'src/utils/constants';
@@ -38,7 +39,7 @@ export interface ITreeFilter {
 export default function useQtreeComposable(props) {
   console.log('DEBUG: useQtreeComposable::SETUP');
   const store = useStore();
-  const { getOffsetTop, loaded } = useLibraryComposable();
+  const { getOffsetTop, loaded } = library;
   const { contenttree, markRead, isRead } = useContenttreeComposable();
   const { assemblyIdentifier } = useAssemblyComposable('qtree.comp');
   const { userid } = usePKCEComposable();

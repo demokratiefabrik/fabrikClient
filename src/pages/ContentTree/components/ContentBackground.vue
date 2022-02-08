@@ -238,7 +238,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import UserInfo from 'src/pages/components/UserInfo.vue';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 // import { runtimeStore } from 'src/store/runtime.store';
 import api from 'src/utils/api';
 import constants from 'src/utils/constants';
@@ -259,7 +260,7 @@ export default defineComponent({
   setup() {
     const { monitorLog } = useMonitorComposable();
     const { assemblyIdentifier } = useAssemblyComposable('');
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const { getUsername, getUsernameDerivation } = useAuthComposable();
 
     return {

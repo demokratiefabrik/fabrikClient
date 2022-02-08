@@ -10,7 +10,7 @@
 </style>
 
 <template>
-  <div v-if="ready">
+  <div v-if="ready && assemblyMenuData">
     <q-tabs
       v-model="currenttab"
       outside-arrows
@@ -21,11 +21,11 @@
         v-for="item in Object.values(assemblyMenuData)"
         :key="item.name"
         :name="item.name"
-        :disable="!groupsAccessible.includes(item.name)"
+        :disable="!groupsAccessible?.includes(item.name)"
         :to="item.to()"
         alert-icon="mdi-account-supervisor-circle"
         :alert="
-          next_scheduled_stage && next_scheduled_stage.stage.group == item.name
+          nextScheduledStage && nextScheduledStage.stage.group == item.name
             ? 'blue'
             : false
         "
@@ -37,20 +37,20 @@
         :label="item.label"
       >
         <q-tooltip
-          v-if="!groupsAccessible.includes(item.name)"
+          v-if="!groupsAccessible?.includes(item.name)"
           :offset="menuOffset"
           max-width="300px"
           >{{ $t('menu.items.locked.tooltip') }}</q-tooltip
         >
 
         <q-tooltip
-          v-if="groupsAccessible.includes(item.name)"
+          v-if="groupsAccessible?.includes(item.name)"
           :offset="menuOffset"
           max-width="300px"
           >{{ item.tooltip }}</q-tooltip
         >
         <q-badge
-          v-if="!groupsAccessible.includes(item.name)"
+          v-if="!groupsAccessible?.includes(item.name)"
           color="orange"
           style="position: absolute; top: 2em; right: 2em"
         >
@@ -61,11 +61,10 @@
   </div>
 </template>
 
-<script>
-import useAssemblyComposable from 'src/composables/assembly.composable';
+<script lang="ts">
 import useStageComposable from 'src/composables/stage.composable';
 import useRouterComposable from 'src/composables/router.composable';
-import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -73,25 +72,24 @@ export default defineComponent({
   props: ['menuOffset'],
 
   setup() {
-    const { loaded } = useLibraryComposable();
-    const { assemblyIdentifier, assemblyMenuData } = useAssemblyComposable();
+    const { loaded } = library;
     const {
       stages_by_groups,
       routedStageGroup,
+      nextScheduledStage,
+      assemblyMenuData,
       groupsAccessible,
       getFirstOrRoutedStageIDByGroup,
-      next_scheduled_stage,
     } = useStageComposable();
     const { pushR } = useRouterComposable();
 
     return {
       getFirstOrRoutedStageIDByGroup,
-      assemblyIdentifier,
       stages_by_groups,
       routedStageGroup,
       assemblyMenuData,
       groupsAccessible,
-      next_scheduled_stage,
+      nextScheduledStage,
       loaded,
       pushR,
     };
@@ -102,7 +100,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ready() {
+    ready(): boolean {
       return this.loaded(this.assemblyMenuData) && this.loaded(this.routedStageGroup);
     },
   },

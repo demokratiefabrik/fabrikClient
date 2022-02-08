@@ -1,9 +1,11 @@
 <template>
   <q-page class="doc_content side_menu">
+
     <template v-if="showAssemblyMenu">
       <!--      <teleport to="#assemblyMenuContainer">
         <AssemblyMenu />
       </teleport>-->
+
       <AssemblyMenu />
     </template>
 

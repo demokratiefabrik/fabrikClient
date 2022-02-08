@@ -1,5 +1,6 @@
-import useLibraryComposable from 'src/utils/library';
-const { filter } = useLibraryComposable();
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
+const { filter } = library;
 
 export const ongoing_assemblies = (state) => {
   const publicIndex = state.publicIndex;

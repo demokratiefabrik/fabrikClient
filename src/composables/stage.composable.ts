@@ -6,14 +6,11 @@ import useRouterComposable from './router.composable';
 import { useStore } from 'vuex';
 import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
-import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import { IStageTuple } from 'src/models/stage';
-// import { IAssemblyTuple } from 'src/models/assembly';
-
-// const output = ref<null | any>(null);
 
 const emitter = useEmitter();
-const { loaded } = useLibraryComposable();
+const { loaded } = library;
 const { userid } = usePKCEComposable();
 
 export default function useStageComposable() {
@@ -47,9 +44,6 @@ export default function useStageComposable() {
   const IsManager = computed(
     (): boolean => store.getters['assemblystore/IsManager']
   );
-  // const assembly = computed(
-  //   (): IAssemblyTuple => store.getters['assemblystore/assembly']
-  // );
 
   const is_stage_accessible =
     store.getters['assemblystore/is_stage_accessible'];
@@ -81,12 +75,6 @@ export default function useStageComposable() {
     if (!assemblyStages.value) {
       return null;
     }
-    console.log(
-      'routed stage debug................',
-      stageID.value,
-      assemblyStages.value,
-      assemblyStages.value[stageID.value]
-    );
     return assemblyStages.value[stageID.value];
   });
 
@@ -108,8 +96,6 @@ export default function useStageComposable() {
   });
 
   const contenttreeID = computed((): null | number => {
-    // console.log('load contenttreeID in .compcontentreeuted', routed_stage.value)
-    // console.log("RETRIEVE contenttreeID..", this.routed_stage)
     if (!routed_stage.value?.stage?.contenttree_id) {
       return null;
     }
@@ -189,31 +175,7 @@ export default function useStageComposable() {
     checkMilestones();
   };
 
-  //TODO add watcher... to sync data..
-  /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
-  watch(contenttreeID, () => {
-    if (contenttreeID.value) {
-      store.dispatch('contenttreestore/syncContenttree', {
-        assemblyIdentifier: assemblyIdentifier,
-        contenttreeID: contenttreeID.value,
-        oauthUserID: userid.value,
-      });
-    }
-  });
-
-  // MOUNTED
-  // when stage has been loaded already
-  if (routed_stage.value?.stage.contenttree_id && userid) {
-    store.dispatch('contenttreestore/syncContenttree', {
-      assemblyIdentifier,
-      contenttreeID: routed_stage.value.stage.contenttree_id,
-      oauthUserID: userid.value,
-    });
-
-    // earlier: in created section of mixin
-    checkMilestones();
-  }
-
+  
   const groups = computed((): string[] => {
     return Object.keys(stages_by_groups);
   });
@@ -245,9 +207,6 @@ export default function useStageComposable() {
     return groups;
   });
 
-  const testGroupsScheduled = computed((): any => {
-    return assembly_scheduled_stages.value;
-  });
 
   const groupsScheduled = computed((): string[] | undefined => {
     console.log('DEBUGGER, ', assembly_scheduled_stages.value);
@@ -317,6 +276,33 @@ export default function useStageComposable() {
     return stage.stage.id;
   };
 
+
+  // MOUNTED
+  //TODO add to initialize function ()
+  /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
+  watch(contenttreeID, () => {
+    if (contenttreeID.value) {
+      store.dispatch('contenttreestore/syncContenttree', {
+        assemblyIdentifier: assemblyIdentifier,
+        contenttreeID: contenttreeID.value,
+        oauthUserID: userid.value,
+      });
+    }
+  });
+
+  // when stage has been loaded already
+  if (routed_stage.value?.stage.contenttree_id && userid) {
+    store.dispatch('contenttreestore/syncContenttree', {
+      assemblyIdentifier,
+      contenttreeID: routed_stage.value.stage.contenttree_id,
+      oauthUserID: userid.value,
+    });
+
+    // earlier: in created section of mixin
+    checkMilestones();
+  }
+
+
   return {
     ready,
     assemblyMenuData,
@@ -330,7 +316,6 @@ export default function useStageComposable() {
     markCompleted,
     routedStageGroup,
     groups,
-    testGroupsScheduled,
     nextScheduledStage,
     groupsScheduled,
     groupsAccessible,

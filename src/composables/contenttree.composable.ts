@@ -6,7 +6,8 @@
 // import { LayoutEventBus } from 'src/utils/eventbus.js'
 import constants from 'src/utils/constants';
 import useEmitter from 'src/utils/emitter';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 // import useAssemblyComposable from './assembly.composable';
 import { computed } from 'vue';
 // import useAppComposable from './app.composable';
@@ -17,7 +18,7 @@ import { INodeTuple } from 'src/models/content';
 
 
 const emitter = useEmitter();
-const { loaded, pushSorted} = useLibraryComposable();
+const { loaded, pushSorted} = library;
 
 export default function useContenttreeComposable() {
   console.log('DEBUG: useContenttreeComposable::SETUP')

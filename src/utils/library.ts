@@ -1,6 +1,7 @@
 /** DEMOKRATIFABRIK standalone Method Libraryies */
 
-export default function useLibraryComposable() {
+// export default function useLibraryComposable() {
+  // export default library {
 
   /* Add Object filter: helper...
   * <var>.filter only works for lists but not for objects...
@@ -81,9 +82,8 @@ export default function useLibraryComposable() {
   //   )
   // }
 
-  return {
+export default {
     timestamp,
-    // groupBy,
     removeItem,
     getOffsetTop,
     pushSorted,
@@ -92,4 +92,4 @@ export default function useLibraryComposable() {
     nLength,
     filter,
   };
-}
+// }

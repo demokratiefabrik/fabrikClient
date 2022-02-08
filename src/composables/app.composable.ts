@@ -2,7 +2,8 @@
 import { watch, ref, readonly } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useEmitter from 'src/utils/emitter';
 import useAssemblyComposable from './assembly.composable';
 import useRouterComposable from './router.composable';
@@ -14,14 +15,13 @@ const { setVerticalScrollPosition } = scroll;
 import { dom } from 'quasar';
 import { useStore } from 'vuex';
 import { INotificationBanner } from 'src/models/layout';
+import useStoreComposable from './store.composable';
 const { offset } = dom;
 
-const { removeItem } = useLibraryComposable();
+const { removeItem } = library;
 const headerOffset = ref<number>(150); // default header is minimized within assembly sections
 const setHeaderOffset = (offset: number) => (headerOffset.value = offset);
 const fixedSelectedItem = ref<HTMLElement | null>(null); // Fixed Element (TODO: describe better what this is for!)
-
-
 
 export interface INotificationConfig {
   settimer?: boolean;
@@ -31,6 +31,9 @@ export interface INotificationConfig {
 // APP State
 const appExitState = ref<boolean>(false);
 const emitter = useEmitter();
+
+const { setStageID, setAssemblyIdentifier, assemblyIdentifier, stageID } =
+useStoreComposable();
 
 // Notifications
 const notificationBanner = ref<INotificationBanner | undefined>(undefined);
@@ -42,24 +45,29 @@ export default function useAppComposable() {
   const setup = () => {
     console.log('DEBUG: APP COMPOSABLE - START');
 
-    const assemblyComposable = useAssemblyComposable('app.comp');
-    const {authorized, logoutState, logout, is_in_testing_phase, initialize: authInitialize} = useAuthComposable();
-    const monitorComposable = useMonitorComposable();
-    const routerComposable = useRouterComposable();
+
+    const { initialize: assemblyInitialize, syncUserAssembly } =
+      useAssemblyComposable('app.comp');
+    const {
+      authorized,
+      logoutState,
+      logout,
+      is_in_testing_phase,
+      initialize: authInitialize,
+    } = useAuthComposable();
+    const { monitorLog, initialize: monitorInitialize } =
+      useMonitorComposable();
+    const { setLastRoute, instanceNr } = useRouterComposable();
     const store = useStore();
     const $q = useQuasar();
     const currentRoute = useRoute();
-    const { getOffsetTop } = useLibraryComposable();
+    const { getOffsetTop } = library;
     const { t } = useI18n();
     const exitApp = () => (appExitState.value = true);
 
     /* LOADING GIF: give a label to facilitate debugging... 
     -------------------------
   */
-
-
-
-
 
     const showLoadingGif = (label) => {
       // const extlabel = `${label}${timestamp()}`
@@ -159,10 +167,7 @@ export default function useAppComposable() {
         settimer: config?.settimer ? true : false,
       };
 
-      monitorComposable.monitorLog(
-        constants.MONITOR_ERROR_AUTHORIZATION,
-        banner
-      );
+      monitorLog(constants.MONITOR_ERROR_AUTHORIZATION, banner);
       showNotification(banner);
     };
 
@@ -178,7 +183,7 @@ export default function useAppComposable() {
         settimer: config?.settimer ? true : false,
       };
 
-      monitorComposable.monitorLog(constants.MONITOR_ERROR_SERVICE, banner);
+      monitorLog(constants.MONITOR_ERROR_SERVICE, banner);
       showNotification(banner);
     };
 
@@ -192,7 +197,7 @@ export default function useAppComposable() {
         settimer: config?.settimer ? true : false,
       };
 
-      monitorComposable.monitorLog(constants.MONITOR_ERROR_NETWORK, banner);
+      monitorLog(constants.MONITOR_ERROR_NETWORK, banner);
       showNotification(banner);
     };
 
@@ -207,10 +212,7 @@ export default function useAppComposable() {
         buttons: ['auth', 'home'],
         settimer: config?.settimer ? true : false,
       };
-      monitorComposable.monitorLog(
-        constants.MONITOR_ERROR_INVALID_TOKEN,
-        banner
-      );
+      monitorLog(constants.MONITOR_ERROR_INVALID_TOKEN, banner);
       showNotification(banner);
       //       setBrokenSession()
       logout(null, {}, true);
@@ -226,10 +228,7 @@ export default function useAppComposable() {
         body: t('app.error.toomanyrequests_error_body'),
         settimer: config?.settimer ? true : false,
       };
-      monitorComposable.monitorLog(
-        constants.MONITOR_ERROR_TOO_MANY_REQUESTS,
-        banner
-      );
+      monitorLog(constants.MONITOR_ERROR_TOO_MANY_REQUESTS, banner);
       showNotification(banner);
     };
 
@@ -245,10 +244,7 @@ export default function useAppComposable() {
         settimer: config?.settimer ? true : false,
       };
 
-      monitorComposable.monitorLog(
-        constants.MONITOR_WARNING_AUTHENTICATION,
-        banner
-      );
+      monitorLog(constants.MONITOR_WARNING_AUTHENTICATION, banner);
       showNotification(banner);
     };
 
@@ -263,23 +259,19 @@ export default function useAppComposable() {
         settimer: config?.settimer ? true : false,
       };
 
-      monitorComposable.monitorLog(
-        constants.MONITOR_ERROR_AUTHENTICATION,
-        banner
-      );
+      monitorLog(constants.MONITOR_ERROR_AUTHENTICATION, banner);
       showNotification(banner);
     };
-
 
     const apireset = (full: boolean) => {
       // TESTING: reset user data of the day or the full assembly session...
       if (is_in_testing_phase.value) {
-        store.dispatch('appstore/monitorReset', {notifyBackend: true, full});
+        store.dispatch('appstore/monitorReset', { notifyBackend: true, full });
         setTimeout(() => {
           logout();
         }, 10);
       }
-    }
+    };
 
     // const appExitState = () => {
     //     return appExitState.value
@@ -293,9 +285,9 @@ export default function useAppComposable() {
 
       authInitialize();
       // START MONITOR ENGINE
-      monitorComposable.initialize();
+      monitorInitialize();
       // START ASSEMBLY ENGINE
-      assemblyComposable.initialize();
+      assemblyInitialize();
       // LISTENING ON ERRORS
       emitter.on('showNetworkError', () => {
         showNetworkError();
@@ -372,45 +364,45 @@ export default function useAppComposable() {
 
       /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
       watch(currentRoute, () => {
-        console.log('WATCHER in CURRENT ROUTE (APP)', 'syncAssembliesSync')
+        console.log('WATCHER in CURRENT ROUTE (APP)', 'syncAssembliesSync');
         notificationBanner.value = undefined;
-        routerComposable.setLastRoute(currentRoute)
+        setLastRoute(currentRoute);
         // currentRoute.fullPath
 
         // TODO: should we log each route?
         // store.dispatch('assemblystore/monitor_route_changes', { to, from })
 
         if (currentRoute.params?.assemblyIdentifier) {
-          
           // UPDATE CURRENT ASSEMBLY...
           // TODO: redirect to Home, when assembly is invalid
-          if (currentRoute.params?.assemblyIdentifier != routerComposable.assemblyIdentifier) {
-            routerComposable.setAssemblyIdentifier(
+          if (
+            currentRoute.params?.assemblyIdentifier != assemblyIdentifier.value
+          ) {
+            setAssemblyIdentifier(
               currentRoute?.params?.assemblyIdentifier as string | null
             );
-            assemblyComposable.syncUserAssembly()
+            syncUserAssembly();
           }
 
           // UPDATE STAGES...
           // TODO: redirect to asembly home, when stage is invalid
           if (
             currentRoute.params?.stageID !== null &&
-            currentRoute.params?.stageID !== undefined && 
-            currentRoute.params?.stageID !== routerComposable.stageID
+            currentRoute.params?.stageID !== undefined &&
+            currentRoute.params?.stageID !== `${stageID.value}`
           ) {
-            routerComposable.setStageID(
-              parseInt(currentRoute.params.stageID as string)
-            );
+            setStageID(parseInt(currentRoute.params.stageID as string));
             emitter.emit('showLoading');
           }
         }
       });
     };
+    
 
     return {
       appExitState: readonly(appExitState),
       headerOffset: readonly(headerOffset),
-      instanceNr: readonly(routerComposable.instanceNr),
+      instanceNr: readonly(instanceNr),
       scrollToAnchorIfNecessary,
       scrollToAnchor,
       showAuthenticationError,

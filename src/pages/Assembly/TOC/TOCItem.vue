@@ -85,9 +85,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-// import { useRouter } from 'vue-router';
 import TOCSubItem from './TOCSubItem.vue';
-// import useStageComposable from 'src/composables/stage.composable';
 import { IStageTuple } from 'src/models/stage';
 
 export default defineComponent({

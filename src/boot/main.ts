@@ -2,7 +2,7 @@ import { boot } from 'quasar/wrappers';
 import filters from 'src/utils/filters';
 import useEmitter from 'src/utils/emitter';
 import Constants from 'src/utils/constants';
-import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import { pluginNames } from 'src/plugins';
 
 // import {
@@ -13,7 +13,7 @@ import { pluginNames } from 'src/plugins';
 // } from 'vue-router';
 
 const emitter = useEmitter();
-const library = useLibraryComposable();
+// const library = useLibraryComposable();
 
 /** extend global property */
 

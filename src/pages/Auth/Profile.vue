@@ -235,7 +235,7 @@ export default defineComponent({
 
     skipProfile: function () {
       if (this.destination_route) {
-        this.$router.push(this.destination_route);
+        this.$router.push(this.destination_route as RouteLocationRaw);
       } else {
         const route = { name: 'home' } as RouteLocationRaw;
         this.$router.push(route);
@@ -334,7 +334,9 @@ export default defineComponent({
       return;
     }
 
-    this.destination_route = this.lastRouteString;
+    if (this.lastRouteString) {
+      this.destination_route = this.lastRouteString  as RouteLocationNormalizedLoaded | null;
+    }
     this.loadProfile();
   },
 

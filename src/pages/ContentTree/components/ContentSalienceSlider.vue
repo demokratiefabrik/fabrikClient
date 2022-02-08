@@ -34,7 +34,8 @@ import { debounce } from 'quasar';
 import { mapActions } from 'vuex';
 import constants from 'src/utils/constants';
 import { colors } from 'quasar';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useMonitorComposable from 'src/composables/monitor.composable';
 import { INodeTuple } from 'src/models/content';
 const { rgbToHex } = colors;
@@ -42,7 +43,7 @@ const { rgbToHex } = colors;
 export default defineComponent({
   setup() {
     const { monitorLog } = useMonitorComposable();
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     // const debouncedInitSet: null | (() => void) = () => void
     const debouncedInitSet: null | (() => void) = () => undefined;
     return { loaded, debouncedInitSet, monitorLog };

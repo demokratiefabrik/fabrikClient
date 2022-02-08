@@ -12,7 +12,8 @@
 import AMs from './ArtificialModeration';
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import { defineComponent } from 'vue';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useStageComposable from 'src/composables/stage.composable';
 import useAuthComposable from 'src/composables/auth.composable';
 import useEmitter from 'src/utils/emitter';
@@ -27,7 +28,7 @@ export default defineComponent({
       routed_stage,
       gotoStage,
     } = useStageComposable();
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     // const store = useStore();
     const { payload, emailIsAvailable } = useAuthComposable();
     const emitter = useEmitter();

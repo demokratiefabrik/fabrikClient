@@ -229,7 +229,8 @@ import ContentTreeQTreeBody from './ContentTreeQTreeBody.vue';
 import AMs from '../ArtificialModeration';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useQtreeComposable from 'src/composables/qtree.composable';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useAppComposable from 'src/composables/app.composable';
 
@@ -237,7 +238,7 @@ export default defineComponent({
   setup(props) {
     const { getDailyContributionLimits } = useAssemblyComposable('');
     const qtree = useQtreeComposable(props);
-    const { sample } = useLibraryComposable();
+    const { sample } = library;
     const { contenttree, isRead } = useContenttreeComposable();
     const { limitForAddingCommentsReached } = useAssemblyComposable('');
     const { scrollToAnchor } = useAppComposable();

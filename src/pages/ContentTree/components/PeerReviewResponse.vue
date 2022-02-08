@@ -29,13 +29,14 @@ import { defineComponent } from 'vue';
 import { mapActions } from 'vuex';
 import { debounce } from 'quasar';
 import constants from 'src/utils/constants';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useMonitorComposable from 'src/composables/monitor.composable';
 
 export default defineComponent({
   setup() {
     const debouncedInitSet: null | (() => void) = () => undefined;
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const { monitorFire } = useMonitorComposable();
     return { loaded, monitorFire, debouncedInitSet };
   },

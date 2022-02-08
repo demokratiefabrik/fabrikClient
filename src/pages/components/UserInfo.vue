@@ -185,7 +185,8 @@
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import api from 'src/utils/api';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useAuthComposable from 'src/composables/auth.composable';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 
@@ -195,7 +196,7 @@ export default defineComponent({
 
   setup() {
     // console.log('DEBUG setup mainLayout')
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const { currentUsername, currentUsernameDerivation } = useAuthComposable();
     const { assemblyIdentifier } = useAssemblyComposable('userinfo');
     // const {loading} = useLibraryComposable()

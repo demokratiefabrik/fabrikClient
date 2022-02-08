@@ -41,12 +41,13 @@ import AMs from 'src/pages/Assembly/ArtificialModeration';
 import ArtificialModeration from 'src/pages/components/artificial_moderation/ArtificialModeration.vue';
 import useStageComposable from 'src/composables/stage.composable';
 import { IStageGroup } from 'src/models/stage';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 
 export default defineComponent({
   setup() {
     const { push } = useRouter();
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     // const { assembly, assemblyMenuData } = useAssemblyComposable();
     const {
       groupsScheduled,

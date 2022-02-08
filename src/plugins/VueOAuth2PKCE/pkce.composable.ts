@@ -2,8 +2,6 @@
 const { OAuth2AuthCodePKCE } = require('@bity/oauth2-auth-code-pkce');
 import { ref, computed, readonly } from 'vue';
 import useOAuthEmitter from 'src/plugins/VueOAuth2PKCE/oauthEmitter';
-// import { useRouter } from 'vue-router';
-// import useRouterComposable from 'src/composables/router.composable';
 
 /// POLYFILL (IE11 for oAuth2 PKCE Module)
 // Note: does not work anymore when outsourced in seperate files..

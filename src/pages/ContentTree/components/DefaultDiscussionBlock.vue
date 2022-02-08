@@ -81,7 +81,8 @@ import constants from 'src/utils/constants';
 // import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useAppComposable from 'src/composables/app.composable';
 import useMonitorComposable from 'src/composables/monitor.composable';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 // import useAssemblyComposable from 'src/composables/assembly.composable';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import { INodeTuple } from 'src/models/content';
@@ -92,7 +93,7 @@ type IPath = number[]; //array of cells
 export default defineComponent({
   setup() {
     const { monitorLog } = useMonitorComposable();
-    const { pushSorted } = useLibraryComposable();
+    const { pushSorted } = library;
     const { scrollToAnchor } = useAppComposable();
     const { contenttree, isRead, isAlerted } = useContenttreeComposable();
 

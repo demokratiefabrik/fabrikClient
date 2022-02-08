@@ -174,7 +174,8 @@ import SideMenu from 'src/pages/components/SideMenu.vue';
 import { mapGetters, useStore } from 'vuex';
 import Skeleton from 'src/pages/components/Skeleton.vue';
 import useAssemblyComposable from 'src/composables/assembly.composable';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import { IStageTuple } from 'src/models/stage';
 import { IContentTree } from 'src/models/contenttree';
 import { INodeTuple } from 'src/models/content';
@@ -185,7 +186,7 @@ import { ISideMenuItem } from 'src/models/layout';
 
 export default defineComponent({
   setup() {
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const { assemblyIdentifier, assembly, assemblyStages, ready } =
       useAssemblyComposable('');
     const { routed_stage, markUnAlert } = useStageComposable();

@@ -51,7 +51,7 @@ export default function useCIRComposable() {
         expanded: () => false,
         to: () => {
           return {
-            name: 'CIR_VOICE',
+            name: 'VOICE',
             params: {
               assemblyIdentifier: assemblyIdentifier.value,
               stageID: getFirstOrRoutedStageIDByGroup('voice'),
@@ -71,7 +71,7 @@ export default function useCIRComposable() {
         'Nun wird es konkret: Was genau sind für Sie die wichtigsten Argumente die Vorlage anzunehmen oder abzulehnen. Für welche Argumente bringen Sie am meisten Verständnis auf?',
         to: () => {
           return {
-            name: 'CIR_ARGUMENTS',
+            name: 'ARGUMENTS',
             params: {
               assemblyIdentifier: assemblyIdentifier.value,
               stageID: getFirstOrRoutedStageIDByGroup('arguments'),
@@ -92,7 +92,7 @@ export default function useCIRComposable() {
         expanded: () => false,
         to: () => {
           return {
-            name: 'CIR_CONCLUSION',
+            name: 'CONCLUSION',
             params: {
               assemblyIdentifier: assemblyIdentifier.value,
               stageID: getFirstOrRoutedStageIDByGroup('conclusion'),

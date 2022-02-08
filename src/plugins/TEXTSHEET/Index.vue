@@ -74,7 +74,8 @@ import localI18n from './i18n';
 import constants from 'src/utils/constants';
 import { defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import useEmitter from 'src/utils/emitter';
 import { INodeTuple } from 'src/models/content';
@@ -87,7 +88,7 @@ import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
   setup() {
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const {
       contenttreeID,
       routed_stage,

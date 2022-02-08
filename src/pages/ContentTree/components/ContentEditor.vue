@@ -257,7 +257,8 @@
 import { mapGetters, mapActions, useStore } from 'vuex';
 import api from 'src/utils/api';
 import { defineComponent, ref } from 'vue';
-import useLibraryComposable from 'src/utils/library';
+// import useLibraryComposable from 'src/utils/library';
+import library  from 'src/utils/library';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
 import { INodeTuple } from 'src/models/content';
@@ -279,7 +280,7 @@ export interface IData {
 
 export default defineComponent({
   setup() {
-    const { loaded } = useLibraryComposable();
+    const { loaded } = library;
     const {
       getDailyContributionLimits,
       limitForAddingCommentsReached,

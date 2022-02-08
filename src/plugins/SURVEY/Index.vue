@@ -34,6 +34,8 @@ import useAuthComposable from 'src/composables/auth.composable';
 import useStageComposable from 'src/composables/stage.composable';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useRouterComposable from 'src/composables/router.composable';
+import useStoreComposable from 'src/composables/store.composable';
+const { assemblyIdentifier, stageID } = useStoreComposable();
 
 export default defineComponent({
   setup() {
@@ -48,10 +50,8 @@ export default defineComponent({
       nextScheduledStage,
       isRoutedStageCompleted,
     } = useStageComposable();
-    const { gotoAssemblyHome, assemblyIdentifier, stageID  } =
-      useRouterComposable();
-    const { assembly  } =
-      useAssemblyComposable();
+    const { gotoAssemblyHome } = useRouterComposable();
+    const { assembly } = useAssemblyComposable();
 
     return {
       userid,
@@ -121,12 +121,18 @@ export default defineComponent({
       // this.$router.currentRoute.path
       let url = process.env.ENV_SURVEY_URL as string;
       console.log(url, 'DEBUGGGGG');
+
+      if (!this.assemblyIdentifier || !this.stageID) {
+        throw Error('Error while redirecting to survey');
+        return;
+      }
+
       var re = /:SID:/g;
       var newurl = url.replace(re, SID);
       re = /:USERID:/g;
       newurl = newurl.replace(re, this.userid);
       re = /:STAGEID:/g;
-      newurl = newurl.replace(re, this.stageID);
+      newurl = newurl.replace(re, `${this.stageID}`);
       re = /:ASSEMBLYIDENTIFIER:/g;
       newurl = newurl.replace(re, this.assemblyIdentifier);
       window.location.href = newurl;
