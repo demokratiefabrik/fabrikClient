@@ -15,20 +15,15 @@
       hovercraft: stage_accessible,
       'bg-blue-1': stage == nextScheduledStage,
     }"
-    @click="stage_accessible && gotoStage(stage)"
+    @click="stage_accessible && $emit('goto-stage', stage)"
   >
-
     <q-tooltip max-width="300px" v-if="stage_scheduled && !stage_accessible">
       {{ $t('menu.items.locked.tooltip') }}
     </q-tooltip>
 
     <q-item-section avatar top middle class="q-pt-sm">
       <q-icon v-if="!stage_scheduled" color="green" name="mdi-check-bold" />
-      <q-icon
-        v-if="stage == nextScheduledStage"
-        color="blue"
-        name="mdi-bell"
-      />
+      <q-icon v-if="stage == nextScheduledStage" color="blue" name="mdi-bell" />
       <q-icon
         v-if="stage_scheduled && !stage_accessible"
         color="orange"
@@ -58,21 +53,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import useStageComposable from 'src/composables/stage.composable';
 import { mapGetters } from 'vuex';
-import useAssemblyComposable from 'src/composables/assembly.composable';
 
 export default defineComponent({
-  setup() {
-    const { gotoStage } = useAssemblyComposable('');
-    const { nextScheduledStage } = useStageComposable();
-    return {
-      nextScheduledStage,
-      gotoStage,
-    };
-  },
+  emits: ['goto-stage'],
   name: 'TOCSubItem',
-  props: ['stage'],
+  props: ['stage', 'nextScheduledStage'],
   computed: {
     ...mapGetters('assemblystore', [
       'is_stage_alerted',

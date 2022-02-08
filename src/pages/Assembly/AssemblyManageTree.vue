@@ -33,12 +33,14 @@ import DefaultDiscussionBlock from 'src/pages/ContentTree/components/DefaultDisc
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import useStageComposable from 'src/composables/stage.composable';
 import useContenttreeComposable from 'src/composables/contenttree.composable';
+import useRouterComposable from 'src/composables/router.composable';
 // const {  } = useContenttreeComposable();
 export default defineComponent({
   setup() {
-    const { ready, gotoAssemblyManage, assembly } = useAssemblyComposable('');
-    const { contenttree } = useContenttreeComposable();
+    const { assembly } = useAssemblyComposable();
+    const { contenttree, ready } = useContenttreeComposable();
     const { routed_stage } = useStageComposable();
+    const {gotoAssemblyManage} = useRouterComposable()
     return { ready, routed_stage, gotoAssemblyManage, contenttree, assembly };
   },
   name: 'VAATopics',

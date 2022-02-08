@@ -140,7 +140,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, Ref } from 'vue';
 // import { RouteRecordRaw, LocationAsRelativeRaw} from 'vue-router';
 // import AssemblyMixin from 'src/mixins/assembly';
 // import DefaultDiscussionBlock from 'src/pages/ContentTree/components/DefaultDiscussionBlock';
@@ -174,7 +174,7 @@ export default defineComponent({
       loaded,
       store,
       // contenttree,
-      assembly_sorted_stages: assembly_sorted_stages as IStageTuple[],
+      assembly_sorted_stages: assembly_sorted_stages as Ref<IStageTuple[]>,
       userid,
     };
   },
@@ -202,9 +202,7 @@ export default defineComponent({
   },
 
   components: {
-    // ArtificialModeration,
     SideMenu,
-    // DefaultDiscussionBlock,
     StageEditor,
     AssemblyEditor,
   },

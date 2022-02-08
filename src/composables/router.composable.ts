@@ -56,6 +56,51 @@ export default function useRouterComposable() {
       pushR({ name: 'home' } as RouteLocationRaw);
     };
 
+    
+    const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
+
+      return {
+        name: assembly.type,
+        params: { assemblyIdentifier: assembly.identifier },
+      } as RouteLocationRaw;
+    };
+
+    const getAssemblyManageRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
+
+      return {
+        name: 'assembly_manage',
+        params: { assemblyIdentifier: assembly.identifier },
+      } as RouteLocationRaw;
+    };
+
+    const gotoAssemblyHome = (assembly) => {
+      const route = getAssemblyHomeRoute(assembly);
+      pushR(route);
+    };
+
+    const gotoAssemblyManage = (assembly) => {
+      const route = getAssemblyManageRoute(assembly);
+      pushR(route);
+    };
+
+    // const clickBackToAssemblyListButton = (): void => {
+    //   // setAssemblyIdentifier(null);
+    //   pushR({ name: 'assemblies' });
+    // };
+
+
+    
+
     const gotoProfile = () => {
       pushR({ name: 'profile' } as RouteLocationRaw);
     };
@@ -98,6 +143,12 @@ export default function useRouterComposable() {
       setAssemblyIdentifier,
       setStageID,
       setLastRoute,
+      // gotoStage,
+      // clickBackToAssemblyListButton,
+      gotoAssemblyManage,
+      gotoAssemblyHome,
+      getAssemblyHomeRoute,
+      getAssemblyManageRoute,  
       instanceNr,
       lastRouteString,
       assemblyIdentifier,

@@ -18,7 +18,13 @@
         v-for="(item, index) in assemblyMenuItems"
         :key="index"
         :index="index"
-        v-on:toggle-expand-state="item.manual_expanded = !item.manual_expanded"
+        :nextScheduledStage="nextScheduledStage"
+        :groupsAccessible="groupsAccessible"
+        :groupsScheduled="groupsScheduled"
+        :stages_by_groups="stages_by_groups"
+        v-on:expand-stage-group="expandStageGroup($event)"
+        v-on:goto-stage-group="gotoStageGroup($event)"
+        v-on:goto-stage="gotoStage($event)"
         :item="item"
       />
     </template>
@@ -27,7 +33,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import useAssemblyComposable from 'src/composables/assembly.composable';
+import { useRouter } from 'vue-router';
+// import useAssemblyComposable from 'src/composables/assembly.composable';
 import TOCItem from './TOCItem.vue';
 import AMs from 'src/pages/Assembly/ArtificialModeration';
 
@@ -38,10 +45,15 @@ import useLibraryComposable from 'src/utils/library';
 
 export default defineComponent({
   setup() {
+    const { push } = useRouter();
     const { loaded } = useLibraryComposable();
-    const { assembly, assemblyMenuData, gotoStage } = useAssemblyComposable();
+    // const { assembly, assemblyMenuData } = useAssemblyComposable();
     const {
       groupsScheduled,
+      gotoStage,
+      assembly,
+      assemblyMenuData,
+      groupsAccessible,
       stages_by_groups,
       nextScheduledStage,
     } = useStageComposable();
@@ -51,6 +63,8 @@ export default defineComponent({
       groupsScheduled,
       assembly,
       loaded,
+      push,
+      groupsAccessible,
       nextScheduledStage,
       gotoStage,
       stages_by_groups,
@@ -76,17 +90,31 @@ export default defineComponent({
 
     nextScheduledStageGroup(): null | IStageGroup {
       const group = this.nextScheduledStage?.stage.group;
-      if (!group) {
+      if (!group || !this.assemblyMenuData) {
         return null;
       }
 
-      console.log('DEBUG; ', group, this.assemblyMenuData);
+      // console.log('DEBUG; ', group, this.assemblyMenuData);
       return this.assemblyMenuData[group];
     },
 
     assemblyMenuItems(): IStageGroup[] {
+      if (!this.assemblyMenuData) {
+        return [];
+      }
       return Object.values(this.assemblyMenuData);
     },
+  },
+
+  methods: {
+    gotoStageGroup(item: IStageGroup) {
+      // console.log('ddddddddddddddd')
+      this.push(item.to());
+    },
+
+    expandStageGroup(item) {
+      item.manual_expanded = !item.manual_expanded
+    }
   },
 });
 </script>

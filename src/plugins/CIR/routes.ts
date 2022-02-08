@@ -5,7 +5,7 @@ const routes: RouteRecordRaw[] = [
 
   {
     name: 'AssemblyHome_CIR',
-    path: '/:assemblyIdentifier/cir/',
+    path: '/:assemblyIdentifier/CIR/',
     component: () => import('/src/plugins/CIR/Layout.vue'),
     children: [
       {

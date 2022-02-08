@@ -16,13 +16,13 @@ const { userid } = usePKCEComposable();
 const emitter = useEmitter();
 const { loaded } = useLibraryComposable();
 
-let output: null | any = null;
+// let output: null | any = null;
 
 const assemblyMenuData = ref<Record<string, IStageGroup> | null>(null);
 const assemblyType = ref<string | null>(null);
 
 export default function useAssemblyComposable(caller = '') {
-  const setup = () => {
+  // const setup = () => {
     console.log('DEBUG: useAssemblyComposable::SETUP', caller);
     const store = useStore();
 
@@ -184,52 +184,6 @@ export default function useAssemblyComposable(caller = '') {
       }, intervall * 1000);
     };
 
-    const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
-      if (!assembly) {
-        return {
-          name: 'home',
-        } as RouteLocationRaw;
-      }
-
-      return {
-        name: assembly.type,
-        params: { assemblyIdentifier: assembly.identifier },
-      } as RouteLocationRaw;
-    };
-
-    const getAssemblyManageRoute = (assembly): RouteLocationRaw => {
-      if (!assembly) {
-        return {
-          name: 'home',
-        } as RouteLocationRaw;
-      }
-
-      return {
-        name: 'assembly_manage',
-        params: { assemblyIdentifier: assembly.identifier },
-      } as RouteLocationRaw;
-    };
-
-    const gotoAssemblyHome = (assembly) => {
-      const route = getAssemblyHomeRoute(assembly);
-      pushR(route);
-    };
-
-    const gotoAssemblyManage = (assembly) => {
-      const route = getAssemblyManageRoute(assembly);
-      pushR(route);
-    };
-
-    const clickBackToAssemblyListButton = (): void => {
-      // setAssemblyIdentifier(null);
-      push({ name: 'assemblies' });
-    };
-
-    const gotoStage = (stage): void => {
-      console.assert(stage);
-      push(getStageRoute(stage));
-    };
-
     const getStageRoute = (stage): RouteLocationRaw => {
       console.assert(stage);
       const params = {
@@ -245,6 +199,11 @@ export default function useAssemblyComposable(caller = '') {
       };
     };
 
+    const gotoStage = (stage): void => {
+      console.assert(stage);
+      pushR(getStageRoute(stage));
+    };
+    
     const gotoNextStageNr = (stage): void => {
       console.assert(stage);
       // console.log('gotoNextStageNr');
@@ -361,12 +320,12 @@ export default function useAssemblyComposable(caller = '') {
 
       // All other functions
       syncUserAssembly,
-      gotoAssemblyHome,
+      // gotoAssemblyHome,
       initialize,
       gotoDefaultStageTeaser,
-      gotoAssemblyManage,
+      // gotoAssemblyManage,
       getDailyContributionLimits,
-      clickBackToAssemblyListButton,
+      // clickBackToAssemblyListButton,
       gotoNextStageNr,
       gotoStage,
 
@@ -376,13 +335,13 @@ export default function useAssemblyComposable(caller = '') {
       assemblyMenuData,
       assemblyType,
     };
-  };
+  // };
 
-  if (output === null) {
-    output = setup();
-  }
+  // if (output === null) {
+  //   output = setup();
+  // }
 
-  return output;
+  // return output;
 }
 // }
 

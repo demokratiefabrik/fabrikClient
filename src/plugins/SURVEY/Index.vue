@@ -33,6 +33,7 @@ import { useI18n } from 'vue-i18n';
 import useAuthComposable from 'src/composables/auth.composable';
 import useStageComposable from 'src/composables/stage.composable';
 import useAssemblyComposable from 'src/composables/assembly.composable';
+import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
   setup() {
@@ -47,8 +48,10 @@ export default defineComponent({
       nextScheduledStage,
       isRoutedStageCompleted,
     } = useStageComposable();
-    const { gotoAssemblyHome, assemblyIdentifier, assembly, stageID } =
-      useAssemblyComposable('');
+    const { gotoAssemblyHome, assemblyIdentifier, stageID  } =
+      useRouterComposable();
+    const { assembly  } =
+      useAssemblyComposable();
 
     return {
       userid,

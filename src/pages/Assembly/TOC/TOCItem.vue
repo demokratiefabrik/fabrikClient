@@ -74,7 +74,9 @@
     <q-list v-if="expanded && subStages.length" class="q-pb-lg">
       <TOCSubItem
         v-for="stage in subStages"
+        v-on:goto-stage="$emit('goto-stage',$event)"
         :key="(stage as any).stage.id"
+        :nextScheduledStage="nextScheduledStage"
         :stage="stage"
       />
     </q-list>
@@ -83,36 +85,25 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 import TOCSubItem from './TOCSubItem.vue';
-import useStageComposable from 'src/composables/stage.composable';
+// import useStageComposable from 'src/composables/stage.composable';
 import { IStageTuple } from 'src/models/stage';
 
 export default defineComponent({
-  setup() {
-    const { push } = useRouter();
-    const {
-      nextScheduledStage,
-      groupsAccessible,
-      groupsScheduled,
-      stages_by_groups,
-    } = useStageComposable();
-
-    return {
-      groupsScheduled,
-      groupsAccessible,
-      nextScheduledStage,
-      stages_by_groups,
-      push
-    };
-  },
   name: 'AssemblyTOCItem',
-  props: ['item', 'index'],
+  emits: ['goto-stage', 'expand-stage-group', 'goto-stage-group'],
+  props: [
+    'item',
+    'index',
+    'nextScheduledStage',
+    'groupsAccessible',
+    'groupsScheduled',
+    'stages_by_groups',
+  ],
   components: { TOCSubItem },
 
   computed: {
-    
-
     subStages(): IStageTuple[] {
       if (!this.stages_by_groups) {
         return [];
@@ -160,11 +151,11 @@ export default defineComponent({
   methods: {
     clickItem(): void {
       if (this.item.expandable) {
-        this.$emit('toggle-expand-state');
+        this.$emit('expand-stage-group', this.item);
       } else {
         // move to next stage
         if (!this.isDisabled && !this.expanded) {
-          this.push(this.item.to());
+          this.$emit('goto-stage-group', this.item);
         }
       }
     },

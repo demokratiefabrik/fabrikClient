@@ -83,6 +83,7 @@ import { ISideMenuItem, ISideMenuItems } from 'src/models/layout';
 import { IArtificialModerationGroup } from 'src/pages/components/artificial_moderation/model';
 import useAssemblyComposable from 'src/composables/assembly.composable';
 import { mapGetters } from 'vuex';
+import useRouterComposable from 'src/composables/router.composable';
 
 export default defineComponent({
   setup() {
@@ -93,11 +94,13 @@ export default defineComponent({
       isFirstText,
       isRoutedStageAlerted,
       markUnAlert,
+      gotoStage,
+      // assembly,
       nextScheduledStage,
     } = useStageComposable();
     const { contenttree, filter_entries } = useContenttreeComposable();
-    const { gotoAssemblyHome, gotoStage, assembly } = useAssemblyComposable();
-
+    const { assembly } = useAssemblyComposable();
+    const {gotoAssemblyHome} = useRouterComposable();
     const emitter = useEmitter();
 
     // extend i18n
