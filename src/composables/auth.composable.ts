@@ -198,7 +198,7 @@ export default function useAuthComposable() {
     // PROFILE METHODS
     // ------------------------
     const profile = computed(() => {
-      return store.state.profilestore.profile.user;
+      return store.state.profilestore?.profile?.user;
     });
 
     const getUsername = (profile) => (profile ? profile.U : 'Anonymous');

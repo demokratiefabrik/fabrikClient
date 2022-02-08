@@ -75,7 +75,7 @@ export default defineComponent({
     };
   },
   computed: {
-    redirecting(): boolean {
+    redirecting(): boolean | null {
       return (
         this.routed_stage && this.check_data && !this.isRoutedStageCompleted
       );
@@ -84,7 +84,7 @@ export default defineComponent({
     check_data(): boolean | null {
       console.log('check survey data..');
 
-      if (this.routed_stage === undefined) {
+      if (!this.routed_stage) {
         return null;
       }
 
@@ -114,7 +114,7 @@ export default defineComponent({
   methods: {
     redirectToSurveyProvider() {
       // all data available
-      const SID = this.routed_stage.stage.custom_data.SID;
+      const SID = this.routed_stage?.stage.custom_data.SID;
       // this.$router.currentRoute.path
       let url = process.env.ENV_SURVEY_URL as string;
       console.log(url, 'DEBUGGGGG');
@@ -137,7 +137,6 @@ export default defineComponent({
     if (!this.isRoutedStageCompleted) {
       if (this.is_a_survey_response) {
         // Seems to be a survey response: survey is finished...
-        console.log('aooos')
         this.markCompleted();
       } else {
         this.redirectToSurveyProvider();

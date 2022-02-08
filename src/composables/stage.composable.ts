@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import usePKCEComposable from 'src/plugins/VueOAuth2PKCE/pkce.composable';
 import useMonitorComposable from './monitor.composable';
 import constants from 'src/utils/constants';
@@ -10,16 +10,17 @@ import useLibraryComposable from 'src/utils/library';
 import { IStageTuple } from 'src/models/stage';
 import { IAssemblyTuple } from 'src/models/assembly';
 
-const output = ref<null | any>(null);
+// const output = ref<null | any>(null);
+
+const emitter = useEmitter();
+const { loaded } = useLibraryComposable();
+const { userid } = usePKCEComposable();
 
 export default function useStageComposable() {
-  const setup = () => {
+  // const setup = () => {
     console.log('DEBUG: useStageComposable::SETUP');
-
     const store = useStore();
-    const emitter = useEmitter();
-    const { loaded } = useLibraryComposable();
-    const { userid } = usePKCEComposable();
+
     const { gotoAssemblyHome, stageID, gotoStage } =
       useAssemblyComposable('stage.comp');
     const { monitorLog } = useMonitorComposable();
@@ -246,13 +247,19 @@ export default function useStageComposable() {
       return groups;
     });
 
+    const testGroupsScheduled = computed((): any => {
+      return assembly_scheduled_stages.value
+    })
+
     const groupsScheduled = computed((): string[] | undefined => {
+      console.log('DEBUGGER, ', assembly_scheduled_stages.value)
       if (!assembly_scheduled_stages.value) {
         return;
       }
       const groups = assembly_scheduled_stages.value.map(
         (stage) => stage.stage.group
       );
+      console.log('DEBUGGER, ', assembly_scheduled_stages.value, groups)
       return groups;
     });
 
@@ -323,6 +330,7 @@ export default function useStageComposable() {
       markCompleted,
       routedStageGroup,
       groups,
+      testGroupsScheduled,
       nextScheduledStage,
       groupsScheduled,
       groupsAccessible,
@@ -333,13 +341,13 @@ export default function useStageComposable() {
       isRoutedStageCompleted,
       isRoutedStageAlerted,
     };
-  };
+  // };
 
-  if (output.value === null) {
-    output.value = setup();
-  }
+  // if (output.value === null) {
+  //   output.value = setup();
+  // }
 
-  return output.value;
+  // return output.value;
 }
 
 //     /**

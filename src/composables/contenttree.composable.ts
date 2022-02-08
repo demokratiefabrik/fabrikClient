@@ -16,26 +16,27 @@ import useStageComposable from './stage.composable';
 import { INodeTuple } from 'src/models/content';
 
 
+const emitter = useEmitter();
+const { loaded, pushSorted} = useLibraryComposable();
 
 export default function useContenttreeComposable() {
   console.log('DEBUG: useContenttreeComposable::SETUP')
   const store = useStore();
-  const emitter = useEmitter();
   // const { gotoAssemblyHome } = useAssemblyComposable('');
-  const { loaded, pushSorted} = useLibraryComposable();
   const { monitorLog } = useMonitorComposable();
+  
   const { routed_stage } = useStageComposable();
-  const get_contenttree = store.getters['contenttreestore/get_contenttree']
 
+    // TODO: extract runtime Store to own composable. (Saves Resources, I gues...)
   const contenttreeID = computed(() => {
     // Mixin is only usable for pages with assemblyIdentifier in the URL
 
-    if (!routed_stage || !routed_stage.stage?.contenttree_id) {
+    if (!routed_stage || !routed_stage.value?.stage?.contenttree_id) {
       console.log(' routed_stage not loaded');
       return null;
     }
     // console.log('contenttreeID', routed_stage.value.stage?.contenttree_id);
-    return routed_stage.stage?.contenttree_id;
+    return routed_stage.value.stage?.contenttree_id;
   });
 
   const contenttree = computed(() => {
@@ -44,13 +45,12 @@ export default function useContenttreeComposable() {
     }
 
     // retrieve from localStorage
+    console.log('TODO: does this get_contenttree getter work?')
+    const get_contenttree = store.getters['contenttreestore/get_contenttree']
     const contenttree = get_contenttree ({
       contenttreeID: contenttreeID.value
     });
     console.log('load contenttree in contentree.computed', contenttreeID.value);
-
-
-    console.log('contenttree l', contenttree);
     return contenttree;
   });
 
@@ -124,9 +124,6 @@ export default function useContenttreeComposable() {
     return Object.values(unrated_children).length;
   });
 
-  // ...mapGetters({
-  //   get_contenttree: 'contenttreestore/get_contenttree'
-  // })
 
   /** Filter nodes by type (positive list) */
   const filter_entries = (nodes, TYPES): INodeTuple[] | null => {

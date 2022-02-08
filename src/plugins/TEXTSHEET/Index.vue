@@ -195,8 +195,8 @@ export default defineComponent({
     },
 
     AM_index_bottom(): IArtificialModerationGroup {
-      console.log('CONSENT REQUEST...', this.routed_stage.stage.custom_data);
-      if (this.routed_stage.stage.custom_data?.REQUEST_CONSENT) {
+      console.log('CONSENT REQUEST...', this.routed_stage?.stage.custom_data);
+      if (this.routed_stage?.stage.custom_data?.REQUEST_CONSENT) {
         console.log('CONSENT REQUEST...!!');
         return this.index_bottom_with_request_for_consent;
       } else {

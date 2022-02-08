@@ -13,6 +13,8 @@ import { IContributionLimits } from 'src/models/layout';
 
 const oauthEmitter = useOAuthEmitter();
 const { userid } = usePKCEComposable();
+const emitter = useEmitter();
+const { loaded } = useLibraryComposable();
 
 let output: null | any = null;
 
@@ -24,41 +26,6 @@ export default function useAssemblyComposable(caller = '') {
     console.log('DEBUG: useAssemblyComposable::SETUP', caller);
     const store = useStore();
 
-    // REturn the composabe Function of the currently active assembly plugin.
-    // return null, if no funciton is available...
-    // const pluginComposableFunction = computed(() => {
-
-    //   // console.log('AASSSSEMBLY?', assembly, assemblyIdentifier)
-
-    //   // const type = assembly?.value?.type;
-    //   // console.log('LOAD PLUGIN COMPOS BY ASSEMBLY TYPE', type);
-    //   // if (type) {
-    //   //   // const app = getCurrentInstance(); // works
-    //   //   // TODO: DOES THIS WORK?
-
-    //   //   // const pluginComposables =
-    //   //   //   app?.appContext.config.globalProperties.$pluginComposables;
-    //   //   // if (pluginComposables) {
-    //   //   //   if (Object.keys(pluginComposables).includes(type)) {
-    //   //   //     return pluginComposables[type];
-    //   //   //   }
-    //   //   // }
-    //   // }
-
-    //   return null;
-    // });
-
-    // LOAD PLUGIN COMPOSABLE FUNCTION
-    // const assemblyMenu = computed((): null | any => {
-    //   if (pluginComposableFunction.value) {
-    //     const { assemblyMenu } = pluginComposableFunction.value();
-    //     return assemblyMenu;
-    //   }
-
-    //   return null;
-    // });
-
-    const emitter = useEmitter();
     const {
       pushR,
       assemblyIdentifier,
@@ -67,7 +34,6 @@ export default function useAssemblyComposable(caller = '') {
       clearSession,
       setStageID,
     } = useRouterComposable();
-    const { loaded } = useLibraryComposable();
     const { push } = useRouter();
 
     const get_stage_number_by_stage_id =
@@ -98,84 +64,11 @@ export default function useAssemblyComposable(caller = '') {
     );
 
     const showAssemblyMenu = computed(
-      (): boolean => 
+      (): boolean =>
         !!assemblyType.value &&
         !currentRouteMeta.value?.hideAssemblyMenu &&
         !IsManager.value
     );
-
-    const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
-      if (!assembly) {
-        return {
-          name: 'home',
-        } as RouteLocationRaw;
-      }
-
-      return {
-        name: assembly.type,
-        params: { assemblyIdentifier: assembly.identifier },
-      } as RouteLocationRaw;
-    };
-
-    const getAssemblyManageRoute = (assembly): RouteLocationRaw => {
-      if (!assembly) {
-        return {
-          name: 'home',
-        } as RouteLocationRaw;
-      }
-
-      return {
-        name: 'assembly_manage',
-        params: { assemblyIdentifier: assembly.identifier },
-      } as RouteLocationRaw;
-    };
-
-    const syncPublicAssembly = () => {
-      // console.log('syncAssembliesSync...')
-      // sync public assembly...
-      store.dispatch('publicindexstore/syncPublicIndex');
-    };
-
-    const syncUserAssembly = () => {
-      console.log(
-        'syncAssembliesSync...',
-        assemblyIdentifier.value,
-        userid.value
-      );
-      // sync public assembly...
-      if (assemblyIdentifier.value && userid.value) {
-        console.log('syncAssembliesSync...II');
-        store.dispatch('assemblystore/syncAssembly', {
-          oauthUserID: userid.value,
-          assemblyIdentifier: assemblyIdentifier.value,
-        });
-      }
-    };
-
-    const setSyncIntervall = () => {
-      // CREATE INTERVALL TO KEEP IN SYNC ASSEMBLY
-      const intervallString: string = process.env
-        .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
-        ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
-        : '60';
-      const intervall = (parseInt(intervallString) + 5) * 1000;
-      // console.log(intervall);
-      setInterval(() => {
-        // INTERVALL SYNC
-        syncPublicAssembly();
-        syncUserAssembly();
-      }, intervall);
-    };
-
-    const gotoAssemblyHome = (assembly) => {
-      const route = getAssemblyHomeRoute(assembly);
-      pushR(route);
-    };
-
-    const gotoAssemblyManage = (assembly) => {
-      const route = getAssemblyManageRoute(assembly);
-      pushR(route);
-    };
 
     const stage_nr_last_visited: Ref<number | null> = computed({
       get() {
@@ -260,20 +153,97 @@ export default function useAssemblyComposable(caller = '') {
       return limitReached;
     });
 
+    const syncPublicAssembly = () => {
+      // sync public assembly...
+      store.dispatch('publicindexstore/syncPublicIndex');
+    };
+
+    const syncUserAssembly = () => {
+      // sync public assembly...
+      if (assemblyIdentifier.value && userid.value) {
+        console.log('syncAssembliesSync...');
+        store.dispatch('assemblystore/syncAssembly', {
+          oauthUserID: userid.value,
+          assemblyIdentifier: assemblyIdentifier.value,
+        });
+      }
+    };
+
+    const setSyncIntervall = () => {
+      // CREATE INTERVALL TO KEEP IN SYNC ASSEMBLY
+      const intervallString: string = process.env
+        .ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+        ? process.env.ENV_APISERVER_MONITOR_INTERVAL_SECONDS
+        : '60';
+      const intervall = (parseInt(intervallString) + 5) * 1000;
+      // console.log(intervall);
+      setInterval(() => {
+        // INTERVALL SYNC
+        syncPublicAssembly();
+        syncUserAssembly();
+      }, intervall * 1000);
+    };
+
+    const getAssemblyHomeRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
+
+      return {
+        name: assembly.type,
+        params: { assemblyIdentifier: assembly.identifier },
+      } as RouteLocationRaw;
+    };
+
+    const getAssemblyManageRoute = (assembly): RouteLocationRaw => {
+      if (!assembly) {
+        return {
+          name: 'home',
+        } as RouteLocationRaw;
+      }
+
+      return {
+        name: 'assembly_manage',
+        params: { assemblyIdentifier: assembly.identifier },
+      } as RouteLocationRaw;
+    };
+
+    const gotoAssemblyHome = (assembly) => {
+      const route = getAssemblyHomeRoute(assembly);
+      pushR(route);
+    };
+
+    const gotoAssemblyManage = (assembly) => {
+      const route = getAssemblyManageRoute(assembly);
+      pushR(route);
+    };
+
     const clickBackToAssemblyListButton = (): void => {
       // setAssemblyIdentifier(null);
       push({ name: 'assemblies' });
     };
 
-    // const stageTransition = (newVal, oldVal) => {
-    //   // this.scrollToStage()
-    // }
-    //
-    // const laggedScrollToStage = () => {
-    //   setTimeout(() => {
-    //     scrollToStage();
-    //   }, 200);
-    // };
+    const gotoStage = (stage): void => {
+      console.assert(stage);
+      push(getStageRoute(stage));
+    };
+
+    const getStageRoute = (stage): RouteLocationRaw => {
+      console.assert(stage);
+      const params = {
+        assemblyIdentifier: assemblyIdentifier.value,
+        assemblyType: assemblyType.value,
+        stageID: stage.stage.id,
+        contenttreeID: stage.stage.contenttree_id,
+      };
+
+      return {
+        name: stage.stage.type,
+        params,
+      };
+    };
 
     const gotoNextStageNr = (stage): void => {
       console.assert(stage);
@@ -296,26 +266,6 @@ export default function useAssemblyComposable(caller = '') {
         stage_nr_last_visited.value = get_stage_number_by_stage(nextStage);
         // console.log(stage_nr_last_visited.value, 'new stage');
       }
-    };
-
-    const gotoStage = (stage): void => {
-      console.assert(stage);
-      push(getStageRoute(stage));
-    };
-
-    const getStageRoute = (stage): RouteLocationRaw => {
-      console.assert(stage);
-      const params = {
-        assemblyIdentifier: assemblyIdentifier.value,
-        assemblyType: assemblyType.value,
-        stageID: stage.stage.id,
-        contenttreeID: stage.stage.contenttree_id,
-      };
-
-      return {
-        name: stage.stage.type,
-        params,
-      };
     };
 
     // TODO: what is that for?
@@ -435,6 +385,16 @@ export default function useAssemblyComposable(caller = '') {
   return output;
 }
 // }
+
+// const stageTransition = (newVal, oldVal) => {
+//   // this.scrollToStage()
+// }
+//
+// const laggedScrollToStage = () => {
+//   setTimeout(() => {
+//     scrollToStage();
+//   }, 200);
+// };
 
 //     /**
 //      * Clear all the data, that is linked to a certain user. => performed at logout

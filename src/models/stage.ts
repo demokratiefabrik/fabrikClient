@@ -13,7 +13,7 @@ export interface IStage {
     group: string;
     type: string;
     info: string;
-    
+    custom_data: any;
     id: number;
 
 }

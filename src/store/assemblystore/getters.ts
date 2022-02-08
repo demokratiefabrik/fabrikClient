@@ -1,4 +1,5 @@
-import { date } from 'quasar';
+// import { date } from 'quasar';
+// const { isSameDate } = date;
 import useRouterComposable from 'src/composables/router.composable';
 import {
   IAssembly,
@@ -7,8 +8,7 @@ import {
   IAssemblyTuple,
 } from 'src/models/assembly';
 import { IStage, IStageTuple } from 'src/models/stage';
-const { isSameDate } = date;
-1;
+
 export const assemblies = (state): IAssemblyTuple[] | null => {
   // const { assemblyIdentifier } = useRouterComposable();
   return Object.values(state.assemblydata);
@@ -196,15 +196,18 @@ export const stageMilestoneWeigths = (
   return weights;
 };
 
-export const stageMilestonesCompleted = (state, getters): boolean => {
+export const stageMilestonesCompleted = (_state, getters): boolean => {
   // Every user needs to archieve 10 milestones weights for each stage a day.
   const milestones = getters.stageMilestones;
-  console.assert(milestones !== null);
+  if(!milestones) {
+    return false
+  }
   const weights = milestones.reduce((n, milestone) => n + milestone.weight, 0);
   // console.log(weights, "weights")
   return weights >= 12;
 };
 
+// TODO: rename to routedStage
 export const stage = (_state, getters) => {
   const stages = getters.assemblyStages;
 
@@ -432,23 +435,23 @@ export const is_stage_alerted =
     return !stage.progression || stage.progression.alerted;
   };
 
-export const is_stage_idle =
-  (_state, getters) =>
-  (stage): boolean => {
-    console.assert(stage);
-    return (
-      !getters.is_stage_scheduled(stage) &&
-      !getters.is_stage_completed(stage) &&
-      !getters.is_stage_disabled(stage)
-    );
-  };
+// export const is_stage_idle =
+//   (_state, getters) =>
+//   (stage): boolean => {
+//     console.assert(stage);
+//     return (
+//       !getters.is_stage_scheduled(stage) &&
+//       !getters.is_stage_completed(stage) &&
+//       !getters.is_stage_disabled(stage)
+//     );
+//   };
 
-export const is_stage_skipped =
-  () =>
-  (stage): boolean => {
-    console.assert(stage);
-    return stage.progression?.skipped;
-  };
+// export const is_stage_skipped =
+//   () =>
+//   (stage): boolean => {
+//     console.assert(stage);
+//     return stage.progression?.skipped;
+//   };
 
 export const is_stage_disabled =
   () =>
@@ -472,16 +475,16 @@ export const is_stage_accessible =
     return accessible_stage_ids?.includes(stage.stage.id);
   };
 
-export const is_stage_done =
-  (_state, getters) =>
-  (stage): boolean => {
-    return (
-      getters.is_stage_accessible(stage) || getters.is_stage_completed(stage)
-    );
-  };
+// export const is_stage_done =
+//   (_state, getters) =>
+//   (stage): boolean => {
+//     return (
+//       getters.is_stage_accessible(stage) || getters.is_stage_completed(stage)
+//     );
+//   };
 
-export const is_first_day =
-  () =>
-  (stage): boolean => {
-    return isSameDate(stage.progression.date_created, Date.now(), 'day');
-  };
+// export const is_first_day =
+//   () =>
+//   (stage): boolean => {
+//     return isSameDate(stage.progression.date_created, Date.now(), 'day');
+//   };

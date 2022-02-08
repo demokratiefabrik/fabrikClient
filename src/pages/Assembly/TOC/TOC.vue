@@ -40,8 +40,11 @@ export default defineComponent({
   setup() {
     const { loaded } = useLibraryComposable();
     const { assembly, assemblyMenuData, gotoStage } = useAssemblyComposable();
-    const { groupsScheduled, stages_by_groups, nextScheduledStage } =
-      useStageComposable();
+    const {
+      groupsScheduled,
+      stages_by_groups,
+      nextScheduledStage,
+    } = useStageComposable();
 
     return {
       assemblyMenuData,

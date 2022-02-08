@@ -26,7 +26,7 @@ export default function useCIRComposable() {
         icon: 'mdi-information-outline',
         tooltip: 'Sie finden hier das Demokratiefabrik-Programm.',
         expanded: (item) =>
-          nextScheduledStage?.stage.group == 'preparation' ||
+          nextScheduledStage?.value?.stage.group == 'preparation' ||
           item.manual_expanded,
         expandable: true,
         manual_expanded: false,

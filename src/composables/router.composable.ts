@@ -6,9 +6,11 @@ import { ref, computed } from 'vue';
 
 const emitter = useEmitter();
 const instanceNr = ref<number>(0);
-const assemblyIdentifier = ref<string | null>(null);
 const lastRouteString = ref<RouteLocationRaw | null>(null); // the last visited url 
 const currentRouteString = ref<RouteLocationRaw | null>(null); // the last visited url 
+
+// TODO: rename to routedAssemblyIdentifier / routedStageID
+const assemblyIdentifier = ref<string | null>(null);
 const stageID = ref<number | null>(null);
 
 let output: null | any = null;
@@ -19,15 +21,6 @@ export default function useRouterComposable() {
 
     const router = useRouter();
     const currentRoute = useRoute();
-    
-
-    
-    /* Reset Notifications when routing...Ensure that all (error) messages disappear, when route changes.. */
-    // TODO: assure that this is only run once...
-    // watch(currentRoute, (_to, from) => {
-    //     lastRoute.value = from
-    //     // console.log(lastRoute, 'ROUTE CHANGED....')
-    // })
 
     // to enforce reload of page container!
     const reload = () => {
@@ -70,7 +63,6 @@ export default function useRouterComposable() {
     const currentRouteMeta = computed(
       () => currentRoute?.meta
     );
-
 
     const setLastRoute = (route: RouteLocationNormalizedLoaded | null) => {
       
