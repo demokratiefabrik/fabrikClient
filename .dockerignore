@@ -1,7 +1,7 @@
 public/storage
 doc
 .vscode
-node_modules
+# node_modules
 .git
 dist
 package.lock.json

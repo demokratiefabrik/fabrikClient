@@ -60,7 +60,6 @@ const pushSorted = (children, toAdd): any[] => {
 const getOffsetTop = (element: HTMLElement) => {
   let offsetTop = 0;
   let el: HTMLElement | null = element
-  console.log(element)
   while (el) {
     offsetTop += el.offsetTop;
     if (el.offsetParent) {
@@ -90,14 +89,10 @@ const timestamp = (): number => {
 // };
 
 const scrollToAnchor = (anchor, headerOffset, duration = 300, lag = 0) => {
-  // console.log('DEBUG: scrollTOAnchgro', headerOffset, lag, duration)
-
   const dom = document.getElementsByName(anchor);
   const ele = dom?.item(0);
   const scrollFnc = () => {
     // let fixedSelectedItem: HTMLElement | null = anchor;
-    // console.log(anchor)
-    // console.log( getOffsetTop(ele))
     const elOffset = getOffsetTop(ele) - headerOffset;
     setVerticalScrollPosition(window, elOffset, duration);
     // setTimeout(() => (fixedSelectedItem = null), duration);

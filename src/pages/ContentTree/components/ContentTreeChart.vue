@@ -63,7 +63,7 @@ import { defineComponent } from 'vue';
 import ChartBar from 'src/pages/components/charts/ChartBar.vue';
 import ChartRadar from 'src/pages/components/charts/ChartRadar.vue';
 import ChartPie from 'src/pages/components/charts/ChartPie.vue';
-// import useLibraryComposable from 'src/utils/library';
+import library from 'src/utils/library';
 import { INodeTuple } from 'src/models/content';
 
 export default defineComponent({

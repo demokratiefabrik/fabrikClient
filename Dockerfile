@@ -14,9 +14,10 @@ COPY .env.production .env
 
 # build stage
 FROM develop-stage as build-stage
-RUN quasar build
-
+WORKDIR /app
 # production stage
+RUN quasar build
+# RUN node node_modules/quasar-cli/bin/quasar-build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist/spa /usr/share/nginx/html
 

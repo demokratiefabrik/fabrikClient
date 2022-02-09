@@ -17,22 +17,42 @@
           icon="mdi-video-outline"
         >
           <div>
-            <a
-              href="/storage/upload/koeniz2021_walkthrough_de.mp4"
-              style="float: left; padding-right: 15px; margin-bottom: 1em"
-              target="_blank"
-              alt="Könizer Demokratiefabrik Walkthrough Video"
-            >
-              <q-icon name="mdi-video-outline" class="text-grey-9" size="4em" />
-
-              <br />Walkthrough Video (MP4)
-            </a>
-
             <div style="block">
               Sind Sie neugierig, wie die Könizer Demokratiefabrik von Innen
-              ausgesehen hat? Dann laden Sie hier das Walktrhough Video
+              ausgesehen hat? Dann laden Sie hier das Walkthrough-Video
               herunter.
+              <br /><br />
+              <a
+                href="/storage/upload/koeniz2021_walkthrough_de.mp4"
+                style="float: left; padding-right: 15px; margin-bottom: 1em"
+                target="_blank"
+                alt="Könizer Demokratiefabrik Walkthrough Video"
+              >
+                <q-icon
+                  name="mdi-video-outline"
+                  class="text-grey-9"
+                  size="2em"
+                />
+
+                <br />Download (Deutsch)
+              </a>
+
+              <a
+                href="/storage/upload/koeniz2021_walkthrough_en.mp4"
+                style="float: left; padding-right: 15px; margin-bottom: 1em"
+                target="_blank"
+                alt="Könizer Demokratiefabrik Walkthrough Video (English)"
+              >
+                <q-icon
+                  name="mdi-video-outline"
+                  class="text-grey-9"
+                  size="2em"
+                />
+
+                <br />Download (English)
+              </a>
             </div>
+            <br /><br /><br />
           </div>
         </q-timeline-entry>
 
